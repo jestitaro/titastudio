@@ -11,6 +11,7 @@ import { SheetV4 } from "./characters/v4/Sheet";
 import { AnimTestV4 } from "./characters/v4/AnimTest";
 import { S01Headache, S01_DURATION } from "./scenes/S01Headache";
 import { S10AiFred, S10_TEST_DURATION } from "./scenes/S10AiFred";
+import { MotionTest, MOTION_TEST_DURATION } from "./motion-test/MotionTest";
 
 const CharacterSheet: React.FC = () => (
   <AbsoluteFill style={{ background: "#FFFFFF", flexDirection: "row" }}>
@@ -34,6 +35,18 @@ const CharacterSheet: React.FC = () => (
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {(["v1", "v2"] as const).map((version) => (
+        <Composition
+          key={version}
+          id={`MotionTest-${version}`}
+          component={MotionTest}
+          durationInFrames={MOTION_TEST_DURATION}
+          fps={30}
+          width={1920}
+          height={1080}
+          defaultProps={{ version }}
+        />
+      ))}
       <Composition id="S01-Headache" component={S01Headache} durationInFrames={S01_DURATION} fps={30} width={1920} height={1080} defaultProps={{ showSubtitles: true }} />
       <Composition id="S10-AiFred-Test" component={S10AiFred} durationInFrames={S10_TEST_DURATION} fps={30} width={1920} height={1080} defaultProps={{ showSubtitles: true }} />
       <Composition id="V4-AnimTest" component={AnimTestV4} durationInFrames={140} fps={30} width={1920} height={1080} />
