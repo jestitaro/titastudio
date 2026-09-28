@@ -81,42 +81,63 @@ export const optionCenter = (field: Rect, i: number): [number, number] => [
 ];
 
 // ── Selección de productos ──────────────────────────────────────
+// Versión con más aire: filas de 52 px, thumbnails reales, stepper de cantidad.
 export const PRODUCTS_L = {
   titleY: top + 70,
   search: { x: mx + 440, y: top + 62, w: 450, h: 32 } as Rect,
   chip: { x: mx, y: top + 104, w: 84, h: 36 } as Rect,
-  headY: top + 156,
-  rowsY: top + 188,
-  rowH: 36,
-  visibleRows: 14,
-  // Producto, UxB, Pres., PSL, Desc.%, P/Desc.%, info, Cantidad
-  cols: [290, 70, 80, 118, 90, 118, 30, mw - (290 + 70 + 80 + 118 + 90 + 118 + 30)],
-  qtyW: 108,
-  qtyEditW: 52,
+  headY: top + 160,
+  rowsY: top + 192,
+  rowH: 52,
+  visibleRows: 9,
+  // Producto, UxB, Pres., PSL, Desc.%, P/Desc.%, Cantidad
+  cols: [340, 64, 64, 120, 80, 120, mw - (340 + 64 + 64 + 120 + 80 + 120)],
+  stepW: 116,
+  stepH: 30,
+  stepBtn: 28,
   continueBtn: { x: mx + mw - 124, y: bottom - PAD - 32, w: 124, h: 32 } as Rect,
   pagerY: bottom - PAD - 32 - 46,
 };
-const qtyColX = mx + PRODUCTS_L.cols.slice(0, 7).reduce((a, b) => a + b, 0);
-export const qtyInput = (row: number): Rect => ({
-  x: qtyColX + 22,
-  y: PRODUCTS_L.rowsY + row * PRODUCTS_L.rowH + (PRODUCTS_L.rowH - 24) / 2,
-  w: PRODUCTS_L.qtyW,
-  h: 24,
+export const productColX = (i: number) => PRODUCTS_L.cols.slice(0, i).reduce((a, b) => a + b, 0);
+// Stepper de cantidad [− n +] en la fila `row`.
+export const qtyStepper = (row: number): Rect => ({
+  x: mx + productColX(6) + (PRODUCTS_L.cols[6] - PRODUCTS_L.stepW) / 2,
+  y: PRODUCTS_L.rowsY + row * PRODUCTS_L.rowH + (PRODUCTS_L.rowH - PRODUCTS_L.stepH) / 2,
+  w: PRODUCTS_L.stepW,
+  h: PRODUCTS_L.stepH,
 });
-export const qtyCheck = (row: number): [number, number] => {
-  const r = qtyInput(row);
-  return [r.x + PRODUCTS_L.qtyEditW + 16, r.y + r.h / 2];
+export const qtyInputCenter = (row: number): [number, number] => {
+  const r = qtyStepper(row);
+  return [r.x + r.w / 2, r.y + r.h / 2];
+};
+export const qtyPlusCenter = (row: number): [number, number] => {
+  const r = qtyStepper(row);
+  return [r.x + r.w - PRODUCTS_L.stepBtn / 2, r.y + r.h / 2];
 };
 
-// ── Carrito ─────────────────────────────────────────────────────
+// ── Resumen del Pedido (panel lateral inferior derecho) ─────────
+const CPAD = 20;
 export const CART = {
-  innerX: CARD.cart.x + PAD,
-  innerW: CARD.cart.w - PAD * 2,
-  totalY: CARD.cart.y + 28,
-  metaY: CARD.cart.y + 66,
-  itemsY: CARD.cart.y + 100,
-  itemH: 66,
+  innerX: CARD.cart.x + CPAD,
+  innerW: CARD.cart.w - CPAD * 2,
+  titleY: CARD.cart.y + 20,
+  statsY: CARD.cart.y + 56,
+  statsH: 46,
+  itemsY: CARD.cart.y + 118,
+  itemH: 76,
+  footerY: CARD.cart.y + CARD.cart.h - 70,
+  // Geometría interna de cada ítem (relativa a su esquina superior izquierda)
+  item: { thumbW: 40, thumbH: 44, textX: 52, stepY: 44, stepW: 88, stepH: 24, stepBtn: 24, trash: 26 },
 };
+const cartItemTop = (i: number) => CART.itemsY + i * CART.itemH;
+export const cartMinusCenter = (i: number): [number, number] => [
+  CART.innerX + CART.item.textX + CART.item.stepBtn / 2,
+  cartItemTop(i) + CART.item.stepY + CART.item.stepH / 2,
+];
+export const cartTrashCenter = (i: number): [number, number] => [
+  CART.innerX + CART.innerW - CART.item.trash / 2,
+  cartItemTop(i) + 6 + CART.item.trash / 2,
+];
 
 // ── Stepper ─────────────────────────────────────────────────────
 export const STEPPER = {
@@ -134,7 +155,7 @@ export const SUMMARY = {
   info: { x: mx, y: top + 96, w: mw, h: 92 } as Rect,
   headY: top + 206,
   rowsY: top + 232,
-  rowH: 62,
+  rowH: 64,
   rowGap: 10,
   send: { x: mx + mw - 144, y: bottom - PAD - 34, w: 144, h: 34 } as Rect,
 };

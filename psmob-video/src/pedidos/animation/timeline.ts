@@ -26,80 +26,88 @@ export const T = {
 
   // ── Escena 3 · Información general ─────────────────────────────
   formReveal: 372, // stagger de campos
-  cursorToOc: [392, 428] as const,
-  clickOc: 434,
-  typeOc: 444, // 1 carácter cada `typeEvery` frames
-  typeEvery: 4,
-  cursorToClient: [484, 522] as const,
-  clickClient: 530,
-  clientOpen: [532, 548] as const,
-  clientSkeleton: [548, 590] as const,
-  clientOptions: [588, 606] as const,
-  cursorToClientOpt: [604, 642] as const,
-  clickClientOpt: 656,
-  clientClose: [658, 672] as const,
-  branchEnable: [668, 698] as const,
-  cursorToBranch: [688, 722] as const,
-  clickBranch: 732,
-  branchOpen: [734, 750] as const,
-  cursorToBranchOpt: [752, 780] as const,
-  clickBranchOpt: 792,
-  branchClose: [794, 808] as const,
-  saveEnable: [804, 830] as const,
-  cursorToSave: [818, 858] as const,
-  clickSave: 874,
+  cursorToOc: [392, 424] as const,
+  clickOc: 430,
+  typeOc: 438, // 1 carácter cada `typeEvery` frames
+  typeEvery: 3,
+  cursorToClient: [470, 502] as const,
+  clickClient: 508,
+  clientOpen: [510, 524] as const,
+  clientSkeleton: [524, 552] as const,
+  clientOptions: [550, 566] as const,
+  cursorToClientOpt: [562, 594] as const,
+  clickClientOpt: 604,
+  clientClose: [606, 618] as const,
+  branchEnable: [614, 640] as const,
+  cursorToBranch: [630, 658] as const,
+  clickBranch: 666,
+  branchOpen: [668, 682] as const,
+  cursorToBranchOpt: [684, 706] as const,
+  clickBranchOpt: 716,
+  branchClose: [718, 730] as const,
+  saveEnable: [726, 748] as const,
+  cursorToSave: [738, 772] as const,
+  clickSave: 784,
 
   // ── Escena 4 · Selección de productos ──────────────────────────
-  formExit: [876, 900] as const,
-  step1Done: [882, 910] as const,
-  step2Active: [894, 920] as const,
-  productsHeader: [896, 928] as const,
-  cartIn: [904, 944] as const,
-  productsSkeleton: [906, 960] as const,
-  productsRows: 952, // stagger por fila
-  cursorToQtyA: [982, 1024] as const,
-  clickQtyA: 1034,
-  typeA: 1048,
-  cursorToCheckA: [1054, 1080] as const,
-  clickCheckA: 1090,
-  cartUpdateA: [1094, 1136] as const,
-  cursorToQtyB: [1172, 1214] as const,
-  clickQtyB: 1226,
-  typeB: 1240,
-  cursorToCheckB: [1246, 1270] as const,
-  clickCheckB: 1282,
-  cartUpdateB: [1286, 1328] as const,
-  cursorRest: [1300, 1352] as const,
+  // intro
+  formExit: [786, 810] as const,
+  step1Done: [792, 820] as const,
+  step2Active: [804, 830] as const,
+  productsHeader: [806, 838] as const,
+  cartIn: [814, 854] as const,
+  productsSkeleton: [816, 870] as const,
+  productsRows: 862, // stagger por fila
+  // selección: A se tipea (6), B se tipea (5), C sube con "+" (1→3)
+  cursorToQtyA: [876, 912] as const,
+  clickQtyA: 920,
+  typeA: 932,
+  commitA: 946, // la línea entra al Resumen del Pedido
+  cursorToQtyB: [958, 990] as const,
+  clickQtyB: 998,
+  typeB: 1008,
+  commitB: 1022,
+  cursorToPlusC: [1036, 1070] as const,
+  plusC: [1080, 1096, 1112] as const,
 
-  // ── Escena 5 · Validación ──────────────────────────────────────
-  validationDown: [1372, 1410] as const,
-  validationUp: [1472, 1508] as const,
+  // ── Escena 5 · Foco en el Resumen del Pedido (clave de cámara) ──
+  focusIn: [1136, 1214] as const, // enfoque: pan + zoom hacia abajo a la derecha
+  cursorToMinusA: [1186, 1226] as const,
+  minusA: [1238, 1256] as const, // interacción: editar cantidad 6 → 5 → 4
+  cursorToTrashB: [1270, 1304] as const,
+  clickTrashB: 1318, // interacción: eliminar
+  removeB: [1322, 1360] as const, // update: la línea colapsa y el resto sube
+  focusHold: 1394, // fin de la lectura del resultado
+  focusOut: [1394, 1470] as const, // alejamiento: vuelta a pantalla completa
 
   // ── Escena 6 · Continuar ───────────────────────────────────────
-  cursorToContinue: [1508, 1548] as const,
-  clickContinue: 1562,
+  cursorToContinue: [1440, 1486] as const,
+  clickContinue: 1498,
 
   // ── Escena 7 · Resumen ─────────────────────────────────────────
-  step2Done: [1566, 1594] as const,
-  step3Active: [1578, 1604] as const,
-  toSummary: [1566, 1622] as const, // filas de tabla → tarjetas de resumen
-  summaryInfo: [1596, 1640] as const,
-  cursorToSend: [1698, 1750] as const,
-  clickSend: 1766,
+  step2Done: [1502, 1530] as const,
+  step3Active: [1514, 1540] as const,
+  toSummary: [1502, 1558] as const, // filas de tabla → tarjetas de resumen
+  summaryInfo: [1532, 1576] as const,
+  cursorToSend: [1612, 1656] as const,
+  clickSend: 1672,
 
   // ── Escena 8 · Envío ───────────────────────────────────────────
-  sending: [1768, 1808] as const, // ≈ 670 ms
-  toast: [1808, 1832] as const,
+  sending: [1674, 1714] as const, // ≈ 670 ms
+  toast: [1714, 1738] as const,
 
   // ── Escena 9 · Cierre ──────────────────────────────────────────
-  backToList: [1828, 1872] as const, // card de resumen → card de listado
-  listSkeleton: [1852, 1892] as const,
-  listRows: 1886,
-  newRow: [1922, 1956] as const,
-  newRowHighlightOut: [1990, 2050] as const,
-  toastOut: [1940, 1962] as const,
-  cursorOut: [1840, 1900] as const,
-  end: 2100,
+  backToList: [1734, 1778] as const, // card de resumen → card de listado
+  listSkeleton: [1758, 1798] as const,
+  listRows: 1792,
+  newRow: [1828, 1862] as const,
+  newRowHighlightOut: [1896, 1956] as const,
+  toastOut: [1846, 1868] as const,
+  cursorOut: [1746, 1806] as const,
+  end: 2016,
 } as const;
 
-export const DURATION = T.end; // 35 s @ 60 fps
+// Duración de las animaciones de valor (totales, unidades) tras cada cambio.
+export const VALUE_TWEEN = 26;
+
+export const DURATION = T.end; // 33,6 s @ 60 fps

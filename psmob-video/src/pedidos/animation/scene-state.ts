@@ -14,8 +14,8 @@ import {
 import { getCamera } from "./camera";
 import { CursorState, getCursor } from "./cursor";
 import { CARD, FORM, LIST, lerpRect, panelRect, PRODUCTS_L, Rect, SUMMARY } from "./layout";
-import { T } from "./timeline";
-import { BRANCH_OPTIONS, CLIENT_OPTIONS, LINE_A, LINE_B, ORDER, PRODUCTS } from "../data/mock-data";
+import { T, VALUE_TWEEN } from "./timeline";
+import { BRANCH_OPTIONS, CLIENT_OPTIONS, FINAL_LINES, LINE_A, LINE_B, LINE_C, ORDER, PRODUCTS } from "../data/mock-data";
 
 const inside = (cur: CursorState, r: Rect, pad = 0) =>
   cur.opacity > 0.5 && cur.x >= r.x - pad && cur.x <= r.x + r.w + pad && cur.y >= r.y - pad && cur.y <= r.y + r.h + pad;
@@ -184,67 +184,80 @@ export const getSceneState = (frame: number) => {
     },
   };
 
-  // ── Escena 4/5 · Productos + carrito ────────────────────────────
-  // Multiplicador de validación: 1 → 0 → 1 (demo de pedido inválido).
-  const valDown = progress(f, T.validationDown[0], T.validationDown[1], easeInOutCubic);
-  const valUp = progress(f, T.validationUp[0], T.validationUp[1], easeInOutCubic);
-  const m = 1 - valDown + valUp;
-  const qA = LINE_A.qty * progress(f, T.cartUpdateA[0], T.cartUpdateA[1], easeProduct) * m;
-  const qB = LINE_B.qty * progress(f, T.cartUpdateB[0], T.cartUpdateB[1], easeProduct) * m;
-  const total = PRODUCTS[LINE_A.index].psl * qA + PRODUCTS[LINE_B.index].psl * qB;
-  const units = Math.round(qA + qB);
+  // ── Escena 4/5 · Productos + Resumen del Pedido ─────────────────
+  // Cantidades como eventos [frame, valor]. Discretas para inputs, suavizadas para montos.
+  type QtyEvents = readonly (readonly [number, number])[];
+  const EV_A: QtyEvents = [[T.commitA, LINE_A.qty], [T.minusA[0], LINE_A.qty - 1], [T.minusA[1], LINE_A.edited]];
+  const EV_B: QtyEvents = [[T.commitB, LINE_B.qty], [T.clickTrashB, 0]];
+  const EV_C: QtyEvents = T.plusC.map((fr, i) => [fr, i + 1] as const);
+  const qtyAt = (ev: QtyEvents) => ev.reduce((v, [fr, val]) => (f >= fr ? val : v), 0);
+  const qtySmooth = (ev: QtyEvents) =>
+    ev.reduce((acc, [fr, val], i) => acc + (val - (i ? ev[i - 1][1] : 0)) * progress(f, fr, fr + VALUE_TWEEN, easeProduct), 0);
+  const lastChange = (ev: QtyEvents) => ev.reduce((last, [fr]) => (f >= fr ? fr : last), -999);
 
-  // Inválido (total < mínimo): derivado del total mostrado, con una banda suave
-  // para que ícono, aviso y botón cambien justo cuando el total cruza el mínimo.
+  const lines = [
+    { line: LINE_A, ev: EV_A },
+    { line: LINE_B, ev: EV_B },
+    { line: LINE_C, ev: EV_C },
+  ];
+  const total = lines.reduce((t, l) => t + PRODUCTS[l.line.index].psl * qtySmooth(l.ev), 0);
+  const units = Math.round(lines.reduce((t, l) => t + qtySmooth(l.ev), 0));
+  // Inválido (total < mínimo), con banda suave: ícono, aviso y CTA cambian al cruzar el mínimo.
   const invalid = clamp((ORDER.minAmount - total) / 1400 + 0.5);
 
+  const rowOf = (row: number) => lines.find((l) => l.line.index === row);
   const tableQty = (row: number): string => {
-    if (row === LINE_A.index) {
-      if (f < T.typeA) return "0";
-      if (f < T.cartUpdateA[0]) return String(LINE_A.qty);
-      return String(Math.round(LINE_A.qty * m));
-    }
-    if (row === LINE_B.index) {
-      if (f < T.typeB) return "0";
-      if (f < T.cartUpdateB[0]) return String(LINE_B.qty);
-      return String(Math.round(LINE_B.qty * m));
-    }
-    return "0";
+    const l = rowOf(row);
+    if (!l) return "0";
+    if (row === LINE_A.index && f >= T.typeA && f < T.commitA) return String(LINE_A.qty);
+    if (row === LINE_B.index && f >= T.typeB && f < T.commitB) return String(LINE_B.qty);
+    return String(qtyAt(l.ev));
   };
-
-  const editing = (click: number, type: number, confirm: number, row: number) => {
-    if (f < click || f > confirm + 14) return null;
+  // Edición por teclado en la tabla (A y B): foco, selección del "0", caret.
+  const typing = (row: number) => {
+    const [click, type, commit] = row === LINE_A.index ? [T.clickQtyA, T.typeA, T.commitA] : row === LINE_B.index ? [T.clickQtyB, T.typeB, T.commitB] : [-1, -1, -1];
+    if (click < 0 || f < click || f > commit + 12) return null;
     return {
-      row,
-      open: progress(f, click, click + 10, easeProduct) * (1 - progress(f, confirm + 2, confirm + 14, easeOutCubic)),
-      selected: f < type, // el "0" queda seleccionado hasta tipear
-      caret: f >= type && (f < type + 16 || caretOn),
-      checkHover: hoverWindow(f, confirm - 18, confirm + 6),
-      checkScale: pressScale(f, confirm, 0.12),
+      focus: progress(f, click, click + 8) * (1 - progress(f, commit, commit + 12)),
+      selected: f < type,
+      caret: f >= type && f < commit,
     };
   };
-  const edit = editing(T.clickQtyA, T.typeA, T.clickCheckA, LINE_A.index) ?? editing(T.clickQtyB, T.typeB, T.clickCheckB, LINE_B.index);
-
-  const rowFlash = (row: number) => {
-    const c = row === LINE_A.index ? T.clickCheckA : row === LINE_B.index ? T.clickCheckB : -1;
-    return c < 0 ? 0 : pulse(f, c, c + 6, c + 26, c + 76);
+  const rowActive = (row: number) => {
+    const l = rowOf(row);
+    if (!l) return 0;
+    const [first] = l.ev[0];
+    const on = progress(f, first, first + 18, easeProduct);
+    const off = row === LINE_B.index ? progress(f, T.clickTrashB, T.clickTrashB + 24, easeInOutCubic) : 0;
+    return on * (1 - off);
   };
+  const flashAt = (ev: QtyEvents) => Math.max(0, ...ev.map(([fr]) => pulse(f, fr, fr + 6, fr + 18, fr + 60)));
   const productsTableRect = { x: FORM.innerX, y: PRODUCTS_L.rowsY, w: FORM.innerW, h: PRODUCTS_L.rowH * PRODUCTS_L.visibleRows };
 
   const products = {
     visible: f >= T.productsHeader[0] && f < T.backToList[0] + 2,
     header: reveal(f, T.productsHeader[0], 26, 10),
     skeleton: progress(f, T.productsSkeleton[0], T.productsSkeleton[0] + 8) * (1 - progress(f, T.productsRows - 4, T.productsRows + 28)),
-    rowAt: (i: number) => progress(f, T.productsRows + i * 2, T.productsRows + i * 2 + 18, easeProduct),
+    rowAt: (i: number) => progress(f, T.productsRows + i * 3, T.productsRows + i * 3 + 20, easeProduct),
     qty: tableQty,
-    edit,
-    flash: rowFlash,
-    hoverRow: inside(cursor, productsTableRect) && f < T.validationDown[0] ? Math.floor((cursor.y - PRODUCTS_L.rowsY) / PRODUCTS_L.rowH) : -1,
-    qtyFocus: (row: number) =>
-      (row === LINE_A.index ? pulse(f, T.clickQtyA, T.clickQtyA + 6, T.clickCheckA, T.clickCheckA + 10) : 0) +
-      (row === LINE_B.index ? pulse(f, T.clickQtyB, T.clickQtyB + 6, T.clickCheckB, T.clickCheckB + 10) : 0),
+    typing,
+    active: rowActive,
+    flash: (row: number) => {
+      const l = rowOf(row);
+      return l ? flashAt(l.ev) : 0;
+    },
+    hoverRow: inside(cursor, productsTableRect) && f < T.focusIn[1] ? Math.floor((cursor.y - PRODUCTS_L.rowsY) / PRODUCTS_L.rowH) : -1,
+    plus: {
+      row: LINE_C.index,
+      hover: hoverWindow(f, T.cursorToPlusC[1] - 6, T.plusC[2] + 10),
+      scale: Math.min(...T.plusC.map((c) => pressScale(f, c, 0.12))),
+    },
+    // El número del input "sube" al cambiar.
+    valueTick: (row: number) => {
+      const l = rowOf(row);
+      return l ? 1 - progress(f, lastChange(l.ev), lastChange(l.ev) + 12, easeOutCubic) : 0;
+    },
     invalid,
-    warnPulse: pulse(f, T.validationDown[1] - 4, T.validationDown[1] + 8, T.validationDown[1] + 20, T.validationDown[1] + 44),
     continueBtn: {
       enabled: 1 - invalid,
       hover: hoverWindow(f, T.cursorToContinue[1] - 8, T.clickContinue + 14),
@@ -255,29 +268,41 @@ export const getSceneState = (frame: number) => {
     exit: toSummaryP,
   };
 
-  const itemP = (confirmStart: number) => {
-    const appear = progress(f, confirmStart, confirmStart + 26, easeProduct);
-    const collapse = 1 - progress(f, T.validationDown[0] + 14, T.validationDown[1] + 2, easeInOutCubic) + progress(f, T.validationUp[0] + 4, T.validationUp[0] + 30, easeProduct);
-    return Math.min(appear, clamp(collapse));
+  const removeP = progress(f, T.removeB[0], T.removeB[1], easeInOutCubic);
+  const cartItem = (k: number) => {
+    const { line, ev } = lines[k];
+    const first = ev[0][0];
+    const appear = progress(f, first, first + 28, easeProduct);
+    const removing = line === LINE_B ? removeP : 0;
+    const change = lastChange(ev);
+    return {
+      product: PRODUCTS[line.index],
+      qty: qtyAt(ev),
+      subtotal: PRODUCTS[line.index].psl * qtySmooth(ev),
+      size: appear * (1 - removing), // alto relativo (colapsa al eliminar)
+      o: appear * (1 - progress(f, T.removeB[0], T.removeB[0] + 20, easeOutCubic) * (line === LINE_B ? 1 : 0)),
+      x: (1 - appear) * 16 + removing * 24,
+      flash: flashAt(ev),
+      tick: change > first ? 1 - progress(f, change, change + 14, easeOutCubic) : 0,
+      minus: line === LINE_A ? { hover: hoverWindow(f, T.cursorToMinusA[1] - 6, T.minusA[1] + 12), scale: Math.min(...T.minusA.map((c) => pressScale(f, c, 0.14))) } : null,
+      trash: line === LINE_B ? { hover: hoverWindow(f, T.cursorToTrashB[1] - 6, T.clickTrashB + 20), scale: pressScale(f, T.clickTrashB, 0.14) } : null,
+      // Tinte rojo muy suave mientras se elimina
+      danger: line === LINE_B ? pulse(f, T.clickTrashB, T.clickTrashB + 6, T.removeB[1], T.removeB[1] + 4) : 0,
+    };
   };
-  const itemA = itemP(T.cartUpdateA[0]);
-  const itemB = itemP(T.cartUpdateB[0]);
+  const items = [cartItem(0), cartItem(1), cartItem(2)];
+  const count = items.filter((it) => it.size > 0.5).length;
   const cart = {
     ...cartCard,
     units,
     boxes: units,
     total,
     invalid,
-    items: [
-      { product: PRODUCTS[LINE_A.index], qty: Math.round(qA), p: itemA, flash: pulse(f, T.cartUpdateA[0], T.cartUpdateA[0] + 8, T.cartUpdateA[0] + 30, T.cartUpdateA[0] + 80) },
-      { product: PRODUCTS[LINE_B.index], qty: Math.round(qB), p: itemB, flash: pulse(f, T.cartUpdateB[0], T.cartUpdateB[0] + 8, T.cartUpdateB[0] + 30, T.cartUpdateB[0] + 80) },
-    ],
-    // "Carrito Vacio" entra recién cuando las líneas casi se fueron (sin superposición).
-    empty: clamp((0.3 - Math.max(itemA, itemB)) / 0.3),
-    // Destello de valor al actualizarse el total
-    totalFlash:
-      pulse(f, T.cartUpdateA[0], T.cartUpdateA[0] + 6, T.cartUpdateA[1] - 10, T.cartUpdateA[1] + 20) +
-      pulse(f, T.cartUpdateB[0], T.cartUpdateB[0] + 6, T.cartUpdateB[1] - 10, T.cartUpdateB[1] + 20),
+    count,
+    items,
+    empty: clamp((0.3 - Math.max(...items.map((it) => it.size))) / 0.3),
+    totalFlash: Math.max(0, ...lines.flatMap((l) => l.ev.map(([fr]) => pulse(f, fr, fr + 6, fr + 20, fr + 56)))),
+    focus: progress(f, T.focusIn[0], T.focusIn[1], easeInOutCubic) * (1 - progress(f, T.focusOut[0], T.focusOut[1], easeInOutCubic)),
   };
 
   // ── Stepper ─────────────────────────────────────────────────────
@@ -323,7 +348,7 @@ export const getSceneState = (frame: number) => {
     info: progress(f, T.summaryInfo[0], T.summaryInfo[1], easeProduct),
     head: progress(f, T.toSummary[0] + 16, T.toSummary[0] + 40, easeProduct),
     rowMorph: (k: number) => progress(f, T.toSummary[0] + k * 5, T.toSummary[1] + k * 5, easeInOutQuart),
-    rowFromY: (k: number) => PRODUCTS_L.rowsY + (k === 0 ? LINE_A.index : LINE_B.index) * PRODUCTS_L.rowH,
+    rowFromY: (k: number) => PRODUCTS_L.rowsY + FINAL_LINES[k].index * PRODUCTS_L.rowH,
     rowToY: (k: number) => SUMMARY.rowsY + k * (SUMMARY.rowH + SUMMARY.rowGap),
     send: {
       appear: progress(f, T.toSummary[0] + 20, T.toSummary[1], easeProduct),

@@ -1,9 +1,9 @@
 // Cursor: trayectoria por tramos, cada uno con arco leve y frenado antes del target.
 // La posición es función pura del frame.
 import { clamp, easeCursor, easeOutCubic, lerp, progress } from "./easing";
-import { center, FORM, LIST, MODAL, optionCenter, PRODUCTS_L, qtyCheck, qtyInput, SUMMARY } from "./layout";
+import { cartMinusCenter, cartTrashCenter, center, FORM, LIST, MODAL, optionCenter, PRODUCTS_L, qtyInputCenter, qtyPlusCenter, SUMMARY } from "./layout";
 import { T } from "./timeline";
-import { BRANCH_INDEX, CLIENT_INDEX, LINE_A, LINE_B } from "../data/mock-data";
+import { BRANCH_INDEX, CLIENT_INDEX, LINE_A, LINE_B, LINE_C } from "../data/mock-data";
 
 type Pt = [number, number];
 type Move = { span: readonly [number, number]; to: Pt; arc?: number };
@@ -19,11 +19,12 @@ const MOVES: Move[] = [
   { span: T.cursorToBranch, to: [FORM.branch.x + 300, center(FORM.branch)[1] + 2], arc: -0.12 },
   { span: T.cursorToBranchOpt, to: [optionCenter(FORM.branch, BRANCH_INDEX)[0] + 20, optionCenter(FORM.branch, BRANCH_INDEX)[1] + 2], arc: 0.1 },
   { span: T.cursorToSave, to: [center(FORM.save)[0] + 10, center(FORM.save)[1] + 2], arc: 0.08 },
-  { span: T.cursorToQtyA, to: [qtyInput(LINE_A.index).x + 30, center(qtyInput(LINE_A.index))[1] + 2], arc: -0.1 },
-  { span: T.cursorToCheckA, to: [qtyCheck(LINE_A.index)[0] + 2, qtyCheck(LINE_A.index)[1] + 2], arc: 0.2 },
-  { span: T.cursorToQtyB, to: [qtyInput(LINE_B.index).x + 30, center(qtyInput(LINE_B.index))[1] + 2], arc: 0.25 },
-  { span: T.cursorToCheckB, to: [qtyCheck(LINE_B.index)[0] + 2, qtyCheck(LINE_B.index)[1] + 2], arc: 0.2 },
-  { span: T.cursorRest, to: [1110, 600], arc: -0.1 },
+  { span: T.cursorToQtyA, to: [qtyInputCenter(LINE_A.index)[0] + 4, qtyInputCenter(LINE_A.index)[1] + 2], arc: -0.1 },
+  { span: T.cursorToQtyB, to: [qtyInputCenter(LINE_B.index)[0] + 4, qtyInputCenter(LINE_B.index)[1] + 2], arc: 0.25 },
+  { span: T.cursorToPlusC, to: [qtyPlusCenter(LINE_C.index)[0] + 1, qtyPlusCenter(LINE_C.index)[1] + 2], arc: 0.25 },
+  // Resumen del Pedido: el ítem A es el primero, B el segundo.
+  { span: T.cursorToMinusA, to: [cartMinusCenter(0)[0] + 1, cartMinusCenter(0)[1] + 2], arc: -0.12 },
+  { span: T.cursorToTrashB, to: [cartTrashCenter(1)[0] + 1, cartTrashCenter(1)[1] + 2], arc: 0.1 },
   { span: T.cursorToContinue, to: [center(PRODUCTS_L.continueBtn)[0] + 10, center(PRODUCTS_L.continueBtn)[1] + 2], arc: 0.1 },
   { span: T.cursorToSend, to: [center(SUMMARY.send)[0] + 10, center(SUMMARY.send)[1] + 2], arc: -0.12 },
   { span: T.cursorOut, to: [1290, 720], arc: 0.1 },
@@ -39,9 +40,10 @@ const CLICKS = [
   T.clickBranchOpt,
   T.clickSave,
   T.clickQtyA,
-  T.clickCheckA,
   T.clickQtyB,
-  T.clickCheckB,
+  ...T.plusC,
+  ...T.minusA,
+  T.clickTrashB,
   T.clickContinue,
   T.clickSend,
 ];
@@ -53,16 +55,17 @@ const POINTER: [number, number][] = [
   [T.cursorToClientOpt[1] - 8, T.clickClientOpt + 6],
   [T.cursorToBranchOpt[1] - 8, T.clickBranchOpt + 6],
   [T.cursorToSave[1] - 8, T.clickSave + 10],
-  [T.cursorToCheckA[1] - 6, T.clickCheckA + 8],
-  [T.cursorToCheckB[1] - 6, T.clickCheckB + 8],
+  [T.cursorToPlusC[1] - 6, T.plusC[2] + 10],
+  [T.cursorToMinusA[1] - 6, T.cursorToTrashB[0] + 4],
+  [T.cursorToTrashB[1] - 6, T.clickTrashB + 8],
   [T.cursorToContinue[1] - 8, T.clickContinue + 10],
   [T.cursorToSend[1] - 8, T.clickSend + 10],
 ];
 // Sobre inputs de texto: I-beam.
 const TEXT: [number, number][] = [
   [T.cursorToOc[1] - 6, T.cursorToClient[0] + 4],
-  [T.cursorToQtyA[1] - 6, T.cursorToCheckA[0] + 4],
-  [T.cursorToQtyB[1] - 6, T.cursorToCheckB[0] + 4],
+  [T.cursorToQtyA[1] - 6, T.cursorToQtyB[0] + 4],
+  [T.cursorToQtyB[1] - 6, T.cursorToPlusC[0] + 4],
 ];
 
 const inAny = (f: number, ranges: [number, number][]) => ranges.some(([a, b]) => f >= a && f <= b);

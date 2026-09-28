@@ -1,5 +1,6 @@
 // Datos ficticios. Se mantienen iguales durante toda la historia.
 // Formatos tomados de las capturas: moneda $1,234.56 y fecha DD/MM/YYYY.
+import { CATALOG, CatalogItem } from "./catalog";
 
 export type OrderStatus = "completo" | "parcial" | "rechazado" | "noCreado" | "transmitido" | "borrador";
 
@@ -10,14 +11,6 @@ export type OrderRow = {
   branch: string;
   total: number;
   status: OrderStatus;
-};
-
-export type Product = {
-  code: string;
-  name: string;
-  uxb: number;
-  pres: string;
-  psl: number;
 };
 
 export const ORDER = {
@@ -72,29 +65,23 @@ export const CLIENT_INDEX = 2;
 export const BRANCH_OPTIONS = ["Sucursal Centro", "Sucursal Norte", "Depósito Sur"];
 export const BRANCH_INDEX = 0;
 
-export const PRODUCTS: Product[] = [
-  { code: "7790010000011 | 7790010000011", name: "PRODUCTO DEMO A", uxb: 1, pres: "UN", psl: 2450 },
-  { code: "7790010000028 | 7790010000028", name: "PRODUCTO DEMO B", uxb: 1, pres: "UN", psl: 1890 },
-  { code: "7790010000035 | 7790010000035", name: "PRODUCTO DEMO C", uxb: 1, pres: "UN", psl: 3120.5 },
-  { code: "7790010000042 | 7790010000042", name: "PRODUCTO DEMO D", uxb: 1, pres: "UN", psl: 875 },
-  { code: "7790010000059 | 7790010000059", name: "PRODUCTO DEMO E", uxb: 1, pres: "UN", psl: 1240.75 },
-  { code: "7790010000066 | 7790010000066", name: "PRODUCTO DEMO F", uxb: 1, pres: "UN", psl: 4980 },
-  { code: "7790010000073 | 7790010000073", name: "PRODUCTO DEMO G", uxb: 1, pres: "UN", psl: 690.4 },
-  { code: "7790010000080 | 7790010000080", name: "PRODUCTO DEMO H", uxb: 1, pres: "UN", psl: 2015 },
-  { code: "7790010000097 | 7790010000097", name: "PRODUCTO DEMO I", uxb: 1, pres: "UN", psl: 1560 },
-  { code: "7790010000103 | 7790010000103", name: "PRODUCTO DEMO J", uxb: 1, pres: "UN", psl: 3375.2 },
-  { code: "7790010000110 | 7790010000110", name: "PRODUCTO DEMO K", uxb: 1, pres: "UN", psl: 940 },
-  { code: "7790010000127 | 7790010000127", name: "PRODUCTO DEMO L", uxb: 1, pres: "UN", psl: 2780 },
-  { code: "7790010000134 | 7790010000134", name: "PRODUCTO DEMO M", uxb: 1, pres: "UN", psl: 1325.6 },
-  { code: "7790010000141 | 7790010000141", name: "PRODUCTO DEMO N", uxb: 1, pres: "UN", psl: 5210 },
-  { code: "7790010000158 | 7790010000158", name: "PRODUCTO DEMO O", uxb: 1, pres: "UN", psl: 760 },
-];
+// Catálogo con imágenes: ver catalog.ts.
+export const PRODUCTS = CATALOG;
+export type Product = CatalogItem;
 
-// Líneas del pedido: índice de producto + cantidad final.
-export const LINE_A = { index: 0, qty: 6 };
+// Líneas del pedido (índice en el catálogo). La historia en el Resumen del Pedido:
+// A se carga con 6 y se edita a 4; B se agrega y después se elimina; C se sube a 3 con "+".
+export const LINE_A = { index: 0, qty: 6, edited: 4 };
 export const LINE_B = { index: 1, qty: 5 };
+export const LINE_C = { index: 2, qty: 3 };
 
-export const orderTotal = () => PRODUCTS[LINE_A.index].psl * LINE_A.qty + PRODUCTS[LINE_B.index].psl * LINE_B.qty;
+// Líneas finales que llegan al resumen y al listado.
+export const FINAL_LINES = [
+  { index: LINE_A.index, qty: LINE_A.edited },
+  { index: LINE_C.index, qty: LINE_C.qty },
+];
+export const orderTotal = () => FINAL_LINES.reduce((t, l) => t + PRODUCTS[l.index].psl * l.qty, 0);
+export const orderUnits = () => FINAL_LINES.reduce((t, l) => t + l.qty, 0);
 
 export const money = (v: number) =>
   "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
