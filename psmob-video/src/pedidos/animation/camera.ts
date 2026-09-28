@@ -1,7 +1,7 @@
 // Cámara virtual: foco (x, y) en coordenadas lógicas + escala.
 // Keyframes consecutivos iguales = respiración (la cámara no se mueve).
 import { easeCamera, lerp, progress } from "./easing";
-import { CARD, center, FORM, LIST, SUMMARY, VIEW } from "./layout";
+import { CARD, CART, center, FORM, LIST, SUMMARY, VIEW } from "./layout";
 import { T } from "./timeline";
 
 type Cam = { x: number; y: number; s: number };
@@ -10,46 +10,50 @@ type Key = { f: number; cam: Cam };
 const HOME: Cam = { x: VIEW.w / 2, y: VIEW.h / 2, s: 1 };
 const [nbx, nby] = center(LIST.newBtn);
 
-// Encuadre del Resumen del Pedido (card inferior derecha). Escala alta a propósito:
-// es el único zoom fuerte del video y tiene que leerse como "acercarse al panel".
-const FOCUS_CART: Cam = { x: CARD.cart.x + CARD.cart.w / 2 - 250, y: CARD.cart.y + CARD.cart.h / 2 + 10, s: 1.6 };
+// Resumen del Pedido (card inferior derecha): zoom fuerte en dos encuadres.
+// 1) métricas + líneas (edición de cantidad) · 2) líneas + total (eliminación y resultado).
+const FOCUS_ITEMS: Cam = { x: CARD.cart.x + CARD.cart.w, y: CART.statsY + 120, s: 2.1 };
+const FOCUS_TOTAL: Cam = { x: CARD.cart.x + CARD.cart.w, y: CARD.cart.y + CARD.cart.h, s: 2.1 };
 
 const KEYS: Key[] = [
   { f: 0, cam: HOME },
   { f: T.pushIn[0], cam: HOME },
   // Push-in hacia "+ Nuevo Pedido"
-  { f: T.pushIn[1], cam: { x: nbx + 260, y: nby + 190, s: 1.1 } },
-  { f: T.clickNew + 8, cam: { x: nbx + 260, y: nby + 190, s: 1.1 } },
+  { f: T.pushIn[1], cam: { x: nbx + 120, y: nby + 120, s: 1.35 } },
+  { f: T.clickNew + 8, cam: { x: nbx + 120, y: nby + 120, s: 1.35 } },
   // Modal centrado, leve acercamiento a "Tradicional"
-  { f: T.modalOpen[1] + 10, cam: { x: 800, y: 468, s: 1.06 } },
-  { f: T.clickTrad, cam: { x: 800, y: 468, s: 1.06 } },
+  { f: T.modalOpen[1] + 10, cam: { x: 800, y: 458, s: 1.45 } },
+  { f: T.clickTrad, cam: { x: 800, y: 462, s: 1.5 } },
   // Morph a formulario: vuelve a plano general
   { f: T.morph[1] + 8, cam: HOME },
   { f: T.cursorToClient[0], cam: HOME },
   // Formulario → Cliente
-  { f: T.clickClient + 8, cam: { x: 640, y: center(FORM.client)[1] + 110, s: 1.08 } },
-  { f: T.cursorToSave[0], cam: { x: 640, y: center(FORM.client)[1] + 130, s: 1.08 } },
+  { f: T.clickClient + 8, cam: { x: 560, y: center(FORM.client)[1] + 110, s: 1.35 } },
+  { f: T.cursorToSave[0], cam: { x: 560, y: center(FORM.client)[1] + 140, s: 1.35 } },
   { f: T.cursorToSave[1] + 6, cam: HOME },
   // Selección de productos: pantalla completa, la tabla es la protagonista
   { f: T.focusIn[0], cam: HOME },
   // Enfoque: pan + zoom hacia abajo a la derecha, hasta encuadrar el Resumen del Pedido
-  { f: T.focusIn[1], cam: FOCUS_CART },
-  { f: T.focusHold, cam: FOCUS_CART },
+  { f: T.focusIn[1], cam: FOCUS_ITEMS },
+  { f: T.minusA[1] + 8, cam: FOCUS_ITEMS },
+  // Seguimiento: baja dentro del panel para tener el total en cuadro antes de eliminar
+  { f: T.cursorToTrashB[1] - 2, cam: FOCUS_TOTAL },
+  { f: T.focusHold, cam: FOCUS_TOTAL },
   // Alejamiento: vuelta a la pantalla completa
   { f: T.focusOut[1], cam: HOME },
   { f: T.cursorToContinue[0] + 10, cam: HOME },
-  { f: T.clickContinue + 6, cam: { x: 820, y: 500, s: 1.04 } },
+  { f: T.clickContinue + 6, cam: { x: 1000, y: 620, s: 1.2 } },
   // Resumen: recorrido sutil de la información hacia Enviar Pedido
-  { f: T.summaryInfo[1], cam: { x: 760, y: 360, s: 1.08 } },
-  { f: T.cursorToSend[0], cam: { x: 820, y: 400, s: 1.08 } },
-  { f: T.clickSend + 4, cam: { x: center(SUMMARY.send)[0] - 300, y: center(SUMMARY.send)[1] - 250, s: 1.1 } },
-  { f: T.sending[1], cam: { x: center(SUMMARY.send)[0] - 300, y: center(SUMMARY.send)[1] - 250, s: 1.1 } },
+  { f: T.summaryInfo[1], cam: { x: 720, y: 290, s: 1.3 } },
+  { f: T.cursorToSend[0], cam: { x: 760, y: 330, s: 1.3 } },
+  { f: T.clickSend + 4, cam: { x: center(SUMMARY.send)[0] - 120, y: center(SUMMARY.send)[1] - 120, s: 1.6 } },
+  { f: T.sending[1], cam: { x: center(SUMMARY.send)[0] - 120, y: center(SUMMARY.send)[1] - 120, s: 1.6 } },
   // Se abre el plano para que el toast (arriba a la derecha) entre en cuadro, y se vuelve al listado
   { f: T.toast[1] + 8, cam: HOME },
   { f: T.newRow[0], cam: HOME },
   // Foco final en la fila nueva
-  { f: T.newRow[1] + 60, cam: { x: 840, y: 380, s: 1.05 } },
-  { f: T.end, cam: { x: 840, y: 380, s: 1.05 } },
+  { f: T.newRow[1] + 60, cam: { x: 900, y: 300, s: 1.2 } },
+  { f: T.end, cam: { x: 900, y: 300, s: 1.2 } },
 ];
 
 // Evita mostrar fuera del viewport cuando hay zoom.

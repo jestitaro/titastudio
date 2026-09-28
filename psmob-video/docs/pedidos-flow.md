@@ -51,12 +51,12 @@ Para un solo frame con la CLI: `npx remotion still Pedidos-Flow out/f1200.png --
 |---|---|---|
 | intro | 786–870 | la card del formulario pasa a la tabla; skeleton → filas con imagen |
 | selección | 876–1112 | A se tipea (6), B se tipea (5), C se sube con "+" (1→3); cada línea entra al panel |
-| enfoque | 1136–1214 | pan + zoom (×1,6) hacia el panel inferior derecho |
-| interacción | 1238–1318 | "−" dos veces en A (6→4) y eliminar B |
+| enfoque | 1136–1214 | pan + zoom (×2,1) hacia el panel inferior derecho: métricas + líneas |
+| interacción | 1238–1318 | "−" dos veces en A (6→4); la cámara baja dentro del panel hasta el total y se elimina B |
 | update | 1322–1394 | B colapsa, C sube; total, unidades y cajas se interpolan |
 | alejamiento | 1394–1470 | zoom out a pantalla completa |
 
-Todos esos frames están en `timeline.ts` (`focusIn`, `minusA`, `clickTrashB`, `removeB`, `focusHold`, `focusOut`). El encuadre del zoom es `FOCUS_CART` en `camera.ts`. La cámara interpola el rectángulo visible (1/escala lineal), así que paneo y zoom avanzan juntos a velocidad pareja.
+Todos esos frames están en `timeline.ts` (`focusIn`, `minusA`, `clickTrashB`, `removeB`, `focusHold`, `focusOut`). Los encuadres del zoom son `FOCUS_ITEMS` y `FOCUS_TOTAL` en `camera.ts`. La cámara interpola el rectángulo visible (1/escala lineal), así que paneo y zoom avanzan juntos a velocidad pareja.
 
 Totales coherentes: después de cargar, $33,511.50 (14 u.); después de editar y eliminar, $19,161.50 (7 u.). Ese es el monto que llega al resumen y a la fila nueva del listado.
 
