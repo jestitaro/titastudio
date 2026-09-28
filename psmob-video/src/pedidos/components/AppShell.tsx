@@ -1,6 +1,7 @@
 // Layout de Apollo: sidebar de navegación + topbar con breadcrumb. Constante en todo el video:
 // es el ancla espacial que hace que el flujo se lea como "dentro del producto".
 import React from "react";
+import { Img, staticFile } from "remotion";
 import { SHELL, VIEW } from "../animation/layout";
 import { c, font } from "../design/tokens";
 import { Icon } from "./ui";
@@ -18,15 +19,8 @@ const NAV: { label: string; caret?: boolean; active?: boolean }[] = [
   { label: "Gestor de Descuentos" },
 ];
 
-const Logo: React.FC = () => (
-  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-    <svg width="22" height="22" viewBox="0 0 24 24">
-      <path d="M12 2.5l7.8 4.5v9L12 20.5 4.2 16V7z" fill="none" stroke={c.primary} strokeWidth="2.2" strokeLinejoin="round" />
-      <path d="M12 7.2l3.9 2.3v4.6L12 16.4l-3.9-2.3V9.5z" fill={c.primary} opacity="0.85" />
-    </svg>
-    <span style={{ fontFamily: font, fontWeight: 600, fontSize: 17, color: c.primary, letterSpacing: -0.2 }}>QuartzSales</span>
-  </div>
-);
+// Logo oficial QuartzSales full color (public/logo-qs-fullcolor.svg, 1313×248).
+const Logo: React.FC = () => <Img src={staticFile("logo-qs-fullcolor.svg")} style={{ width: 148, height: 148 * (248 / 1313), display: "block" }} />;
 
 export const Sidebar: React.FC = () => (
   <div
@@ -42,7 +36,7 @@ export const Sidebar: React.FC = () => (
       padding: "30px 0 0 30px",
     }}
   >
-    <div style={{ paddingLeft: 10 }}>
+    <div style={{ paddingLeft: 4 }}>
       <Logo />
     </div>
     <div style={{ marginTop: 38, fontSize: 10, fontWeight: 600, color: c.primary, letterSpacing: 0.3 }}>ADMINISTRACIÓN</div>

@@ -1,7 +1,7 @@
 // Cámara virtual: foco (x, y) en coordenadas lógicas + escala.
 // Keyframes consecutivos iguales = respiración (la cámara no se mueve).
 import { easeCamera, lerp, progress } from "./easing";
-import { CARD, CART, center, FORM, LIST, SUMMARY, VIEW } from "./layout";
+import { CARD, CART, center, FORM, LIST, VIEW } from "./layout";
 import { T } from "./timeline";
 
 type Cam = { x: number; y: number; s: number };
@@ -27,9 +27,9 @@ const KEYS: Key[] = [
   // Morph a formulario: vuelve a plano general
   { f: T.morph[1] + 8, cam: HOME },
   { f: T.cursorToClient[0], cam: HOME },
-  // Formulario → Cliente
-  { f: T.clickClient + 8, cam: { x: 560, y: center(FORM.client)[1] + 110, s: 1.35 } },
-  { f: T.cursorToSave[0], cam: { x: 560, y: center(FORM.client)[1] + 140, s: 1.35 } },
+  // Formulario → Cliente: zoom cerrado sobre el campo y su desplegable (también cubre Sucursal)
+  { f: T.clickClient + 8, cam: { x: 670, y: center(FORM.client)[1] + 130, s: 1.8 } },
+  { f: T.cursorToSave[0], cam: { x: 670, y: center(FORM.client)[1] + 150, s: 1.8 } },
   { f: T.cursorToSave[1] + 6, cam: HOME },
   // Selección de productos: pantalla completa, la tabla es la protagonista
   { f: T.focusIn[0], cam: HOME },
@@ -41,15 +41,7 @@ const KEYS: Key[] = [
   { f: T.focusHold, cam: FOCUS_TOTAL },
   // Alejamiento: vuelta a la pantalla completa
   { f: T.focusOut[1], cam: HOME },
-  { f: T.cursorToContinue[0] + 10, cam: HOME },
-  { f: T.clickContinue + 6, cam: { x: 1000, y: 620, s: 1.2 } },
-  // Resumen: recorrido sutil de la información hacia Enviar Pedido
-  { f: T.summaryInfo[1], cam: { x: 720, y: 290, s: 1.3 } },
-  { f: T.cursorToSend[0], cam: { x: 760, y: 330, s: 1.3 } },
-  { f: T.clickSend + 4, cam: { x: center(SUMMARY.send)[0] - 120, y: center(SUMMARY.send)[1] - 120, s: 1.6 } },
-  { f: T.sending[1], cam: { x: center(SUMMARY.send)[0] - 120, y: center(SUMMARY.send)[1] - 120, s: 1.6 } },
-  // Se abre el plano para que el toast (arriba a la derecha) entre en cuadro, y se vuelve al listado
-  { f: T.toast[1] + 8, cam: HOME },
+  // Resumen y envío: plano general, sin zoom a botones (Continuar / Enviar Pedido)
   { f: T.newRow[0], cam: HOME },
   // Foco final en la fila nueva
   { f: T.newRow[1] + 60, cam: { x: 900, y: 300, s: 1.2 } },
