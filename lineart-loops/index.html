@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Caro y Nico · loops line-art</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <main class="grid" id="grid"></main>
+    <script src="js/art.js"></script>
+    <script src="js/characters.js"></script>
+    <script src="js/scenes.js"></script>
+    <script>
+      const { SCENE_NAMES, sceneInfo, sceneSVG, registerScene, installSeek } = window.LA;
+
+      const grid = document.getElementById("grid");
+      for (const name of SCENE_NAMES) {
+        const info = sceneInfo(name);
+        const card = document.createElement("section");
+        card.className = "card";
+        card.innerHTML = `<div class="frame">${sceneSVG(name, name)}</div><h2>${info.title}</h2><p>${info.desc}</p>`;
+        grid.appendChild(card);
+        registerScene(card, name, name, { intro: true });
+      }
+      installSeek();
+    </script>
+  </body>
+</html>

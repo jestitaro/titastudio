@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Render · loops line-art</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="render" id="stage"></div>
+    <script src="js/art.js"></script>
+    <script src="js/characters.js"></script>
+    <script src="js/scenes.js"></script>
+    <script>
+      // Parámetros: escena=celular|laptop|llamada · intro=1 · alpha=1 · maskbg=1
+      const { sceneSVG, registerScene, installSeek, SCENE_NAMES } = window.LA;
+
+      const params = new URLSearchParams(location.search);
+      const name = SCENE_NAMES.includes(params.get("escena")) ? params.get("escena") : "celular";
+      if (params.get("alpha") === "1") document.body.classList.add("alpha");
+      if (params.get("maskbg") === "1") document.documentElement.style.setProperty("--mask", "var(--bg)");
+
+      const stage = document.getElementById("stage");
+      stage.innerHTML = sceneSVG(name, name);
+      registerScene(stage, name, name, { intro: params.get("intro") === "1" });
+      installSeek();
+      window.seek(0);
+      window.ready = true;
+    </script>
+  </body>
+</html>
