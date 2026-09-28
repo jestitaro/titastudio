@@ -25,3 +25,7 @@ npx remotion render <Comp> out/<archivo>.mp4 --browser-executable=/opt/pw-browse
 ```
 
 Las fuentes (Roboto / Roboto Mono) van por `@fontsource`, sin red. Textos en `src/i18n/es.ts`.
+
+## Composición Pedidos-Flow (QuartzSales web · Apollo)
+
+Es otra pieza, independiente de PSMob. Vive en `src/pedidos/` con sus propios tokens (tema Lara violeta, Poppins, PrimeIcons) y trabaja a 60 fps. Todos los timings están en `src/pedidos/animation/timeline.ts`. La documentación está en `docs/pedidos-flow.md`. Formato de moneda de las capturas de Apollo: `$24,150.00`.
