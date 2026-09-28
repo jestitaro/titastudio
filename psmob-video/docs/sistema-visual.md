@@ -35,3 +35,14 @@ Todos comparten `Face`, `Hand`, `limbPath` y `Neck` (`src/characters/parts.tsx`)
 - **Personaje:** pelo trasero → brazo lejano → cuello → torso → cabeza (cara, flequillo) → brazo cercano → mano. Cada parte tiene su pivote.
 - **Escena:** fondo (parallax 0,35) → elementos intermedios (0,7) → personaje (1) → objetos y UI delanteros (1,25 a 1,9) → viñeta.
 - **Vida mínima:** respiración, parpadeo, balanceo de pelo, idle flotante en objetos y UI, y micro-rotación.
+
+## Rig v2 (`src/characters/v2/`)
+
+- **Cabeza:** cráneo más mandíbula. El mentón se corre hacia el lado de la mirada y la oreja va en la bisagra. Hay dos tipos de mandíbula: `soft` (Caro) y `square` (Nico).
+- **Cuello y hombros:** el trapecio baja en pendiente hacia el hombro, sin hombros cuadrados. La sombra de mandíbula es un plano fijo sobre el cuello.
+- **Brazos:** perfil con 7 estaciones (deltoides, bíceps, codo angosto, antebrazo ancho arriba, muñeca fina). El codo usa la normal promediada para que el doblez sea natural.
+- **Manos:** diseñadas por gesto: `relaxed`, `openBack` y agarre de celular con talón de la palma y dedos afinados.
+- **Pelo:** masa trasera con lóbulos, más casquete, más mechones delanteros con pivote propio para el balanceo.
+- **Ropa:** mangas ceñidas con ruedo, remera metida con fruncido en la cintura, pliegues que tiran hacia el brazo que trabaja, y jeans o pantalón con piernas separadas.
+- **Variante A:** plana, con un plano de sombra por prenda y cejas de trazo uniforme.
+- **Variante B:** cejas afinadas, brillo y párpado en los ojos, plano de sombra facial, reflejos y sombras en el pelo, nudillos, ruedo de manga y costuras. La cabeza está un 5% más chica.
