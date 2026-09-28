@@ -12,6 +12,8 @@ import { AnimTestV4 } from "./characters/v4/AnimTest";
 import { S01Headache, S01_DURATION } from "./scenes/S01Headache";
 import { S10AiFred, S10_TEST_DURATION } from "./scenes/S10AiFred";
 import { MotionTest, MOTION_TEST_DURATION } from "./motion-test/MotionTest";
+import { PSMobVideo } from "./video/Video";
+import { TOTAL } from "./video/timing";
 
 const CharacterSheet: React.FC = () => (
   <AbsoluteFill style={{ background: "#FFFFFF", flexDirection: "row" }}>
@@ -35,6 +37,8 @@ const CharacterSheet: React.FC = () => (
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition id="PSMob-Video" component={PSMobVideo} durationInFrames={TOTAL} fps={30} width={1920} height={1080} defaultProps={{ showVO: false }} />
+      <Composition id="PSMob-Video-Draft" component={PSMobVideo} durationInFrames={TOTAL} fps={30} width={1920} height={1080} defaultProps={{ showVO: true }} />
       {(["v1", "v2"] as const).map((version) => (
         <Composition
           key={version}
