@@ -15,3 +15,13 @@ Video de PSMob (app mobile de campo de QuartzSales) hecho con Remotion.
 - El design system aparece integrado en la historia: celulares, dashboards, formularios, chats, KPIs y elementos de interfaz.
 - Animación y personajes mantienen el estilo visual de los assets aprobados.
 - Convenciones de UI PSMob: moneda `$1.234,07`, fechas `DD/MM/YYYY`, PDV en mayúsculas + dirección en minúscula, EAN en monospace.
+
+## Render en el contenedor cloud
+
+Chromium headless ya está instalado; usarlo en lugar de descargar uno:
+
+```
+npx remotion render <Comp> out/<archivo>.mp4 --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
+```
+
+Las fuentes (Roboto / Roboto Mono) van por `@fontsource`, sin red. Textos en `src/i18n/es.ts`.
