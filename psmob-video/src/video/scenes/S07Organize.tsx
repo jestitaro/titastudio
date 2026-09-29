@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { easeInOut, osc, pop, range } from "../../lib/motion";
-import { Actor, Layer, LightStudio, Particles, POSE, QS } from "../lib/stage";
+import { Actor, camPath, Layer, LightStudio, Particles, POSE, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { APP_H, APP_W, Device } from "../ds/Device";
 import { Avatar } from "../ds/ui";
@@ -10,35 +10,35 @@ import { listSlot, VIS, VisitasScreen } from "../screens/Field";
 import { TEAM } from "../screens/data";
 import { S06_END } from "./S06Reveal";
 
-// Escena 7 — una sola experiencia: el equipo se asigna a cada PDV (avatares magnetizados), aparece Caro
-// gestionando desde su celular, y la app pasa al mapa con el recorrido de UN merchandiser por calles.
-export const S07_END = { x: 1180, y: 540, s: 1 };
-const CARO = { x: 560, feet: 1150, scale: 0.72 };
+// Escena 7 — cámara que ordena la narrativa: arranca con la UI a pantalla completa (continuidad con la 6),
+// zoom out para revelar más interfaz mientras el equipo se asigna, push-out hasta revelar a Caro gestionando,
+// y push-in de vuelta al celular para el mapa con el recorrido del merchandiser.
+const DEV = { x: 1340, y: 540, s: 0.84 }; // celular en el mundo
+const CARO = { x: 470, feet: 1150, scale: 0.72 };
+const Z0 = S06_END.s / DEV.s;
 
-// Recorrido del celular: centro → derecha (entra Caro) → centro-derecha (mapa).
-const phoneAt = (f: number) => {
-  const a = range(f, [42, 60], [0, 1], easeInOut);
-  const b = range(f, [84, 100], [0, 1], easeInOut);
-  return {
-    x: interpolate(a, [0, 1], [S06_END.x, 1340]) + b * (S07_END.x - 1340),
-    y: 540,
-    s: interpolate(a, [0, 1], [S06_END.s, 0.84]) + b * (S07_END.s - 0.84),
-  };
-};
+export const camS07 = (f: number): Cam =>
+  camPath(f, [
+    { f: 0, x: DEV.x, y: DEV.y, zoom: Z0 },
+    { f: 34, x: DEV.x, y: DEV.y, zoom: 1.13 },
+    { f: 46, x: DEV.x - 20, y: DEV.y, zoom: 1.1 },
+    { f: 72, x: 1010, y: 560, zoom: 0.97 },
+    { f: 84, x: 1030, y: 560, zoom: 0.98 },
+    { f: 106, x: 1230, y: 540, zoom: 1.16 },
+    { f: 165, x: 1260, y: 540, zoom: 1.22 },
+  ]);
 
 const START = [
-  { x: 380, y: 250 },
-  { x: 1560, y: 230 },
-  { x: 330, y: 760 },
-  { x: 1600, y: 720 },
+  { x: 820, y: 260 },
+  { x: 1870, y: 250 },
+  { x: 780, y: 820 },
+  { x: 1880, y: 780 },
 ];
 
 export const S07Organize: React.FC = () => {
   const f = useCurrentFrame();
-  const ph = phoneAt(f);
-  const caroIn = range(f, [44, 64], [0, 1], easeInOut);
-  const cam: Cam = { x: 960 - (1 - caroIn) * 60, y: 540, zoom: 1 };
-  const toScreen = (p: { x: number; y: number }) => ({ x: ph.x + (p.x - APP_W / 2) * ph.s, y: ph.y + (p.y - APP_H / 2) * ph.s });
+  const cam = camS07(f);
+  const slotWorld = (p: { x: number; y: number }) => ({ x: DEV.x + (p.x - APP_W / 2) * DEV.s, y: DEV.y + (p.y - APP_H / 2) * DEV.s });
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       <LightStudio f={f + 120} />
@@ -50,37 +50,35 @@ export const S07Organize: React.FC = () => {
         </svg>
         <Particles f={f} n={30} seed="s07" color={QS.indigo} speed={0.3} size={[2, 5]} opacity={0.3} />
       </Layer>
-      {/* Caro gestionando desde su celular */}
-      {caroIn > 0 && (
-        <Layer cam={cam} depth={1}>
-          <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - caroIn) * -700}px)` }}>
-            <div style={{ position: "absolute", left: CARO.x - 200, top: CARO.feet - 16, width: 400, height: 32, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(19,13,93,0.16), rgba(19,13,93,0))" }} />
-            <Actor pose={POSE.caroCelular} x={CARO.x} feetY={CARO.feet} scale={CARO.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [74, 128] }} />
-          </div>
-        </Layer>
-      )}
-      <Device x={ph.x} y={ph.y} scale={ph.s}>
-        <VisitasScreen f={f} />
-      </Device>
-      {/* Equipo que se magnetiza a cada PDV */}
-      {TEAM.map((t, i) => {
-        const appear = pop(f, i * 3, { damping: 12, stiffness: 150, mass: 0.7 });
-        const k = range(f, [VIS.assign[0] + i * 6, VIS.assign[0] + i * 6 + 14], [0, 1], easeInOut);
-        if (k >= 1) return null;
-        const target = toScreen(listSlot(i));
-        const st = START[i];
-        const fx = st.x + osc(f, 60 + i * 7, 10, i * 20);
-        const fy = st.y + osc(f, 50 + i * 5, 12, i * 13);
-        const x = interpolate(k, [0, 1], [fx, target.x]);
-        const y = interpolate(k, [0, 1], [fy, target.y]) - Math.sin(k * Math.PI) * 70;
-        const size = interpolate(k, [0, 1], [96, 40 * ph.s]);
-        return (
-          <div key={t.initials} style={{ position: "absolute", left: x, top: y, transform: `translate(-50%, -50%) scale(${appear})` }}>
-            <Avatar initials={t.initials} color={t.color} size={size} />
-            <div style={{ position: "absolute", top: size + 6, left: "50%", transform: "translateX(-50%)", fontFamily: FONT, fontWeight: 700, fontSize: 18, color: QS.dark, opacity: 1 - k * 2.5, whiteSpace: "nowrap" }}>{t.name}</div>
-          </div>
-        );
-      })}
+      <Layer cam={cam} depth={1}>
+        <div style={{ position: "absolute", left: CARO.x - 200, top: CARO.feet - 16, width: 400, height: 32, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(19,13,93,0.16), rgba(19,13,93,0))" }} />
+        <Actor pose={POSE.caroCelular} x={CARO.x} feetY={CARO.feet} scale={CARO.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [62, 128] }} />
+        <Device x={DEV.x} y={DEV.y} scale={DEV.s}>
+          <VisitasScreen f={f} />
+        </Device>
+        {/* Equipo que se magnetiza a cada PDV */}
+        {TEAM.map((t, i) => {
+          const appear = pop(f, i * 3, { damping: 12, stiffness: 150, mass: 0.7 });
+          const k = range(f, [VIS.assign[0] + i * 6, VIS.assign[0] + i * 6 + 14], [0, 1], easeInOut);
+          if (k >= 1) return null;
+          const target = slotWorld(listSlot(i));
+          const st = START[i];
+          const x = interpolate(k, [0, 1], [st.x + osc(f, 60 + i * 7, 8, i * 20), target.x]);
+          const y = interpolate(k, [0, 1], [st.y + osc(f, 50 + i * 5, 10, i * 13), target.y]) - Math.sin(k * Math.PI) * 60;
+          const size = interpolate(k, [0, 1], [76, 40 * DEV.s]);
+          return (
+            <div key={t.initials} style={{ position: "absolute", left: x, top: y, transform: `translate(-50%, -50%) scale(${appear})` }}>
+              <Avatar initials={t.initials} color={t.color} size={size} />
+              <div style={{ position: "absolute", top: size + 6, left: "50%", transform: "translateX(-50%)", fontFamily: FONT, fontWeight: 700, fontSize: 15, color: QS.dark, opacity: 1 - k * 2.5, whiteSpace: "nowrap" }}>{t.name}</div>
+            </div>
+          );
+        })}
+      </Layer>
     </AbsoluteFill>
   );
 };
+
+// Estado final (para que la escena 8 continúe el movimiento sin corte).
+export const S07_CAM_END = camS07(165);
+export const S07_DEV = DEV;
+export const S07_CARO = CARO;

@@ -1,17 +1,13 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { easeInOut, easeOut, pop, range } from "../../lib/motion";
-import { Char, Layer, LightStudio, POSE } from "../lib/stage";
+import { camPath, Char, Layer, LightStudio, POSE, throughBlur } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { C as color, FONT } from "../ds/tokens";
 import { ar } from "../screens/data";
 import { Icon, IconName } from "../ui/icons";
-import { Device, DEVICE_H, DEVICE_W } from "../ds/Device";
-import { IndicatorsFlow } from "../screens/Indicators";
-import { S10_END } from "./S10Realtime";
 
-// Escena 11 — el dashboard es protagonista. El celular se transforma en el panel (morph de rectángulo);
-// Caro y Nico acompañan en las esquinas, fuera de las áreas de gráficos.
+// Escena 11 — el dashboard es protagonista; Caro y Nico acompañan en los laterales, fuera de los gráficos.
 const PANEL = { x: 395, y: 70, w: 1110, h: 830 };
 const EXHIB = [
   { name: "Aderezos", pct: 50.74 },
@@ -21,10 +17,19 @@ const EXHIB = [
   { name: "Suavizantes", pct: 70.92 },
   { name: "Lavavajillas", pct: 58.24 },
 ];
-const MORPH: [number, number] = [0, 22];
-const IN = 16; // arranque del contenido del dashboard
+const IN = -10; // el contenido ya está entrando cuando llega la cámara
 
-const cam = (f: number): Cam => ({ x: 960, y: 520, zoom: range(f, [10, 120], [1, 1.06], easeInOut) });
+// Push-in a los KPI (llegando desde la pantalla de la escena 10) → abre al panel completo con Caro y Nico
+// → cierra empujando hacia el ranking de PDV (zoom-through a la góndola de la escena 12).
+const cam = (f: number): Cam =>
+  camPath(f, [
+    { f: 0, x: 740, y: 230, zoom: 2.3 },
+    { f: 16, x: 760, y: 235, zoom: 1.95 },
+    { f: 40, x: 800, y: 250, zoom: 1.85 },
+    { f: 72, x: 960, y: 520, zoom: 1.0 },
+    { f: 104, x: 960, y: 520, zoom: 1.04 },
+    { f: 120, x: 1200, y: 640, zoom: 2.2 },
+  ]);
 
 const Kpi: React.FC<{ f: number; at: number; icon: IconName; label: string; value: number; dec: number; suffix: string; delta: string; good: boolean }> = ({
   f,
@@ -232,54 +237,19 @@ const Dashboard: React.FC<{ f: number }> = ({ f }) => (
 export const S11Dashboard: React.FC = () => {
   const f = useCurrentFrame();
   const c = cam(f);
-  const m = range(f, MORPH, [0, 1], easeInOut);
-  const start = { x: S10_END.x - (DEVICE_W * S10_END.s) / 2, y: 540 - (DEVICE_H * S10_END.s) / 2, w: DEVICE_W * S10_END.s, h: DEVICE_H * S10_END.s };
-  const r = {
-    x: interpolate(m, [0, 1], [start.x, PANEL.x]),
-    y: interpolate(m, [0, 1], [start.y, PANEL.y]),
-    w: interpolate(m, [0, 1], [start.w, PANEL.w]),
-    h: interpolate(m, [0, 1], [start.h, PANEL.h]),
-  };
-  const phoneO = 1 - range(f, [2, 12], [0, 1]);
-  const charIn = (d: number) => range(f, [0 + d, 18 + d], [0, 1], easeOut);
+  const blur = throughBlur(f, 120, 12, 10, 12);
   return (
-    <AbsoluteFill style={{ overflow: "hidden" }}>
+    <AbsoluteFill style={{ overflow: "hidden", filter: blur > 0 ? `blur(${blur}px)` : undefined }}>
       <LightStudio f={f + 675} />
       <Layer cam={c} depth={1}>
-        {/* Panel que nace del celular */}
-        <div
-          style={{
-            position: "absolute",
-            left: r.x,
-            top: r.y,
-            width: r.w,
-            height: r.h,
-            borderRadius: interpolate(m, [0, 1], [62, 28]),
-            background: "#F6F7FC",
-            overflow: "hidden",
-            boxShadow: "0 40px 90px rgba(19,13,93,0.22)",
-          }}
-        >
-          <div style={{ position: "absolute", inset: 0, width: PANEL.w, height: PANEL.h, opacity: range(f, [IN - 4, IN + 4], [0, 1]) }}>
-            <Dashboard f={f} />
-          </div>
+        <div style={{ position: "absolute", left: PANEL.x, top: PANEL.y, width: PANEL.w, height: PANEL.h, borderRadius: 28, background: "#F6F7FC", overflow: "hidden", boxShadow: "0 40px 90px rgba(19,13,93,0.22)" }}>
+          <Dashboard f={f} />
         </div>
-        {phoneO > 0 && (
-          <div style={{ position: "absolute", inset: 0, opacity: phoneO }}>
-            <Device x={S10_END.x} y={540} scale={S10_END.s}>
-              <IndicatorsFlow f={130} />
-            </Device>
-          </div>
-        )}
       </Layer>
-      {/* Personajes acompañando, parcialmente en cuadro y fuera de los gráficos */}
+      {/* Caro y Nico acompañan: aparecen cuando la cámara abre, fuera de las áreas de gráficos */}
       <Layer cam={c} depth={1.08}>
-        <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - charIn(0)) * -500}px)` }}>
-          <Char pose={POSE.caroExplicando} x={180} feetY={1190} scale={0.62} />
-        </div>
-        <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - charIn(4)) * 500}px)` }}>
-          <Char pose={POSE.nicoExplicando} x={1765} feetY={1190} scale={0.57} />
-        </div>
+        <Char pose={POSE.caroExplicando} x={180} feetY={1190} scale={0.62} />
+        <Char pose={POSE.nicoExplicando} x={1765} feetY={1190} scale={0.57} />
       </Layer>
     </AbsoluteFill>
   );

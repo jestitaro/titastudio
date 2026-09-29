@@ -1,12 +1,12 @@
 import React from "react";
 import { AbsoluteFill, interpolate, random, useCurrentFrame } from "remotion";
 import { easeInOut, easeOut, range } from "../../lib/motion";
-import { LightStudio, QS } from "../lib/stage";
+import { camRange, LightStudio, QS } from "../lib/stage";
 import { FONT } from "../ds/tokens";
 import { es } from "../../i18n/es";
 import { QSLogo } from "../brand/QSLogo";
 import { fillTri } from "../brand/loader";
-import { LOADER_END, LOGO, LOGO_H, logoLeftCentered } from "./S13Offline";
+import { LOADER_END, LOADER_SCALE_END, LOGO, LOGO_H, logoLeftCentered } from "./S13Offline";
 
 // Escena 14 — cierre exclusivamente con QuartzSales. Los triángulos del loading se ensamblan en el
 // isotipo; el símbolo se desplaza y el wordmark aparece por máscara. La frase final se integra al cierre.
@@ -42,14 +42,16 @@ export const S14Brand: React.FC = () => {
   const wordShift = interpolate(word, [0, 1], [-140, 0]);
   const line = range(f, [T.line, T.line + 16], [0, 1], easeOut);
   const line2 = range(f, [T.line + 6, T.line + 22], [0, 1], easeOut);
-  const settle = range(f, [T.line, 165], [1, 1.025], (t) => t);
+  // Zoom out limpio desde el loader (continúa la escala con la que termina la 13) y respiración final muy leve.
+  const open = camRange(f, [0, 44], [LOADER_SCALE_END, 1]);
+  const settle = open * range(f, [T.line, 165], [1, 1.02], (t) => t);
   // Pulso de luz cuando el isotipo termina de ensamblarse.
   const flash = range(f, [T.assemble[1] - 4, T.assemble[1] + 2], [0, 1]) * (1 - range(f, [T.assemble[1] + 2, T.assemble[1] + 20], [0, 1]));
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       <LightStudio f={f + 120} accent={0.6} />
       <Shards f={f} />
-      <AbsoluteFill style={{ transform: `scale(${settle})` }}>
+      <AbsoluteFill style={{ transform: `scale(${settle})`, transformOrigin: "960px 540px" }}>
         <div
           style={{
             position: "absolute",

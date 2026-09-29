@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { easeInOut, osc, range } from "../../lib/motion";
-import { Closeup, closeupScreen, Layer, LightStudio, Particles, QS, toScreen } from "../lib/stage";
+import { camEase, camPath, Closeup, closeupScreen, Layer, LightStudio, Particles, QS, toScreen } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { APP_H, Device, PngScreen } from "../ds/Device";
 import { QSLogo } from "../brand/QSLogo";
@@ -13,13 +13,17 @@ import { VisitasScreen } from "../screens/Field";
 // pantalla del PNG y queda al centro, recto y frontal.
 const CU = { right: 1960, top: -3, scale: 1 };
 const SCR = closeupScreen("caro", CU.right, CU.top, CU.scale);
-const DETACH: [number, number] = [66, 104];
-export const S06_END = { x: 960, y: 540, s: 0.95 };
+const DETACH: [number, number] = [58, 116];
+// Al final la UI ocupa la altura del cuadro (la escena 7 arranca así y abre para revelar más interfaz).
+export const S06_END = { x: 960, y: 540, s: 1.22 };
 
-const cam = (f: number): Cam => {
-  const k = range(f, [0, DETACH[0] + 10], [0, 1], easeInOut);
-  return { x: interpolate(k, [0, 1], [1000, SCR.x + SCR.w / 2]), y: interpolate(k, [0, 1], [540, SCR.y + SCR.h / 2]), zoom: interpolate(k, [0, 1], [1, 1.14]) };
-};
+// Push-in continuo desde el primer plano de Caro hacia su teléfono.
+const cam = (f: number): Cam =>
+  camPath(f, [
+    { f: 0, x: 1080, y: 560, zoom: 1 },
+    { f: 40, x: SCR.x + SCR.w / 2 + 30, y: SCR.y + SCR.h / 2, zoom: 1.08 },
+    { f: 120, x: SCR.x + SCR.w / 2, y: SCR.y + SCR.h / 2, zoom: 1.5 },
+  ]);
 
 const ScreenContent: React.FC<{ f: number }> = ({ f }) => {
   const splash = range(f, [4, 10], [0, 1]) * (1 - range(f, [26, 32], [0, 1]));
@@ -41,13 +45,13 @@ const ScreenContent: React.FC<{ f: number }> = ({ f }) => {
 export const S06Reveal: React.FC = () => {
   const f = useCurrentFrame();
   const c = cam(f);
-  const d = range(f, DETACH, [0, 1], easeInOut);
+  const d = camEase((f - DETACH[0]) / (DETACH[1] - DETACH[0]));
   const s0 = toScreen(c, 1, { x: SCR.x + SCR.w / 2, y: SCR.y + SCR.h / 2 });
   const startScale = (SCR.w * s0.z) / 390;
   const px = interpolate(d, [0, 1], [s0.x, S06_END.x]);
   const py = interpolate(d, [0, 1], [s0.y + ((APP_H * startScale) / 2 - (SCR.h * s0.z) / 2), S06_END.y]);
   const ps = interpolate(d, [0, 1], [startScale, S06_END.s]);
-  const caroOut = range(f, [DETACH[0] + 8, 112], [0, 1], easeInOut);
+  const caroOut = range(f, [DETACH[0] + 24, 118], [0, 1], easeInOut);
   const glow = range(f, [4, 20], [0, 1]) * (1 - d);
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>

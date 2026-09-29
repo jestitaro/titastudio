@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Img, random, staticFile } from "remotion";
 import { FONT } from "../ds/tokens";
+import type { Cam as CamT } from "../../motion-test/camera";
 
 export { Layer, project, shake, toScreen, W, H } from "../../motion-test/camera";
 export type { Cam } from "../../motion-test/camera";
@@ -250,3 +251,40 @@ export const VoRef: React.FC<{ text: string; o: number; dark?: boolean }> = ({ t
     <span style={{ padding: "4px 12px", borderRadius: 8, background: dark ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.6)" }}>VO · {text}</span>
   </div>
 );
+
+// ——— Lenguaje de cámara ———
+// Un solo easing para todos los movimientos de cámara: arranque suave, llegada larga y controlada.
+export const camEase = (t: number) => {
+  // bezier(0.45, 0, 0.15, 1) aproximada por una curva suave simétrica con cola larga
+  const x = Math.min(1, Math.max(0, t));
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+};
+export const camRange = (f: number, [a, b]: [number, number], [from, to]: [number, number]) => {
+  const t = b === a ? 1 : Math.min(1, Math.max(0, (f - a) / (b - a)));
+  return from + (to - from) * camEase(t);
+};
+
+// Mueve la cámara por tramos (keyframes) con el mismo easing entre cada par.
+export type CamKey = { f: number; x: number; y: number; zoom: number };
+export const camPath = (f: number, keys: CamKey[]): CamT => {
+  if (f <= keys[0].f) return { x: keys[0].x, y: keys[0].y, zoom: keys[0].zoom };
+  for (let i = 0; i < keys.length - 1; i++) {
+    const a = keys[i];
+    const b = keys[i + 1];
+    if (f <= b.f) {
+      const t = camEase((f - a.f) / (b.f - a.f));
+      // El zoom se interpola en escala logarítmica para que se sienta parejo al acercarse y alejarse.
+      const zoom = Math.exp(Math.log(a.zoom) + (Math.log(b.zoom) - Math.log(a.zoom)) * t);
+      return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, zoom };
+    }
+  }
+  const l = keys[keys.length - 1];
+  return { x: l.x, y: l.y, zoom: l.zoom };
+};
+
+// Desenfoque de movimiento para los zoom-through entre escenas (sube al final / baja al inicio).
+export const throughBlur = (f: number, dur: number, outFrames = 0, inFrames = 0, max = 10) => {
+  const o = outFrames > 0 ? Math.max(0, (f - (dur - outFrames)) / outFrames) : 0;
+  const i = inFrames > 0 ? Math.max(0, 1 - f / inFrames) : 0;
+  return Math.min(1, o * o + i * i) * max;
+};

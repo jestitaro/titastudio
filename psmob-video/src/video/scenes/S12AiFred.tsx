@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { easeInOut, osc, pop, range } from "../../lib/motion";
-import { Actor, Layer, POSE, posePoint, project, toScreen, W } from "../lib/stage";
+import { Actor, camPath, camRange, H, Layer, POSE, posePoint, project, throughBlur, W } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { Device } from "../ds/Device";
 import { Chip } from "../ds/ui";
@@ -13,19 +13,22 @@ import { ScanScreen } from "../screens/Scan";
 // Escena 12 — AiFred. Travelling: la cámara acompaña a Nico caminando por la góndola (parallax en planos
 // y cabeceras que cruzan cámara). Nico se frena y escanea (AR sobre los productos), zoom fuerte a su
 // celular: el celular vectorial nace derecho sobre el suyo y muestra el reconocimiento.
-const T0 = { walk: [0, 96] as [number, number], ar: [100, 146] as [number, number], zoom: [140, 170] as [number, number], scan: 176 };
+const T0 = { walk: [0, 96] as [number, number], ar: [100, 140] as [number, number], zoom: [138, 170] as [number, number], scan: 172, context: [204, 232] as [number, number] };
 const NICO_SCALE = 0.7;
 const NICO_FEET = 1150;
-const NICO_SX = 700; // posición en pantalla mientras camina
+const NICO_SX = 720; // posición en pantalla mientras camina
 const DEPTH_N = 1.1;
-export const S12_PHONE = { x: 1180, y: 540, s: 0.92 };
+export const S12_PHONE = { x: 1400, y: 540, s: 0.92 };
 
-const camPan = (f: number) => interpolate(range(f, T0.walk, [0, 1], (t) => (t < 0.85 ? t / 0.85 * 0.92 : 0.92 + (1 - Math.pow(1 - (t - 0.85) / 0.15, 2)) * 0.08)), [0, 1], [1450, 2640]);
+const panEase = (t: number) => (t < 0.85 ? (t / 0.85) * 0.92 : 0.92 + (1 - Math.pow(1 - (t - 0.85) / 0.15, 2)) * 0.08);
+const camPan = (f: number) => interpolate(panEase(range(f, T0.walk, [0, 1], (t) => t)), [0, 1], [1450, 2640]);
+// Zoom del tramo de caminata: arranca cerrado sobre la góndola (continúa el zoom-through) y abre.
+const walkZoom = (f: number) => camRange(f, [0, 26], [1.7, 0.92]);
 
-// Nico en su plano: calculado para quedar en NICO_SX en pantalla mientras camina; se congela al frenar.
+// Nico se calcula para quedar en NICO_SX mientras camina; se congela al frenar.
 const nicoWorldX = (f: number) => {
   const fr = Math.min(f, T0.walk[1]);
-  const c: Cam = { x: camPan(fr), y: 540, zoom: 1 };
+  const c: Cam = { x: camPan(fr), y: 540, zoom: walkZoom(fr) };
   const { z, fx } = project(c, DEPTH_N);
   return fx + (NICO_SX - W / 2) / z;
 };
@@ -35,15 +38,27 @@ const phoneWorld = (f: number) => {
   return { x: NICO_X(f) + p.x, y: NICO_FEET + p.y };
 };
 
-const cam = (f: number): Cam => {
-  const z = range(f, T0.zoom, [0, 1], easeInOut);
-  const ph = phoneWorld(T0.zoom[0]);
-  const base = { x: camPan(f), y: 540 };
-  // El zoom apunta al celular de Nico (en su plano): se compensa la profundidad para centrarlo.
-  const tx = 960 + (ph.x - 960) / DEPTH_N;
-  const ty = 540 + (ph.y - 540) / DEPTH_N;
-  return { x: interpolate(z, [0, 1], [base.x, tx + 60]), y: interpolate(z, [0, 1], [base.y, ty + 40]), zoom: 1 + z * 1.2 };
+// Cámara: travelling → frena → zoom al celular → zoom out leve al contexto → arranca el push-in de la 13.
+const PH = phoneWorld(T0.zoom[0]);
+const ZOOM_TARGET = { x: 960 + (PH.x - 960) / DEPTH_N + 70, y: 540 + (PH.y - 540) / DEPTH_N + 40, zoom: 2.3 };
+export const s12Cam = (f: number): Cam => {
+  if (f < T0.zoom[0]) return { x: camPan(f), y: 540, zoom: walkZoom(f) };
+  const base = { f: T0.zoom[0], x: camPan(T0.zoom[0]), y: 540, zoom: walkZoom(T0.zoom[0]) };
+  return camPath(f, [
+    base,
+    { f: T0.zoom[1], ...ZOOM_TARGET },
+    { f: T0.context[0], ...ZOOM_TARGET },
+    { f: T0.context[1], x: ZOOM_TARGET.x + 60, y: 560, zoom: 1.4 },
+    { f: 240, x: ZOOM_TARGET.x + 80, y: 555, zoom: 1.46 },
+  ]);
 };
+
+// Celular en el mundo (plano de Nico): calculado para quedar en S12_PHONE al terminar el zoom.
+export const DEV_WORLD = (() => {
+  const c = s12Cam(T0.zoom[1]);
+  const { z, fx, fy } = project(c, DEPTH_N);
+  return { x: fx + (S12_PHONE.x - W / 2) / z, y: fy + (S12_PHONE.y - H / 2) / z, s: S12_PHONE.s / z };
+})();
 
 const ArOverlay: React.FC<{ f: number }> = ({ f }) => {
   const near = FACINGS.filter((p) => p.x > 2330 && p.x < 2960 && p.level < 3);
@@ -87,9 +102,9 @@ const ArOverlay: React.FC<{ f: number }> = ({ f }) => {
 };
 
 // Mundo (se exporta para que la escena 13 herede el mismo fondo).
-export const S12World: React.FC<{ f: number }> = ({ f }) => {
-  const c = cam(f);
-  const z = range(f, T0.zoom, [0, 1], easeInOut);
+export const S12World: React.FC<{ f: number; cam?: Cam; device?: React.ReactNode; deviceState?: { x: number; y: number; s: number; o: number } }> = ({ f, cam: camO, device, deviceState }) => {
+  const c = camO ?? s12Cam(f);
+  const z = Math.min(1, Math.max(0, (c.zoom - 1) / 1.3));
   const walking = f < T0.walk[1];
   return (
     <>
@@ -116,6 +131,14 @@ export const S12World: React.FC<{ f: number }> = ({ f }) => {
           blink={walking ? undefined : { pose: POSE.nicoCelularBlink, at: [118, 200] }}
         />
       </Layer>
+      {/* El celular vive en el plano de Nico pero siempre nítido (es el protagonista) */}
+      {device && deviceState && deviceState.o > 0.001 && (
+        <Layer cam={c} depth={DEPTH_N}>
+          <Device x={deviceState.x} y={deviceState.y} scale={deviceState.s} opacity={deviceState.o}>
+            {device}
+          </Device>
+        </Layer>
+      )}
       {/* Cabeceras de góndola que cruzan cámara */}
       <Layer cam={c} depth={1.7} blur={10}>
         {[1500, 2900].map((x) => (
@@ -130,7 +153,7 @@ const Insight: React.FC<{ f: number; at: number; icon: IconName; title: string; 
   const p = pop(f, at, { damping: 12, stiffness: 150 }) * (1 - range(f, [232, 240], [0, 1], easeInOut));
   if (p <= 0.01) return null;
   return (
-    <div style={{ position: "absolute", left: 1700, top: y + osc(f, 70, 5), transform: `translate(-50%, -50%) scale(${p})`, background: C.surface, borderRadius: R.card, padding: `${S.md}px ${S.lg}px`, display: "flex", alignItems: "center", gap: S.md, boxShadow: SH.float, fontFamily: FONT, width: 300 }}>
+    <div style={{ position: "absolute", left: 330, top: y + osc(f, 70, 5), transform: `translate(-50%, -50%) scale(${p})`, background: C.surface, borderRadius: R.card, padding: `${S.md}px ${S.lg}px`, display: "flex", alignItems: "center", gap: S.md, boxShadow: SH.float, fontFamily: FONT, width: 300 }}>
       <div style={{ width: 44, height: 44, borderRadius: R.sm, background: `${tone}1F`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Icon name={icon} size={26} color={tone} />
       </div>
@@ -144,13 +167,14 @@ const Insight: React.FC<{ f: number; at: number; icon: IconName; title: string; 
 
 export const S12AiFred: React.FC = () => {
   const f = useCurrentFrame();
-  const c = cam(f);
-  const born = range(f, [T0.zoom[0] + 8, T0.zoom[1] + 6], [0, 1], easeInOut);
-  const s0 = toScreen(c, DEPTH_N, phoneWorld(f));
-  const startScale = (95 * s0.z * NICO_SCALE) / 844;
+  const c = s12Cam(f);
+  const born = range(f, [T0.zoom[0] + 6, T0.zoom[1] + 2], [0, 1], easeInOut);
+  const ph = phoneWorld(f);
+  const dev = { x: interpolate(born, [0, 1], [ph.x, DEV_WORLD.x]), y: interpolate(born, [0, 1], [ph.y, DEV_WORLD.y]), s: interpolate(born, [0, 1], [0.03, DEV_WORLD.s]), o: Math.min(1, born * 6) };
+  const blur = throughBlur(f, 240, 0, 10, 12);
   return (
-    <AbsoluteFill style={{ overflow: "hidden" }}>
-      <S12World f={f} />
+    <AbsoluteFill style={{ overflow: "hidden", filter: blur > 0 ? `blur(${blur}px)` : undefined }}>
+      <S12World f={f} cam={c} device={<ScanScreen f={f - T0.scan} />} deviceState={dev} />
       {f >= T0.ar[0] && f < T0.zoom[0] + 14 && (
         <div style={{ position: "absolute", left: 100, top: 90, transform: `scale(${pop(f, T0.ar[0])})`, transformOrigin: "0 0", opacity: 1 - range(f, [T0.zoom[0], T0.zoom[0] + 12], [0, 1]) }}>
           <div style={{ display: "flex", alignItems: "center", gap: S.sm, background: C.dark, color: "#fff", padding: `${S.md}px ${S.xl}px`, borderRadius: R.pill, fontFamily: FONT, fontSize: 24, fontWeight: 700, boxShadow: SH.float }}>
@@ -158,14 +182,9 @@ export const S12AiFred: React.FC = () => {
           </div>
         </div>
       )}
-      {born > 0.001 && (
-        <Device x={interpolate(born, [0, 1], [s0.x, S12_PHONE.x])} y={interpolate(born, [0, 1], [s0.y, S12_PHONE.y])} scale={interpolate(born, [0, 1], [startScale, S12_PHONE.s])} opacity={Math.min(1, born * 6)}>
-          <ScanScreen f={f - T0.scan} />
-        </Device>
-      )}
-      <Insight f={f} at={200} icon="dollar" title="Precios validados" value="46 / 48" tone={C.success} y={300} />
-      <Insight f={f} at={208} icon="grid" title="Planograma" value="92% OK" tone={C.violet} y={520} />
-      <Insight f={f} at={216} icon="alert" title="Faltantes" value="2 productos" tone={C.error} y={740} />
+      <Insight f={f} at={190} icon="dollar" title="Precios validados" value="46 / 48" tone={C.success} y={300} />
+      <Insight f={f} at={196} icon="grid" title="Planograma" value="92% OK" tone={C.violet} y={520} />
+      <Insight f={f} at={202} icon="alert" title="Faltantes" value="2 productos" tone={C.error} y={740} />
     </AbsoluteFill>
   );
 };

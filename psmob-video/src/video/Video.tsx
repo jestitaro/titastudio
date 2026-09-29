@@ -32,22 +32,6 @@ const COMPONENTS: Record<SceneId, React.FC> = {
 
 const DARK_SCENES: SceneId[] = ["s01", "s05"];
 
-// Whip-pan entre escenas que no comparten objeto de transición: la escena saliente se va con desenfoque
-// de movimiento y la entrante llega desde el otro lado, en la misma dirección.
-const WHIP_OUT: SceneId[] = ["s08", "s09", "s11"];
-const WHIP_IN: SceneId[] = ["s09", "s10", "s12"];
-const WHIP = 8;
-
-const Whip: React.FC<{ id: SceneId; dur: number; children: React.ReactNode }> = ({ id, dur, children }) => {
-  const f = useCurrentFrame();
-  const out = WHIP_OUT.includes(id) ? range(f, [dur - WHIP, dur], [0, 1], (t) => t * t) : 0;
-  const inn = WHIP_IN.includes(id) ? 1 - range(f, [0, WHIP], [0, 1], (t) => 1 - (1 - t) * (1 - t)) : 0;
-  const x = -out * 900 + inn * 900;
-  const blur = (out + inn) * 28;
-  if (x === 0) return <>{children}</>;
-  return <AbsoluteFill style={{ transform: `translateX(${x}px)`, filter: `blur(${blur}px)` }}>{children}</AbsoluteFill>;
-};
-
 const VoLayer: React.FC<{ id: SceneId }> = ({ id }) => {
   const f = useCurrentFrame();
   const line = VO[id].find((l) => f >= l.from && f < l.to);
@@ -66,9 +50,7 @@ export const PSMobVideo: React.FC<PSMobVideoProps> = ({ showVO }) => {
         const C = COMPONENTS[s.id];
         return (
           <Sequence key={s.id} from={sceneStart(s.id)} durationInFrames={s.dur} name={s.id}>
-            <Whip id={s.id} dur={s.dur}>
-              <C />
-            </Whip>
+            <C />
             {showVO && <VoLayer id={s.id} />}
           </Sequence>
         );
