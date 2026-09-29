@@ -10,7 +10,7 @@ import { fillTri } from "../brand/loader";
 import { Kinetic } from "../ui/Kinetic";
 import { es } from "../../i18n/es";
 import { ScanScreen, SummaryScreen } from "../screens/Scan";
-import { DEPTH_N, DEV12, s12Cam, S12World } from "./S12AiFred";
+import { DEPTH_N, DEV12, s12Cam, S12_DUR, S12World, T0 } from "./S12AiFred";
 
 // Escena 13 — "Incluso sin conexión". La cámara continúa el acercamiento suave de la 12 (Nico entero en
 // cuadro, el celular protagonista); el texto va a la izquierda sobre una placa clara para leerse sobre la
@@ -29,7 +29,7 @@ const LOAD: [number, number] = [116, 156];
 
 const cam = (f: number): Cam =>
   camPath(f, [
-    { f: 0, ...s12Cam(300) },
+    { f: 0, ...s12Cam(S12_DUR) },
     { f: 165, x: DEV12.x - 35, y: 540, zoom: 1.15 },
   ]);
 
@@ -49,7 +49,7 @@ export const S13Offline: React.FC = () => {
   const content = (
     <>
       <div style={{ position: "absolute", inset: 0, transform: `translateX(${-push * 30}%)` }}>
-        <ScanScreen f={(300 - 186) * 0.8 + f * 0.8} offline={range(f, [12, 22], [0, 1])} progress={f > 8 ? 100 : undefined} />
+        <ScanScreen f={(S12_DUR - T0.scan) * 0.8 + f * 0.8} offline={range(f, [12, 22], [0, 1])} progress={f > 8 ? 100 : undefined} />
         {toast > 0.01 && (
           <div style={{ position: "absolute", left: S.lg, right: S.lg, top: 100, transform: `translateY(${(1 - toast) * -120}px)` }}>
             <Toast icon="cloud" title="Modo sin conexión" subtitle="Seguís trabajando · guardado localmente" />
@@ -65,7 +65,7 @@ export const S13Offline: React.FC = () => {
   );
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
-      <S12World f={300} cam={c} device={content} deviceState={{ ...DEV12, o: 1 }} arOpacity={1 - range(f, [0, 30], [0, 1])} />
+      <S12World f={S12_DUR} cam={c} device={content} deviceState={{ ...DEV12, o: 1 }} arOpacity={1 - range(f, [0, 30], [0, 1])} />
       <AbsoluteFill style={{ clipPath: `circle(${reveal * 1300}px at ${lx}px ${ly}px)` }}>
         <LightStudio f={f} accent={0.6} />
       </AbsoluteFill>

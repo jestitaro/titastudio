@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { easeInOut, pop, range } from "../../lib/motion";
-import { Actor, camPath, Contact, Layer, POSE, posePoint, W, WALK_NICO } from "../lib/stage";
+import { Actor, camPath, Contact, Layer, POSE, posePoint, WALK_NICO } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { Device } from "../ds/Device";
 import { Chip } from "../ds/ui";
@@ -16,31 +16,29 @@ import { ScanScreen } from "../screens/Scan";
 // detecciones, precios validados y, al final, faltante y producto fuera de posición.
 // Escala y horizonte: la góndola va en segundo plano (zócalo apoyado en la línea de piso) y Nico más
 // adelante, con los pies sobre el piso y sombra de contacto.
-export const T0 = { walk: [14, 130] as [number, number], born: [150, 186] as [number, number], scan: 186, det1: 196, det2: 224, prices: 252, plano: 270 };
+export const S12_DUR = 330;
+export const T0 = { walk: [0, 130] as [number, number], open: 176, born: [168, 202] as [number, number], scan: 202, det1: 214, det2: 242, prices: 270, plano: 290 };
 const GS = 0.74; // escala de la góndola en el mundo
 const G_FLOOR = 845; // línea de piso donde apoya la góndola
 const GY = G_FLOOR - GONDOLA.bottom * GS;
 const G_DEPTH = 0.9;
 export const DEPTH_N = 1;
 export const NICO12 = { feet: 1000, scale: 0.52 };
-const PAN: [number, number] = [1500, 2500];
+const WIDE = { x: 2500, y: 540, zoom: 1 };
 
-const ease = (t: number) => 1 - Math.pow(1 - t, 2);
-const panX = (f: number) => interpolate(f, [0, T0.walk[1] + 10], PAN, { easing: ease, extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+// Nico camina por delante de la góndola (entra por la izquierda) y se frena.
+const nicoX = (f: number) => interpolate(f, T0.walk, [1250, 2990], { easing: (t) => 1 - Math.pow(1 - t, 1.6), extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
+// Travelling en plano medio (cintura para arriba) mientras camina: las piernas quedan fuera de cuadro y
+// la góndola pasa detrás. Al frenarse, la cámara abre y se lo ve entero, con los pies en el piso.
+const walkCam = (f: number): Cam => ({ x: Math.max(2050, nicoX(f) + 150), y: 430, zoom: 1.7 });
 export const s12Cam = (f: number): Cam => {
-  if (f <= T0.walk[1] + 10) return { x: panX(f), y: 540, zoom: 1 };
+  if (f <= T0.walk[1]) return walkCam(f);
   return camPath(f, [
-    { f: T0.walk[1] + 10, x: PAN[1], y: 540, zoom: 1 },
-    { f: 300, x: PAN[1] - 20, y: 535, zoom: 1.04 },
+    { f: T0.walk[1], ...walkCam(T0.walk[1]) },
+    { f: T0.open, ...WIDE },
+    { f: S12_DUR, x: WIDE.x - 20, y: 535, zoom: 1.04 },
   ]);
-};
-
-// Posición en pantalla de Nico mientras camina (entra por la izquierda, se frena a la derecha del cuadro).
-const nicoSX = (f: number) => interpolate(f, T0.walk, [-280, 1450], { easing: (t) => 1 - Math.pow(1 - t, 1.6), extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-const nicoX = (f: number) => {
-  const fr = Math.min(f, T0.walk[1]);
-  return s12Cam(fr).x + (nicoSX(fr) - W / 2);
 };
 export const NICO12_X = nicoX(T0.walk[1]);
 export const phone12 = (() => {

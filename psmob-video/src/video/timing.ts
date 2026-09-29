@@ -13,9 +13,9 @@ export const SCENES = [
   { id: "s09", dur: 210 }, // Agiliza la captura de datos
   { id: "s10", dur: 180 }, // Información en tiempo real
   { id: "s11", dur: 195 }, // Dashboard
-  { id: "s12", dur: 300 }, // AiFred en góndola
+  { id: "s12", dur: 330 }, // AiFred en góndola
   { id: "s13", dur: 165 }, // Sin conexión → enviando → loading de marca
-  { id: "s14", dur: 195 }, // Cierre QuartzSales
+  { id: "s14", dur: 225 }, // Cierre QuartzSales
 ] as const;
 
 export type SceneId = (typeof SCENES)[number]["id"];
@@ -34,7 +34,7 @@ export const sceneDur = (id: SceneId) => SCENES.find((s) => s.id === id)!.dur;
 export const TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);
 
 // Beats internos de la escena 1–4 (relativos al inicio del bloque).
-export const BEATS_S01 = { stop: 80, team: 110, stress: 140, pdv: 142, check: 174, data: 206, alert: 236, drop: 290 };
+export const BEATS_S01 = { stop: 80, open: 124, team: 128, stress: 150, pdv: 158, check: 188, data: 216, alert: 244, drop: 290 };
 
 // Locución de referencia por escena (frames relativos al bloque). No se muestra en el video: sirve para
 // retimear cuando llegue el audio final.

@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, Sequence } from "remotion";
 import { SCENES, SceneId, sceneStart } from "./timing";
 import { TriangleWipe } from "./transitions/TriangleWipe";
+import { Soundtrack } from "./Soundtrack";
 import { S01Overload } from "./scenes/S01Overload";
 import { S05Desk } from "./scenes/S05Desk";
 import { S06Reveal } from "./scenes/S06Reveal";
@@ -47,6 +48,7 @@ export const PSMobVideo: React.FC<PSMobVideoProps> = () => {
       <Sequence from={wipeAt - 14} durationInFrames={36} name="wipe-s05-s06">
         <TriangleWipe cover={14} />
       </Sequence>
+      <Soundtrack />
     </AbsoluteFill>
   );
 };
