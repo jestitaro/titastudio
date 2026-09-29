@@ -59,9 +59,10 @@ export const POSE = {
   caroCaida: { file: "caro-caida.png", w: 1024, h: 1536, axisX: 520, feetY: 1273 },
 } satisfies Record<string, Pose>;
 
-// Ciclos de caminata ordenados por altura de cabeza (alto → bajo → alto) para un rebote suave.
-export const WALK_CARO = { poses: [POSE.caroWalk5, POSE.caroWalk2, POSE.caroWalk1, POSE.caroWalk4, POSE.caroWalk3, POSE.caroWalk4, POSE.caroWalk1, POSE.caroWalk2], period: 2, bob: 0 };
-export const WALK_NICO = { poses: [POSE.nicoWalk4, POSE.nicoWalk1, POSE.nicoWalk3, POSE.nicoWalk2, POSE.nicoWalk3, POSE.nicoWalk1], period: 3, bob: 0 };
+// Caminata: los fotogramas nuevos comparten la misma fase de paso, así que se alternan solo los dos de
+// altura casi idéntica (sin saltos), a un ritmo de paso natural (~2 pasos/s), con un rebote suave.
+export const WALK_CARO = { poses: [POSE.caroWalk5, POSE.caroWalk2], period: 8, bob: 4 };
+export const WALK_NICO = { poses: [POSE.nicoWalk4, POSE.nicoWalk1], period: 8, bob: 4 };
 
 // Primeros planos mostrando el celular (PNG apaisados recortados en los bordes derecho/arriba/abajo).
 // Se anclan al borde derecho del cuadro; `screen` = pantalla en blanco del celular (coords del PNG).
@@ -125,8 +126,9 @@ export const Actor: React.FC<{
   if (walk) {
     const step = Math.floor(f / walk.period);
     p = walk.poses[step % walk.poses.length];
+    // Rebote suave (coseno): mínimo en el apoyo, sin el "pico" que parece un saltito.
     const phase = (f % walk.period) / walk.period;
-    y = feetY - Math.sin(phase * Math.PI) * walk.bob;
+    y = feetY - (0.5 - 0.5 * Math.cos(phase * Math.PI * 2)) * walk.bob;
   } else if (blink && isBlink(f, blink.at)) {
     p = blink.pose;
   }
@@ -168,8 +170,10 @@ export const Shadow: React.FC<{ x: number; y: number; w?: number; o?: number; da
 );
 
 // Piso: línea suave de horizonte + sombra de contacto. Evita que los personajes "floten".
+// `y` = línea de pies; el horizonte queda un poco más arriba para que los pies apoyen sobre el piso.
+export const FLOOR_HORIZON = 46;
 export const Floor: React.FC<{ y: number; color?: string; o?: number }> = ({ y, color = "rgba(19,13,93,0.10)", o = 1 }) => (
-  <div style={{ position: "absolute", left: -2000, top: y, width: 6000, height: 900, opacity: o, background: "linear-gradient(180deg, rgba(226,230,244,0.9), rgba(244,241,255,0.4) 400px)", borderTop: `2px solid ${color}` }} />
+  <div style={{ position: "absolute", left: -2000, top: y - FLOOR_HORIZON, width: 6000, height: 900, opacity: o, background: "linear-gradient(180deg, rgba(226,230,244,0.9), rgba(244,241,255,0.4) 400px)", borderTop: `2px solid ${color}` }} />
 );
 export const Contact: React.FC<{ x: number; y: number; w?: number; o?: number }> = ({ x, y, w = 300, o = 1 }) => (
   <div style={{ position: "absolute", left: x - w / 2, top: y - w * 0.06, width: w, height: w * 0.12, borderRadius: "50%", opacity: o, background: "radial-gradient(closest-side, rgba(19,13,93,0.22), rgba(19,13,93,0))" }} />

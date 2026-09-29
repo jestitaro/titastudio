@@ -9,7 +9,7 @@ import { es } from "../../i18n/es";
 import { FormsFlow, FT } from "../screens/Forms";
 import { ChatScreen } from "../screens/Chat";
 import { Gondola } from "../ui/Gondola";
-import { chatClock } from "./S08Chat";
+import { chatClock, S08_DUR } from "./S08Chat";
 import { CAM_NICO, NICO_DEV, NICO_W } from "./world";
 
 // Escena 9 — "Agiliza la captura de datos". Arranca con el mismo encuadre que el final de la 8; el fondo
@@ -62,7 +62,7 @@ export const S09Capture: React.FC = () => {
         )}
         <Device x={NICO_DEV.x} y={NICO_DEV.y} scale={NICO_DEV.s}>
           <div style={{ position: "absolute", inset: 0, transform: `translateX(${-nav * 30}%)` }}>
-            <ChatScreen f={chatClock(195 + f)} mine="nico" />
+            <ChatScreen f={chatClock(S08_DUR + f)} mine="nico" />
           </div>
           {nav > 0 && (
             <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - nav) * 100}%)` }}>

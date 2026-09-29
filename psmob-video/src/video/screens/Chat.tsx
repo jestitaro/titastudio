@@ -7,6 +7,14 @@ import { PDVS } from "./data";
 
 // Chat por PDV (captura de corrección 5): header azul con el PDV, selector General / Ejecución,
 // burbujas con tag PDV, audio, hora y doble check.
+// Diálogo de la escena 8 (los mismos textos que los globos que se ven entre los personajes).
+export const CONVO = [
+  { from: "caro", text: "¿Viste los datos que te envié?", time: "10:40" },
+  { from: "nico", text: "¡Sí! Los reviso ahora", time: "10:41" },
+  { from: "caro", text: "Sumá fotos de la góndola, porfa", time: "10:41" },
+  { from: "nico", text: "Dale, te las mando desde el PDV", time: "10:42" },
+] as const;
+
 export const CHAT = { incoming: 6, typing: [26, 44] as [number, number], reply: 44, read: 62, attach: [74, 100] as [number, number] };
 
 const PdvTag = () => (
@@ -51,9 +59,6 @@ const Bubble: React.FC<{ mine?: boolean; p: number; children: React.ReactNode; t
 
 export const ChatScreen: React.FC<{ f: number; mine: "caro" | "nico" }> = ({ f, mine }) => {
   const nicoView = mine === "nico";
-  const pIn = pop(f, CHAT.incoming, { damping: 10, stiffness: 170, mass: 0.6 });
-  const pRe = pop(f, CHAT.reply, { damping: 9, stiffness: 190, mass: 0.6 });
-  const typing = f >= CHAT.typing[0] && f < CHAT.typing[1];
   const k1 = range(f, [CHAT.reply + 6, CHAT.reply + 12], [0, 1]);
   const k2 = range(f, [CHAT.reply + 12, CHAT.reply + 18], [0, 1]);
   const read = f >= CHAT.read;
@@ -68,32 +73,16 @@ export const ChatScreen: React.FC<{ f: number; mine: "caro" | "nico" }> = ({ f, 
         <div style={{ alignSelf: "center" }}>
           <Chip tone="neutral">Hoy</Chip>
         </div>
-        {/* Mensaje previo */}
-        <Bubble mine={!nicoView} p={1} time="09:15" checks={!nicoView ? <Checks k1={1} k2={1} read /> : undefined}>
-          ¿Revisaste los formularios del punto de venta?
-        </Bubble>
-        <Bubble mine={nicoView} p={1} time="09:20" checks={nicoView ? <Checks k1={1} k2={1} read /> : undefined}>
-          Sí, estoy en eso ahora
-        </Bubble>
-        {/* Caro → Nico */}
-        {f >= CHAT.incoming && (
-          <Bubble mine={!nicoView} p={pIn} time="10:40" checks={!nicoView ? <Checks k1={1} k2={1} read={read} /> : undefined}>
-            ¿Viste los datos que te envié?
-          </Bubble>
-        )}
-        {typing && (
-          <div style={{ alignSelf: nicoView ? "flex-end" : "flex-start", background: nicoView ? C.primarySoft : "#EEF2F7", borderRadius: R.card, padding: `${S.md}px ${S.lg}px`, display: "flex", gap: 6 }}>
-            {[0, 1, 2].map((i) => (
-              <div key={i} style={{ width: 8, height: 8, borderRadius: 4, background: C.text2, opacity: 0.35 + 0.65 * Math.max(0, Math.sin((f - CHAT.typing[0]) * 0.5 - i * 0.9)) }} />
-            ))}
-          </div>
-        )}
-        {/* Nico → Caro */}
-        {f >= CHAT.reply && (
-          <Bubble mine={nicoView} p={pRe} time="10:42" checks={nicoView ? <Checks k1={k1} k2={k2} read={read} /> : undefined}>
-            ¡Los revisaré ahora!
-          </Bubble>
-        )}
+        {/* La conversación que Caro y Nico acaban de tener (escena 8) */}
+        {CONVO.map((m, i) => {
+          const last = i === CONVO.length - 1;
+          const own = (m.from === "nico") === nicoView;
+          return (
+            <Bubble key={i} mine={own} p={1} time={m.time} checks={own ? <Checks k1={last ? k1 : 1} k2={last ? k2 : 1} read={last ? read : true} /> : undefined}>
+              {m.text}
+            </Bubble>
+          );
+        })}
       </div>
       {/* Barra de entrada */}
       <div style={{ position: "absolute", left: S.lg, right: S.lg, bottom: S.xl, display: "flex", gap: S.sm, alignItems: "center" }}>

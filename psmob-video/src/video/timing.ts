@@ -9,7 +9,7 @@ export const SCENES = [
   { id: "s05", dur: 255 }, // Escritorio, paso del tiempo
   { id: "s06", dur: 165 }, // Caro muestra el celular → UI
   { id: "s07", dur: 195 }, // Organización: equipo → ruteo
-  { id: "s08", dur: 195 }, // Optimiza la comunicación
+  { id: "s08", dur: 255 }, // Optimiza la comunicación
   { id: "s09", dur: 210 }, // Agiliza la captura de datos
   { id: "s10", dur: 180 }, // Información en tiempo real
   { id: "s11", dur: 195 }, // Dashboard

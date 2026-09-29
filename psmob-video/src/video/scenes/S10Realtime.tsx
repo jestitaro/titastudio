@@ -1,10 +1,9 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
-import { easeInOut, pop, range } from "../../lib/motion";
+import { easeInOut, range } from "../../lib/motion";
 import { Actor, camPath, Contact, Floor, Layer, LightStudio, Particles, POSE, posePoint, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { Device } from "../ds/Device";
-import { Chip } from "../ds/ui";
 import { Kinetic } from "../ui/Kinetic";
 import { es } from "../../i18n/es";
 import { IndicatorsFlow } from "../screens/Indicators";
@@ -36,7 +35,6 @@ export const S10Realtime: React.FC = () => {
   const c = camS10(f);
   const wipe = range(f, [0, 40], [0, 1], easeInOut);
   const born = range(f, BORN, [0, 1], easeInOut);
-  const notif = pop(f, 18, { damping: 16, stiffness: 110 }) * (1 - range(f, [40, 52], [0, 1]));
   const storeCam: Cam = { x: 1080, y: 500, zoom: 1.02 };
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -50,13 +48,6 @@ export const S10Realtime: React.FC = () => {
           <Floor y={FLOOR_Y} />
           <Contact x={CARO_W.x} y={CARO_W.feet} />
           <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [24, 120] }} />
-          {notif > 0.01 && (
-            <div style={{ position: "absolute", left: DEV10.x, top: 330, transform: `translate(-50%, -50%) scale(${notif})` }}>
-              <Chip tone="success" solid icon="check">
-                Formulario recibido · Nico
-              </Chip>
-            </div>
-          )}
           {born > 0.01 && (
             <Device x={interpolate(born, [0, 1], [phone10.x, DEV10.x])} y={interpolate(born, [0, 1], [phone10.y, DEV10.y])} scale={interpolate(born, [0, 1], [0.05, DEV10.s])} opacity={Math.min(1, born * 4)}>
               <IndicatorsFlow f={(f - FLOW0) * TS} />
