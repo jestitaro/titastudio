@@ -176,9 +176,12 @@ export const Floor: React.FC<{ y: number; color?: string; o?: number }> = ({ y, 
   <div style={{ position: "absolute", left: -2000, top: y - FLOOR_HORIZON, width: 6000, height: 900, opacity: o, background: "linear-gradient(180deg, rgba(226,230,244,0.9), rgba(244,241,255,0.4) 400px)", borderTop: `2px solid ${color}` }} />
 );
 // Sombra de contacto plana y pegada a los pies (poco difuminada, núcleo más marcado).
-export const Contact: React.FC<{ x: number; y: number; w?: number; o?: number }> = ({ x, y, w = 260, o = 1 }) => (
-  <div style={{ position: "absolute", left: x - w / 2, top: y - w * 0.035, width: w, height: w * 0.07, borderRadius: "50%", opacity: o, background: "radial-gradient(closest-side, rgba(19,13,93,0.30) 0%, rgba(19,13,93,0.22) 55%, rgba(19,13,93,0) 100%)" }} />
-);
+// Va detrás del personaje y sube por debajo de las suelas (75% queda tapado por los zapatos), así que
+// asoma apenas pegada a los pies en lugar de quedar suelta debajo.
+export const Contact: React.FC<{ x: number; y: number; w?: number; o?: number }> = ({ x, y, w = 260, o = 1 }) => {
+  const h = w * 0.1;
+  return <div style={{ position: "absolute", left: x - w / 2, top: y - h * 0.75, width: w, height: h, borderRadius: "50%", opacity: o, background: "radial-gradient(closest-side, rgba(19,13,93,0.34) 0%, rgba(19,13,93,0.26) 60%, rgba(19,13,93,0) 100%)" }} />;
+};
 
 // ——— Fondos ———
 // Estudio claro del primer video: fondo claro, trama de puntos y círculos suaves (con profundidad).

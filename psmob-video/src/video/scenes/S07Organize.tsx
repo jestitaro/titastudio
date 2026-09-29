@@ -3,13 +3,13 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { easeInOut, osc, pop, range } from "../../lib/motion";
 import { Actor, camPath, Contact, Floor, Layer, LightStudio, Particles, POSE, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
-import { APP_H, APP_W, Device } from "../ds/Device";
+import { APP_W, Device } from "../ds/Device";
 import { Avatar } from "../ds/ui";
 import { FONT } from "../ds/tokens";
 import { listSlot, VIS, VisitasScreen } from "../screens/Field";
 import { TEAM } from "../screens/data";
 import { S06_UI_END } from "./S06Reveal";
-import { CARO_W, DEV7, FLOOR_Y } from "./world";
+import { CARO_APP_H, CARO_W, DEV7, FLOOR_Y } from "./world";
 
 // Escena 7 — arranca con la UI donde terminó la 6 y la cámara se aleja despacio hasta revelar a Caro de
 // cuerpo entero (con piso y sombra) y su celular a su derecha, en una sola composición. El equipo se asigna a cada PDV; luego la app
@@ -35,7 +35,7 @@ export const S07Organize: React.FC = () => {
   const f = useCurrentFrame();
   const cam = camS07(f);
   const vf = f * TS;
-  const slotWorld = (p: { x: number; y: number }) => ({ x: DEV7.x + (p.x - APP_W / 2) * DEV7.s, y: DEV7.y + (p.y - APP_H / 2) * DEV7.s });
+  const slotWorld = (p: { x: number; y: number }) => ({ x: DEV7.x + (p.x - APP_W / 2) * DEV7.s, y: DEV7.y + (p.y - CARO_APP_H / 2) * DEV7.s });
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       <LightStudio f={f + 150} />
@@ -47,7 +47,7 @@ export const S07Organize: React.FC = () => {
         <Contact x={CARO_W.x} y={CARO_W.feet} />
         {/* Caro aparece de a poco mientras la cámara se aleja despacio */}
         <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} opacity={range(f, [40, 110], [0, 1], easeInOut)} />
-        <Device x={DEV7.x} y={DEV7.y} scale={DEV7.s}>
+        <Device x={DEV7.x} y={DEV7.y} scale={DEV7.s} appH={CARO_APP_H}>
           <VisitasScreen f={vf} />
         </Device>
         {TEAM.map((t, i) => {

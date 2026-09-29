@@ -5,6 +5,8 @@
 export const FLOOR_Y = 950;
 export const CARO_W = { x: 600, feet: FLOOR_Y, scale: 0.55 };
 export const NICO_W = { x: 2000, feet: FLOOR_Y, scale: 0.5 };
+// Proporción de la pantalla del celular de Caro en el PNG (se mantiene en el celular vectorial).
+export const CARO_APP_H = Math.round((390 * (907 - 219)) / (661 - 313));
 export const DEV7 = { x: 1060, y: 520, s: 0.74 }; // celular de Caro (a su derecha), escenas 7 y 10
 export const NICO_DEV = { x: 1640, y: 470, s: 0.62 }; // celular de Nico (a su izquierda), escenas 8–9
 // Encuadre final de la 8 = inicial de la 9: Nico hasta la cintura a la derecha, su chat en el centro y

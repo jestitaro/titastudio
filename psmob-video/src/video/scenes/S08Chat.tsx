@@ -10,7 +10,7 @@ import { es } from "../../i18n/es";
 import { ChatScreen, CONVO } from "../screens/Chat";
 import { VisitasScreen } from "../screens/Field";
 import { S07_CAM_END, S07_VF_END } from "./S07Organize";
-import { CAM_NICO, CARO_W, DEV7, FLOOR_Y, NICO_DEV, NICO_W } from "./world";
+import { CAM_NICO, CARO_APP_H, CARO_W, DEV7, FLOOR_Y, NICO_DEV, NICO_W } from "./world";
 
 // Escena 8 — "Optimiza la comunicación". La cámara continúa desde la 7: un pequeño zoom out revela el
 // contexto (Caro a la izquierda, Nico a la derecha). Conversan: globos grandes, uno por vez y con tiempo
@@ -71,7 +71,7 @@ export const S08Chat: React.FC = () => {
         <Actor pose={POSE.nicoCelular} x={NICO_W.x} feetY={NICO_W.feet} scale={NICO_W.scale} f={f} />
         {/* El celular de la 7 vuelve a la mano de Caro */}
         {back < 1 && (
-          <Device x={interpolate(back, [0, 1], [DEV7.x, caroPhoneW.x])} y={interpolate(back, [0, 1], [DEV7.y, caroPhoneW.y])} scale={interpolate(back, [0, 1], [DEV7.s, 0.06])} opacity={1 - range(back, [0.75, 1], [0, 1], (t) => t)}>
+          <Device x={interpolate(back, [0, 1], [DEV7.x, caroPhoneW.x])} y={interpolate(back, [0, 1], [DEV7.y, caroPhoneW.y])} scale={interpolate(back, [0, 1], [DEV7.s, 0.06])} opacity={1 - range(back, [0.75, 1], [0, 1], (t) => t)} appH={CARO_APP_H}>
             <VisitasScreen f={S07_VF_END} />
           </Device>
         )}

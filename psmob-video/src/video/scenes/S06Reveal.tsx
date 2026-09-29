@@ -3,7 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { easeInOut, osc, range } from "../../lib/motion";
 import { camPath, Closeup, closeupScreen, Layer, LightStudio, Particles, QS, toScreen } from "../lib/stage";
 import type { Cam } from "../lib/stage";
-import { APP_H, APP_W, Device, PngScreen } from "../ds/Device";
+import { APP_W, Device, PngScreen } from "../ds/Device";
+import { CARO_APP_H } from "./world";
 import { QSLogo } from "../brand/QSLogo";
 import { fillTri } from "../brand/loader";
 import { VisitasScreen } from "../screens/Field";
@@ -16,7 +17,7 @@ import { VisitasScreen } from "../screens/Field";
 const CU = { right: 2200, top: -60, scale: 1.1 }; // bordes recortados del PNG siempre fuera de cuadro
 const SCR = closeupScreen("caro", CU.right, CU.top, CU.scale);
 const SCR_C = { x: SCR.x + SCR.w / 2, y: SCR.y + SCR.h / 2 };
-const DEV_S = SCR.h / APP_H; // celular vectorial a la misma altura que la pantalla del PNG
+const DEV_S = SCR.w / APP_W; // celular vectorial con la misma pantalla (ancho y proporción) que el PNG
 const SWAP: [number, number] = [118, 140];
 
 const cam = (f: number): Cam =>
@@ -72,7 +73,7 @@ export const S06Reveal: React.FC = () => {
           </div>
         )}
         {swap > 0 && (
-          <Device x={SCR_C.x} y={SCR_C.y} scale={DEV_S} opacity={swap}>
+          <Device x={SCR_C.x} y={SCR_C.y} scale={DEV_S} opacity={swap} appH={CARO_APP_H}>
             <ScreenContent f={f} />
           </Device>
         )}
