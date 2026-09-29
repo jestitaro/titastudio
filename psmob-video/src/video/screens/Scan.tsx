@@ -12,7 +12,7 @@ import { PROD } from "./data";
 // Cámara de AiFred: feed de la góndola real del video, barrido, bounding boxes con etiquetas genéricas,
 // precios reconocidos, planograma (OK / faltante / fuera de posición) y progreso.
 export const SCAN = { boxes: 14, prices: 34, plano: 46, p50: 36, p100: 92 };
-export const VIEW = { x: 2440, y: 150, s: 0.5, w: 390, h: 520 };
+export const VIEW = { x: 2060, y: 150, s: 0.5, w: 390, h: 520 };
 
 const inView = FACINGS.filter((p) => p.x > VIEW.x + 20 && p.x < VIEW.x + VIEW.w / VIEW.s - 20 && p.level < 3);
 const tagsInView = TAGS.filter((t) => t.x > VIEW.x + 40 && t.x < VIEW.x + VIEW.w / VIEW.s - 40 && t.level < 3);

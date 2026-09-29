@@ -48,14 +48,14 @@ const SKU = {
 type SkuKey = keyof typeof SKU;
 const aspect = (s: Sku) => (s.t === "png" ? s.ar : s.t === "jar" ? 100 / 130 : s.t === "doy" ? 100 / 150 : s.t === "sq" ? 70 / 160 : s.t === "box" ? 110 / 150 : 110 / 130);
 
-export const GONDOLA = { top: 120, bases: [372, 612, 842, 1062], heights: [196, 204, 176, 192], width: 5400 };
+export const GONDOLA = { top: 120, bases: [372, 612, 842, 1062], heights: [196, 204, 176, 192], width: 5400, bottom: 1144 };
 
 const ROWS: [SkuKey, number, string][][] = [
   [
     ["shampoo", 4, "$ 3.410,50"],
     ["pump", 3, "$ 2.890,00"],
     ["aerosol", 4, "$ 2.310,00"],
-    ["rollon", 3, "$ 1.760,00"],
+    ["tubo", 3, "$ 1.760,00"],
     ["tubo", 3, "$ 2.450,00"],
     ["crema", 2, "$ 4.120,50"],
     ["shampooTeal", 4, "$ 3.410,50"],
@@ -63,7 +63,7 @@ const ROWS: [SkuKey, number, string][][] = [
     ["pump", 3, "$ 2.890,00"],
     ["tubo", 3, "$ 2.450,00"],
     ["shampoo", 4, "$ 3.410,50"],
-    ["rollon", 3, "$ 1.760,00"],
+    ["tubo", 3, "$ 1.760,00"],
     ["aerosol", 4, "$ 2.310,00"],
     ["crema", 2, "$ 4.120,50"],
     ["shampooTeal", 4, "$ 3.410,50"],
@@ -86,15 +86,15 @@ const ROWS: [SkuKey, number, string][][] = [
   ],
   [
     ["salsa", 4, "$ 1.480,00"],
-    ["ketchup", 5, "$ 1.150,00"],
-    ["mostaza", 5, "$ 990,00"],
+    ["salsaDoy", 4, "$ 1.150,00"],
+    ["pickles", 4, "$ 990,00"],
     ["mayo", 4, "$ 1.650,00"],
     ["pickles", 3, "$ 1.890,00"],
     ["salsaDoy", 4, "$ 1.230,00"],
     ["salsa", 4, "$ 1.480,00"],
-    ["ketchup", 5, "$ 1.150,00"],
+    ["salsaDoy", 4, "$ 1.150,00"],
     ["mayo", 4, "$ 1.650,00"],
-    ["mostaza", 5, "$ 990,00"],
+    ["pickles", 4, "$ 990,00"],
     ["pickles", 3, "$ 1.890,00"],
   ],
   [
@@ -114,9 +114,10 @@ const ROWS: [SkuKey, number, string][][] = [
 export type Facing = { level: number; x: number; base: number; w: number; h: number; sku: SkuKey; kind: "ok" | "gap" | "wrong"; group: number };
 export type PriceTag = { level: number; x: number; y: number; price: string };
 
-// Fallas de planograma (en la zona que escanea Nico).
-const GAP = { level: 1, group: 7, i: 1 };
-const WRONG = { level: 0, group: 9, i: 1, sku: "salsa" as SkuKey };
+// Fallas de planograma: la zona que escanea Nico (coords locales de la góndola).
+export const SCAN_ZONE = { from: 2060, to: 2800 };
+const GAP_X = { level: 1, x: 2330 };
+const WRONG_X = { level: 2, x: 2600, sku: "detergente" as SkuKey };
 
 export const { FACINGS, TAGS } = (() => {
   const facings: Facing[] = [];
@@ -128,15 +129,18 @@ export const { FACINGS, TAGS } = (() => {
       const w = aspect(SKU[key]) * h;
       const start = x;
       for (let i = 0; i < n; i++) {
-        const gap = GAP.level === level && GAP.group === group && GAP.i === i;
-        const wrong = WRONG.level === level && WRONG.group === group && WRONG.i === i;
-        facings.push({ level, x: x + w / 2, base: GONDOLA.bases[level], w, h, sku: wrong ? WRONG.sku : key, kind: gap ? "gap" : wrong ? "wrong" : "ok", group });
+        facings.push({ level, x: x + w / 2, base: GONDOLA.bases[level], w, h, sku: key, kind: "ok", group });
         x += w + 6;
       }
       tags.push({ level, x: (start + x - 6) / 2, y: GONDOLA.bases[level] + 16, price });
       x += 22;
     });
   });
+  const nearest = (level: number, x: number) => facings.filter((p) => p.level === level).reduce((a, b) => (Math.abs(b.x - x) < Math.abs(a.x - x) ? b : a));
+  nearest(GAP_X.level, GAP_X.x).kind = "gap";
+  const w = nearest(WRONG_X.level, WRONG_X.x);
+  w.kind = "wrong";
+  w.sku = WRONG_X.sku;
   return { FACINGS: facings, TAGS: tags };
 })();
 
@@ -166,6 +170,7 @@ export const Gondola: React.FC<{ from?: number; to?: number }> = ({ from = -200,
     {FACINGS.filter((p) => p.kind !== "gap" && p.x > from && p.x < to).map((p, i) => (
       <Product key={`${p.level}-${Math.round(p.x)}`} f={p} idx={i} />
     ))}
+    <div style={{ position: "absolute", left: -20, top: GONDOLA.bases[3] + 38, width: GONDOLA.width + 40, height: 44, background: "linear-gradient(180deg, #8E9AB8, #6F7C9E)" }} />
     {GONDOLA.bases.map((y, level) => (
       <React.Fragment key={y}>
         <div style={{ position: "absolute", left: -20, top: y, width: GONDOLA.width + 40, height: 10, background: "#B9C3D8" }} />

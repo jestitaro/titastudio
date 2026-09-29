@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { easeInOut, osc, pop, range } from "../../lib/motion";
-import { Actor, camPath, Layer, LightStudio, Particles, POSE, QS } from "../lib/stage";
+import { Actor, camPath, Contact, Floor, Layer, LightStudio, Particles, POSE, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { APP_H, APP_W, Device } from "../ds/Device";
 import { Avatar } from "../ds/ui";
@@ -9,25 +9,25 @@ import { FONT } from "../ds/tokens";
 import { listSlot, VIS, VisitasScreen } from "../screens/Field";
 import { TEAM } from "../screens/data";
 import { S06_UI_END } from "./S06Reveal";
-import { CARO_W, DEV7 } from "./world";
+import { CARO_W, DEV7, FLOOR_Y } from "./world";
 
 // Escena 7 — arranca con la UI donde terminó la 6 y la cámara se aleja despacio hasta revelar a Caro de
-// cuerpo entero gestionando desde su celular (a su derecha). El equipo se asigna a cada PDV; luego la app
+// cuerpo entero (con piso y sombra) y su celular a su derecha, en una sola composición. El equipo se asigna a cada PDV; luego la app
 // pasa al mapa con el recorrido de un merchandiser mientras la cámara se acerca apenas.
 const TS = 0.82; // ritmo de la UI
 const Z0 = S06_UI_END.w / (APP_W * DEV7.s);
 export const camS07 = (f: number): Cam =>
   camPath(f, [
     { f: 0, x: DEV7.x - (S06_UI_END.x - 960) / Z0, y: DEV7.y - (S06_UI_END.y - 540) / Z0, zoom: Z0 },
-    { f: 84, x: 980, y: 540, zoom: 1.0 },
-    { f: 195, x: 1010, y: 540, zoom: 1.06 },
+    { f: 90, x: 830, y: 540, zoom: 1.0 },
+    { f: 195, x: 850, y: 535, zoom: 1.05 },
   ]);
 
 const START = [
-  { x: 860, y: 280 },
-  { x: 1780, y: 250 },
-  { x: 900, y: 800 },
-  { x: 1800, y: 780 },
+  { x: 1400, y: 260 },
+  { x: 1580, y: 420 },
+  { x: 1420, y: 600 },
+  { x: 1590, y: 760 },
 ];
 
 export const S07Organize: React.FC = () => {
@@ -42,7 +42,8 @@ export const S07Organize: React.FC = () => {
         <Particles f={f} n={30} seed="s07" color={QS.indigo} speed={0.25} size={[2, 5]} opacity={0.3} />
       </Layer>
       <Layer cam={cam} depth={1}>
-        <div style={{ position: "absolute", left: CARO_W.x - 200, top: CARO_W.feet - 16, width: 400, height: 32, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(19,13,93,0.16), rgba(19,13,93,0))" }} />
+        <Floor y={FLOOR_Y} />
+        <Contact x={CARO_W.x} y={CARO_W.feet} />
         <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [96, 170] }} />
         <Device x={DEV7.x} y={DEV7.y} scale={DEV7.s}>
           <VisitasScreen f={vf} />

@@ -5,17 +5,17 @@ import { es } from "../i18n/es";
 export const FPS = 30;
 
 export const SCENES = [
-  { id: "s01", dur: 330 }, // Escenas 1–4: caminata, tareas en el celular, sobrecarga + órbita
-  { id: "s05", dur: 165 }, // Escritorio, paso del tiempo
-  { id: "s06", dur: 150 }, // Caro muestra el celular → UI
+  { id: "s01", dur: 360 }, // Escenas 1–4: caminata, tareas en el celular, sobrecarga + órbita
+  { id: "s05", dur: 255 }, // Escritorio, paso del tiempo
+  { id: "s06", dur: 165 }, // Caro muestra el celular → UI
   { id: "s07", dur: 195 }, // Organización: equipo → ruteo
-  { id: "s08", dur: 165 }, // Optimiza la comunicación
-  { id: "s09", dur: 180 }, // Agiliza la captura de datos
-  { id: "s10", dur: 165 }, // Información en tiempo real
-  { id: "s11", dur: 165 }, // Dashboard
-  { id: "s12", dur: 270 }, // AiFred en góndola
-  { id: "s13", dur: 150 }, // Sin conexión → enviando → loading de marca
-  { id: "s14", dur: 180 }, // Cierre QuartzSales
+  { id: "s08", dur: 195 }, // Optimiza la comunicación
+  { id: "s09", dur: 210 }, // Agiliza la captura de datos
+  { id: "s10", dur: 180 }, // Información en tiempo real
+  { id: "s11", dur: 195 }, // Dashboard
+  { id: "s12", dur: 300 }, // AiFred en góndola
+  { id: "s13", dur: 165 }, // Sin conexión → enviando → loading de marca
+  { id: "s14", dur: 195 }, // Cierre QuartzSales
 ] as const;
 
 export type SceneId = (typeof SCENES)[number]["id"];
@@ -34,7 +34,7 @@ export const sceneDur = (id: SceneId) => SCENES.find((s) => s.id === id)!.dur;
 export const TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);
 
 // Beats internos de la escena 1–4 (relativos al inicio del bloque).
-export const BEATS_S01 = { stop: 70, phone: 78, stress: 150, team: 168, pdv: 214, process: 258, drop: 298 };
+export const BEATS_S01 = { stop: 80, team: 110, stress: 140, pdv: 142, check: 174, data: 206, alert: 236, drop: 290 };
 
 // Locución de referencia por escena (frames relativos al bloque). No se muestra en el video: sirve para
 // retimear cuando llegue el audio final.

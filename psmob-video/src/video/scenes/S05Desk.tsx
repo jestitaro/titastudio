@@ -1,25 +1,27 @@
 import React from "react";
 import { AbsoluteFill, interpolate, random, useCurrentFrame } from "remotion";
-import { easeInOut, osc, pop, range } from "../../lib/motion";
+import { easeInOut, osc, range } from "../../lib/motion";
 import { Actor, Layer, Particles, POSE, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { C as DC, FONT } from "../ds/tokens";
 import { ar } from "../screens/data";
 import { Icon, IconName } from "../ui/icons";
-import { Tile } from "./S01Overload";
 
-// Escena 5 — el tiempo pasa: Caro sentada y preocupada frente al escritorio, el reloj corre, los papeles
-// se apilan, la ventana pasa de día a noche; una pila de papeles cruza cámara y la encontramos dormida.
-// Agotamiento operativo, no tristeza.
-const DUR = 165;
-const DESK_Y = 660;
-const SLEEP = 104;
+// Escena 5 — continúa la caída de la 1: Caro cae desde arriba junto con los papeles y aterriza detrás del
+// escritorio (que queda en primer plano). Después, progresión lenta: sentada y preocupada, el reloj y el
+// costo avanzan, los papeles se acumulan, se hace de noche; una pila de papeles cruza cámara y la
+// encontramos dormida. Foco: tiempo + costo + agotamiento. Sin íconos.
+const DUR = 255;
+const DESK_Y = 700;
+const LAND = 22;
+const SLEEP = 190;
 const CARO = { x: 960, feet: 1075, scale: 0.6 };
+const FALL_V0 = 56; // velocidad con la que Caro sale de cuadro en la escena 1
 
 const cam = (f: number): Cam => ({
-  x: 960 + range(f, [0, DUR], [-30, 30]),
-  y: range(f, [0, 40], [440, 520], easeInOut) + range(f, [40, DUR], [0, 10]),
-  zoom: range(f, [0, DUR], [1.02, 1.12], (t) => t),
+  x: 960,
+  y: range(f, [0, LAND + 6], [470, 540], easeInOut) - range(f, [40, DUR], [0, 30], easeInOut),
+  zoom: range(f, [40, DUR], [1.0, 1.1], easeInOut),
 });
 
 const mix = (a: string, b: string, t: number) => `color-mix(in srgb, ${b} ${Math.round(Math.min(1, Math.max(0, t)) * 100)}%, ${a})`;
@@ -65,17 +67,17 @@ const Monitor: React.FC<{ f: number }> = ({ f }) => {
   const cost = range(f, [6, DUR - 6], [240000, 1864300], (t) => t * t);
   const rows = Math.min(8, Math.floor(range(f, [0, DUR - 20], [2, 8.99], (t) => t)));
   return (
-    <div style={{ position: "absolute", left: 560, top: 250, width: 480, height: 330 }}>
+    <div style={{ position: "absolute", left: 250, top: 250, width: 480, height: 330 }}>
       <div style={{ position: "absolute", inset: 0, borderRadius: 16, background: "#0F0B45", padding: 12, boxShadow: "0 30px 60px rgba(0,0,0,0.4)" }}>
         <div style={{ width: "100%", height: "100%", borderRadius: 8, background: "#EEF0FA", overflow: "hidden", fontFamily: FONT, padding: 12 }}>
           <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
             <div style={{ flex: 1, background: "#FFF", borderRadius: 8, padding: "8px 10px" }}>
-              <div style={{ fontSize: 12, color: DC.text2 }}>Horas invertidas</div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: QS.dark }}>{hours} h</div>
+              <div style={{ fontSize: 16, color: DC.text2 }}>Horas invertidas</div>
+              <div style={{ fontSize: 34, fontWeight: 700, color: QS.dark }}>{hours} h</div>
             </div>
             <div style={{ flex: 1.3, background: "#FFF", borderRadius: 8, padding: "8px 10px" }}>
-              <div style={{ fontSize: 12, color: DC.text2 }}>Costo operativo</div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: DC.error }}>$ {ar(cost, 0)}</div>
+              <div style={{ fontSize: 16, color: DC.text2 }}>Costo operativo</div>
+              <div style={{ fontSize: 34, fontWeight: 700, color: DC.error }}>$ {ar(cost, 0)}</div>
             </div>
           </div>
           {Array.from({ length: rows }).map((_, i) => (
@@ -87,13 +89,13 @@ const Monitor: React.FC<{ f: number }> = ({ f }) => {
           ))}
         </div>
       </div>
-      <div style={{ position: "absolute", left: 210, top: 330, width: 60, height: 80, background: "#1B1566" }} />
+      
     </div>
   );
 };
 
 const Plant: React.FC<{ f: number }> = ({ f }) => (
-  <svg width={180} height={250} viewBox="0 0 190 260" style={{ position: "absolute", left: 1560, top: DESK_Y - 244 }}>
+  <svg width={180} height={250} viewBox="0 0 190 260" style={{ position: "absolute", left: 1500, top: DESK_Y - 244 }}>
     <g transform={`rotate(${osc(f, 120, 1.5)} 95 190)`}>
       {[
         [-40, 60, "#3E8E7E"],
@@ -110,90 +112,112 @@ const Plant: React.FC<{ f: number }> = ({ f }) => (
   </svg>
 );
 
-type Paper = { x: number; y: number; rot: number; at: number; kind: "tile" | "paper" | "sticky"; icon?: IconName; tile?: number };
-const TILES = [
-  { icons: ["users"] as IconName[], tint: "#463DE1" },
-  { icons: ["pin", "checklist"] as IconName[], tint: "#1D4ED8" },
-];
+type Paper = { x: number; y: number; rot: number; at: number; kind: "paper" | "sticky"; icon?: IconName; fall?: boolean };
+// Papeles que caen con Caro + pilas que crecen despacio sobre el escritorio.
 const PAPERS: Paper[] = [
-  { x: 420, y: DESK_Y - 40, rot: -8, at: 0, kind: "tile", tile: 0 },
-  { x: 1440, y: DESK_Y - 40, rot: 6, at: 4, kind: "tile", tile: 1 },
-  ...Array.from({ length: 24 }).map((_, i): Paper => {
+  ...[520, 700, 1230, 1400].map((x, i): Paper => ({ x, y: DESK_Y + 4 - (i % 2) * 6, rot: (i % 2 ? 7 : -6), at: 0, kind: "paper", icon: (["form", "alert", "clock", "checklist"] as IconName[])[i], fall: true })),
+  ...Array.from({ length: 27 }).map((_, i): Paper => {
     const pile = i % 3;
-    const px = [330, 560, 1380][pile];
-    const level = Math.floor(i / 3);
-    return { x: px + (random(`px${i}`) - 0.5) * 60, y: DESK_Y - 8 - level * 15, rot: (random(`pr${i}`) - 0.5) * 16, at: 12 + i * 3.4, kind: i % 5 === 4 ? "sticky" : "paper", icon: (["form", "alert", "clock", "checklist", "chat"] as IconName[])[i % 5] };
+    const px = [560, 700, 1300][pile];
+    const level = Math.floor(i / 3) + 1;
+    return { x: px + (random(`px${i}`) - 0.5) * 50, y: DESK_Y + 4 - level * 13, rot: (random(`pr${i}`) - 0.5) * 14, at: 40 + i * 5.2, kind: i % 5 === 4 ? "sticky" : "paper", icon: (["form", "alert", "clock", "checklist", "chat"] as IconName[])[i % 5] };
   }),
 ];
 
 const PaperCard: React.FC<{ p: Paper }> = ({ p }) =>
   p.kind === "sticky" ? (
-    <div style={{ width: 100, height: 90, background: "#FFD86B", borderRadius: 6, boxShadow: "0 8px 16px rgba(0,0,0,0.25)", padding: 12 }}>
+    <div style={{ width: 100, height: 60, background: "#FFD86B", borderRadius: 6, boxShadow: "0 6px 12px rgba(0,0,0,0.25)", padding: 10 }}>
       <div style={{ height: 7, width: "80%", background: "#E0AE2E", borderRadius: 3, marginBottom: 8 }} />
       <div style={{ height: 7, width: "60%", background: "#E0AE2E", borderRadius: 3 }} />
     </div>
   ) : (
-    <div style={{ width: 190, height: 56, background: "#FFFFFF", borderRadius: 10, boxShadow: "0 8px 18px rgba(0,0,0,0.3)", display: "flex", alignItems: "center", gap: 10, padding: "0 12px" }}>
-      <Icon name={p.icon ?? "form"} size={24} color={p.icon === "alert" ? "#DC2626" : "#463DE1"} />
+    <div style={{ width: 190, height: 44, background: "#FFFFFF", borderRadius: 8, boxShadow: "0 6px 14px rgba(0,0,0,0.3)", display: "flex", alignItems: "center", gap: 10, padding: "0 12px" }}>
+      <Icon name={p.icon ?? "form"} size={20} color={p.icon === "alert" ? "#DC2626" : "#463DE1"} />
       <div style={{ flex: 1 }}>
-        <div style={{ height: 7, width: "85%", background: "#CFD4E6", borderRadius: 3, marginBottom: 7 }} />
-        <div style={{ height: 6, width: "55%", background: "#E3E6F2", borderRadius: 3 }} />
+        <div style={{ height: 6, width: "85%", background: "#CFD4E6", borderRadius: 3, marginBottom: 6 }} />
+        <div style={{ height: 5, width: "55%", background: "#E3E6F2", borderRadius: 3 }} />
       </div>
-      <div style={{ width: 11, height: 11, borderRadius: 6, background: "#DC2626" }} />
     </div>
   );
+
+// Altura (pies del ancla) de la pose de caída en función del frame.
+const fallFeet = (f: number) => -520 + FALL_V0 * f + 0.5 * f * f;
 
 export const S05Desk: React.FC = () => {
   const f = useCurrentFrame();
   const c = cam(f);
   const asleep = f >= SLEEP;
-  const dim = range(f, [30, DUR], [0, 0.4], easeInOut);
-  // Pila de papeles que cruza cámara (oculta el cambio de pose).
-  const wipe = range(f, [SLEEP - 12, SLEEP + 12], [0, 1], easeInOut);
+  const falling = f < LAND;
+  const dim = range(f, [60, DUR], [0, 0.35], easeInOut);
+  const wipe = range(f, [SLEEP - 14, SLEEP + 14], [0, 1], easeInOut);
+  // Aterrizaje: leve rebote de cámara y papeles que se levantan del escritorio.
+  const thud = f >= LAND ? Math.exp(-(f - LAND) / 5) * Math.sin((f - LAND) * 1.6) * 6 : 0;
+  const cc = { ...c, y: c.y - thud };
+  const puff = range(f, [LAND - 2, LAND + 14], [0, 1]);
   return (
     <AbsoluteFill style={{ overflow: "hidden", background: QS.darker }}>
-      <Layer cam={c} depth={0.5}>
+      <Layer cam={cc} depth={0.5}>
         <div style={{ position: "absolute", left: -600, top: -400, width: 3100, height: 1700, background: "linear-gradient(180deg, #221A78 0%, #1A1466 60%, #130D5D 100%)" }} />
         <WallClock f={f} />
         <Window f={f} />
-        <div style={{ position: "absolute", left: 440, top: 190, width: 200, height: 14, borderRadius: 7, background: "#2E2690" }} />
+        <div style={{ position: "absolute", left: 1340, top: 520, width: 200, height: 14, borderRadius: 7, background: "#2E2690" }} />
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} style={{ position: "absolute", left: 450 + i * 42, top: 110, width: 34, height: 80, borderRadius: 4, background: ["#7C5CFC", "#3C9FF1", "#463DE1", "#9B82FF"][i], transform: `rotate(${i === 3 ? 12 : 0}deg)`, transformOrigin: "bottom left" }} />
+          <div key={i} style={{ position: "absolute", left: 1350 + i * 42, top: 440, width: 34, height: 80, borderRadius: 4, background: ["#7C5CFC", "#3C9FF1", "#463DE1", "#9B82FF"][i], transform: `rotate(${i === 3 ? 12 : 0}deg)`, transformOrigin: "bottom left" }} />
         ))}
       </Layer>
-      <Layer cam={c} depth={0.85}>
+      <Layer cam={cc} depth={0.8}>
         <Monitor f={f} />
-        <div style={{ position: "absolute", left: -400, top: DESK_Y, width: 2800, height: 36, background: "#3A2FA0", borderRadius: 6 }} />
-        <div style={{ position: "absolute", left: -400, top: DESK_Y + 36, width: 2800, height: 700, background: "linear-gradient(180deg, #241C80, #140F5A)" }} />
-        <Plant f={f} />
-        {PAPERS.map((p, i) => {
-          if (f < p.at) return null;
-          const land = range(f, [p.at, p.at + (p.kind === "tile" ? 14 : 10)], [0, 1], (t) => t * t);
-          const bounce = p.kind === "tile" ? pop(f, p.at + 14, { damping: 9, stiffness: 220, mass: 0.5 }) : 1;
-          const y = interpolate(land, [0, 1], [p.kind === "tile" ? -500 : -150, p.y]) - (1 - bounce) * 6;
-          return (
-            <div key={i} style={{ position: "absolute", left: p.x, top: y, transform: `translate(-50%, -100%) rotate(${p.rot * land + (1 - land) * (i % 2 ? 20 : -20)}deg) scale(${p.kind === "tile" ? 0.75 : 1})`, transformOrigin: "50% 100%" }}>
-              {p.kind === "tile" ? <Tile label="" icons={TILES[p.tile!].icons} tint={TILES[p.tile!].tint} /> : <PaperCard p={p} />}
-            </div>
-          );
-        })}
       </Layer>
-      <Layer cam={c} depth={1}>
-        <div style={{ position: "absolute", left: CARO.x - 230, top: CARO.feet - 20, width: 460, height: 40, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(0,0,0,0.45), rgba(0,0,0,0))" }} />
-        <Actor pose={asleep ? POSE.caroDurmiendo : POSE.caroSentada} x={CARO.x} feetY={CARO.feet} scale={CARO.scale} f={f} />
-        {/* "Z" del sueño, chicas y suaves */}
+      <Layer cam={cc} depth={1}>
+        {falling ? (
+          <Actor pose={POSE.caroCaida} x={CARO.x} feetY={fallFeet(f)} scale={CARO.scale} f={f} />
+        ) : (
+          <Actor pose={asleep ? POSE.caroDurmiendo : POSE.caroSentada} x={CARO.x} feetY={CARO.feet} scale={CARO.scale} f={f} />
+        )}
         {asleep &&
           [0, 1, 2].map((i) => {
             const t = ((f - SLEEP - i * 12) % 40) / 40;
             if (f - SLEEP - i * 12 < 0) return null;
             return (
-              <div key={i} style={{ position: "absolute", left: CARO.x + 120 + t * 60, top: 250 - t * 110, fontFamily: FONT, fontWeight: 700, fontSize: 30 + i * 6, color: "#C9B8FF", opacity: Math.sin(t * Math.PI) }}>
+              <div key={i} style={{ position: "absolute", left: CARO.x + 120 + t * 60, top: 300 - t * 110, fontFamily: FONT, fontWeight: 700, fontSize: 30 + i * 6, color: "#C9B8FF", opacity: Math.sin(t * Math.PI) }}>
                 z
               </div>
             );
           })}
       </Layer>
-      {/* Pila de papeles en primer plano que cruza cámara */}
+      {/* Escritorio en primer plano: Caro queda detrás */}
+      <Layer cam={cc} depth={1.05}>
+        <div style={{ position: "absolute", left: -500, top: DESK_Y, width: 3000, height: 34, background: "#4A3FB8", borderRadius: 8 }} />
+        <div style={{ position: "absolute", left: -500, top: DESK_Y + 34, width: 3000, height: 800, background: "linear-gradient(180deg, #2F2596, #19135E 60%)" }} />
+        <Plant f={f} />
+        {PAPERS.map((p, i) => {
+          if (!p.fall && f < p.at) return null;
+          const y = p.fall
+            ? Math.min(p.y, -300 - i * 60 + FALL_V0 * f + 0.5 * f * f)
+            : interpolate(range(f, [p.at, p.at + 10], [0, 1], (t) => t * t), [0, 1], [p.y - 160, p.y]);
+          const landed = p.fall ? y >= p.y : f >= p.at + 10;
+          const rot = landed ? p.rot : p.rot + (i % 2 ? 24 : -24);
+          const o = p.fall ? 1 : range(f, [p.at, p.at + 3], [0, 1]);
+          return (
+            <div key={i} style={{ position: "absolute", left: p.x, top: y, opacity: o, transform: `translate(-50%, -100%) rotate(${rot}deg)`, transformOrigin: "50% 100%" }}>
+              <PaperCard p={p} />
+            </div>
+          );
+        })}
+      </Layer>
+      {/* Al aterrizar: hojas que se levantan y tapan el cambio de pose */}
+      {puff > 0 && puff < 1 && (
+        <Layer cam={cc} depth={1.1}>
+          {Array.from({ length: 9 }).map((_, i) => {
+            const a = -Math.PI / 2 + (i - 4) * 0.28;
+            const d = puff * (180 + (i % 3) * 60);
+            return (
+              <div key={i} style={{ position: "absolute", left: CARO.x + Math.cos(a) * d * 1.4 - 70, top: DESK_Y - 40 + Math.sin(a) * d + puff * puff * 160, width: 140, height: 90, borderRadius: 8, background: i % 4 === 3 ? "#FFD86B" : "#F4F1FF", boxShadow: "0 10px 20px rgba(0,0,0,0.3)", transform: `rotate(${(i - 4) * 18 * puff}deg)`, opacity: 1 - puff * puff }} />
+            );
+          })}
+        </Layer>
+      )}
+      {/* Pila de papeles en primer plano que cruza cámara (cambio a dormida) */}
       {wipe > 0 && wipe < 1 && (
         <div style={{ position: "absolute", left: interpolate(wipe, [0, 1], [-900, 2100]), top: -80, width: 900, height: 1300, transform: "rotate(-6deg)", filter: "blur(6px)" }}>
           {Array.from({ length: 7 }).map((_, i) => (
@@ -201,10 +225,7 @@ export const S05Desk: React.FC = () => {
           ))}
         </div>
       )}
-      <Layer cam={c} depth={1.5} blur={3}>
-        <Particles f={f} n={14} seed="s05" speed={0.5} size={[4, 9]} color="#B79CFF" opacity={0.3} />
-      </Layer>
-      <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 40%, rgba(5,3,31,0.9) 100%)", opacity: 0.5 + dim }} />
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 40%, rgba(5,3,31,0.9) 100%)", opacity: 0.45 + dim }} />
     </AbsoluteFill>
   );
 };

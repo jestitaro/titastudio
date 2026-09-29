@@ -17,7 +17,9 @@ export const Kinetic: React.FC<{
   dark?: boolean;
   accent?: number[];
   eyebrow?: string;
-}> = ({ f, text, at, out, x, y, align = "left", size = 66, dark, accent = [], eyebrow }) => {
+  // Placa clara detrás del texto para leerlo sobre fondos con color (góndola, etc.).
+  plate?: boolean;
+}> = ({ f, text, at, out, x, y, align = "left", size = 66, dark, accent = [], eyebrow, plate }) => {
   const words = text.split(" ");
   const base = dark ? "#FFFFFF" : QS.dark;
   const accentC = dark ? "#B79CFF" : QS.violet;
@@ -35,6 +37,9 @@ export const Kinetic: React.FC<{
         fontFamily: FONT,
       }}
     >
+      {plate && (
+        <div style={{ position: "absolute", inset: "-30px -40px", zIndex: -1, borderRadius: 28, background: "rgba(255,255,255,0.94)", boxShadow: "0 2px 4px rgba(15,23,42,0.08), 0 16px 40px rgba(15,23,42,0.16)", opacity: Math.min(1, bar * 1.4) * (1 - outP), transform: `scale(${0.94 + 0.06 * Math.min(1, bar)})` }} />
+      )}
       {eyebrow && (
         <div style={{ overflow: "hidden", marginBottom: 12 }}>
           <div

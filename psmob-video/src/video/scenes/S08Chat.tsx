@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { easeInOut, range } from "../../lib/motion";
-import { Actor, camPath, Layer, LightStudio, Particles, POSE, posePoint, QS } from "../lib/stage";
+import { Actor, camPath, Contact, Floor, Layer, LightStudio, Particles, POSE, posePoint, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { Device } from "../ds/Device";
 import { C, FONT, R, S, SH, T } from "../ds/tokens";
@@ -10,13 +10,13 @@ import { es } from "../../i18n/es";
 import { ChatScreen } from "../screens/Chat";
 import { VisitasScreen } from "../screens/Field";
 import { S07_CAM_END, S07_VF_END } from "./S07Organize";
-import { CAM_NICO, CARO_W, DEV7, NICO_DEV, NICO_W } from "./world";
+import { CAM_NICO, CARO_W, DEV7, FLOOR_Y, NICO_DEV, NICO_W } from "./world";
 
-// Escena 8 — "Optimiza la comunicación". La cámara continúa desde la 7 y abre despacio a un plano con Caro
-// y Nico frente a frente (Nico entra caminando hacia la izquierda, hacia donde mira). El mensaje viaja de
-// un celular al otro; la cámara se acerca a Nico (plano americano) y el chat crece desde su celular.
-const NICO_STOP = 60;
-const CHAT_IN: [number, number] = [100, 128];
+// Escena 8 — "Optimiza la comunicación". La cámara continúa desde la 7: un pequeño zoom out revela el
+// contexto (Caro a la izquierda, Nico a la derecha, ya parado con su celular, piso y sombras). El mensaje
+// viaja de un celular al otro; después push-in a Nico (hasta la cintura), el chat crece desde su celular y
+// el texto entra a la izquierda, en el aire que deja Caro al salir de cuadro.
+const CHAT_IN: [number, number] = [112, 146];
 // Reloj interno del chat (lo continúa la escena 9).
 export const chatClock = (f: number) => (f - CHAT_IN[0]) * 0.75 + 10;
 
@@ -32,35 +32,24 @@ export const nicoPhoneW = (() => {
 export const camS08 = (f: number): Cam =>
   camPath(f, [
     { f: 0, ...S07_CAM_END },
-    { f: 50, x: 1040, y: 540, zoom: 0.94 },
-    { f: 96, x: 1050, y: 540, zoom: 0.95 },
-    { f: 150, ...CAM_NICO },
-    { f: 165, ...CAM_NICO },
+    { f: 54, x: 1300, y: 540, zoom: 0.82 },
+    { f: 100, x: 1310, y: 538, zoom: 0.83 },
+    { f: 168, ...CAM_NICO },
+    { f: 195, ...CAM_NICO },
   ]);
 
 const MiniBubble: React.FC<{ text: string }> = ({ text }) => (
   <div style={{ background: C.primarySoft, borderRadius: `${R.card}px ${R.card}px ${R.sm / 2}px ${R.card}px`, padding: `${S.sm}px ${S.md}px`, boxShadow: SH.float, fontFamily: FONT, ...T.body, fontSize: 20, color: C.text, whiteSpace: "nowrap" }}>{text}</div>
 );
 
-// Nico: entra caminando hacia la izquierda y se frena; después, con el celular.
-export const NicoWalkIn: React.FC<{ f: number; stop: number; from: number }> = ({ f, stop, from }) => {
-  const walking = f < stop;
-  const x = interpolate(f, [0, stop], [from, NICO_W.x], { easing: (t) => 1 - Math.pow(1 - t, 2.2), extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  return walking ? (
-    <Actor pose={POSE.nicoCaminando} x={x} feetY={NICO_W.feet} scale={NICO_W.scale * 1.05} f={f} walk={{ poses: [POSE.nicoCaminando], period: 10, bob: 7 }} />
-  ) : (
-    <Actor pose={POSE.nicoCelular} x={NICO_W.x} feetY={NICO_W.feet} scale={NICO_W.scale} f={f} blink={{ pose: POSE.nicoCelularBlink, at: [88, 140] }} />
-  );
-};
-
 export const S08Chat: React.FC = () => {
   const f = useCurrentFrame();
   const c = camS08(f);
   const back = range(f, [0, 30], [0, 1], easeInOut);
-  const fly = range(f, [58, 92], [0, 1], easeInOut);
+  const fly = range(f, [60, 96], [0, 1], easeInOut);
   const bx = interpolate(fly, [0, 1], [caroPhoneW.x, nicoPhoneW.x]);
   const by = interpolate(fly, [0, 1], [caroPhoneW.y, nicoPhoneW.y]) - Math.sin(fly * Math.PI) * 180;
-  const ping = range(f, [90, 104], [0, 1]);
+  const ping = range(f, [94, 108], [0, 1]);
   const chat = range(f, CHAT_IN, [0, 1], easeInOut);
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -69,9 +58,11 @@ export const S08Chat: React.FC = () => {
         <Particles f={f} n={30} seed="s08" color={QS.indigo} speed={0.25} size={[2, 5]} opacity={0.3} />
       </Layer>
       <Layer cam={c} depth={1}>
-        <div style={{ position: "absolute", left: CARO_W.x - 200, top: CARO_W.feet - 16, width: 400, height: 32, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(19,13,93,0.16), rgba(19,13,93,0))" }} />
+        <Floor y={FLOOR_Y} />
+        <Contact x={CARO_W.x} y={CARO_W.feet} />
+        <Contact x={NICO_W.x} y={NICO_W.feet} />
         <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [40, 120] }} />
-        <NicoWalkIn f={f} stop={NICO_STOP} from={2250} />
+        <Actor pose={POSE.nicoCelular} x={NICO_W.x} feetY={NICO_W.feet} scale={NICO_W.scale} f={f} blink={{ pose: POSE.nicoCelularBlink, at: [70, 150] }} />
         {/* El celular de la 7 vuelve a la mano de Caro */}
         {back < 1 && (
           <Device x={interpolate(back, [0, 1], [DEV7.x, caroPhoneW.x])} y={interpolate(back, [0, 1], [DEV7.y, caroPhoneW.y])} scale={interpolate(back, [0, 1], [DEV7.s, 0.06])} opacity={1 - range(back, [0.75, 1], [0, 1], (t) => t)}>
@@ -91,7 +82,7 @@ export const S08Chat: React.FC = () => {
           </Device>
         )}
       </Layer>
-      <Kinetic f={f} text={es.video.kinetic.s08.text} at={100} out={150} x={100} y={470} accent={[2]} eyebrow={es.video.kinetic.s08.eyebrow} size={56} />
+      <Kinetic f={f} text={es.video.kinetic.s08.text} at={132} out={184} x={110} y={500} accent={[2]} eyebrow={es.video.kinetic.s08.eyebrow} size={56} />
     </AbsoluteFill>
   );
 };

@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, Img, random, staticFile } from "remotion";
 import { FONT } from "../ds/tokens";
 import type { Cam as CamT } from "../../motion-test/camera";
+import { Layer as LayerRe } from "../../motion-test/camera";
 
 export { Layer, project, shake, toScreen, W, H } from "../../motion-test/camera";
 export type { Cam } from "../../motion-test/camera";
@@ -43,7 +44,24 @@ export const POSE = {
   caroSentada: { file: "caro-sentada.png", w: 1086, h: 1448, axisX: 552, feetY: 1396 },
   caroDurmiendo: { file: "caro-durmiendo.png", w: 1086, h: 1448, axisX: 566, feetY: 1416 },
   nicoSentado: { file: "nico-sentado.png", w: 1086, h: 1448, axisX: 571, feetY: 1408 },
+  // Caminata nueva (ambos caminan hacia la derecha). Eje = centro de cadera, pies = apoyo más bajo:
+  // así el torso no tiembla y la variación de altura entre fotogramas da el rebote natural.
+  caroWalk1: { file: "caro-walk-1.png", w: 1024, h: 1536, axisX: 538, feetY: 1493 },
+  caroWalk2: { file: "caro-walk-2.png", w: 1024, h: 1536, axisX: 548, feetY: 1496 },
+  caroWalk3: { file: "caro-walk-3.png", w: 1024, h: 1536, axisX: 553, feetY: 1477 },
+  caroWalk4: { file: "caro-walk-4.png", w: 1024, h: 1536, axisX: 542, feetY: 1481 },
+  caroWalk5: { file: "caro-walk-5.png", w: 1024, h: 1536, axisX: 541, feetY: 1492 },
+  nicoWalk1: { file: "nico-walk-1.png", w: 1024, h: 1536, axisX: 536, feetY: 1488 },
+  nicoWalk2: { file: "nico-walk-2.png", w: 1024, h: 1536, axisX: 520, feetY: 1468 },
+  nicoWalk3: { file: "nico-walk-3.png", w: 1024, h: 1536, axisX: 534, feetY: 1474 },
+  nicoWalk4: { file: "nico-walk-4.png", w: 1024, h: 1536, axisX: 536, feetY: 1494 },
+  // Caída (cara de sorpresa). Ancla en el centro del cuerpo.
+  caroCaida: { file: "caro-caida.png", w: 1024, h: 1536, axisX: 520, feetY: 1273 },
 } satisfies Record<string, Pose>;
+
+// Ciclos de caminata ordenados por altura de cabeza (alto → bajo → alto) para un rebote suave.
+export const WALK_CARO = { poses: [POSE.caroWalk5, POSE.caroWalk2, POSE.caroWalk1, POSE.caroWalk4, POSE.caroWalk3, POSE.caroWalk4, POSE.caroWalk1, POSE.caroWalk2], period: 2, bob: 0 };
+export const WALK_NICO = { poses: [POSE.nicoWalk4, POSE.nicoWalk1, POSE.nicoWalk3, POSE.nicoWalk2, POSE.nicoWalk3, POSE.nicoWalk1], period: 3, bob: 0 };
 
 // Primeros planos mostrando el celular (PNG apaisados recortados en los bordes derecho/arriba/abajo).
 // Se anclan al borde derecho del cuadro; `screen` = pantalla en blanco del celular (coords del PNG).
@@ -149,7 +167,29 @@ export const Shadow: React.FC<{ x: number; y: number; w?: number; o?: number; da
   />
 );
 
+// Piso: línea suave de horizonte + sombra de contacto. Evita que los personajes "floten".
+export const Floor: React.FC<{ y: number; color?: string; o?: number }> = ({ y, color = "rgba(19,13,93,0.10)", o = 1 }) => (
+  <div style={{ position: "absolute", left: -2000, top: y, width: 6000, height: 900, opacity: o, background: "linear-gradient(180deg, rgba(226,230,244,0.9), rgba(244,241,255,0.4) 400px)", borderTop: `2px solid ${color}` }} />
+);
+export const Contact: React.FC<{ x: number; y: number; w?: number; o?: number }> = ({ x, y, w = 300, o = 1 }) => (
+  <div style={{ position: "absolute", left: x - w / 2, top: y - w * 0.06, width: w, height: w * 0.12, borderRadius: "50%", opacity: o, background: "radial-gradient(closest-side, rgba(19,13,93,0.22), rgba(19,13,93,0))" }} />
+);
+
 // ——— Fondos ———
+// Estudio claro del primer video: fondo claro, trama de puntos y círculos suaves (con profundidad).
+export const DotStudio: React.FC<{ f: number; cam: CamT }> = ({ f, cam }) => (
+  <>
+    <AbsoluteFill style={{ background: "linear-gradient(180deg, #F6F8FD 0%, #EEF1FA 100%)" }} />
+    <LayerRe cam={cam} depth={0.2}>
+      <div style={{ position: "absolute", left: -800, top: -600, width: 3600, height: 2400, backgroundImage: "radial-gradient(rgba(29,78,216,0.16) 2px, transparent 2.5px)", backgroundSize: "44px 44px", opacity: 0.75 }} />
+    </LayerRe>
+    <LayerRe cam={cam} depth={0.35}>
+      <div style={{ position: "absolute", left: 540, top: 60, width: 880, height: 880, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(29,78,216,0.12), rgba(255,255,255,0))", transform: `scale(${1 + Math.sin(f / 24) * 0.03})` }} />
+      <div style={{ position: "absolute", left: 1320, top: 110, width: 400, height: 400, borderRadius: "50%", background: "#EDE5FC", opacity: 0.6 }} />
+      <div style={{ position: "absolute", left: 200, top: 600, width: 360, height: 360, borderRadius: "50%", background: "#DBEAFE", opacity: 0.6 }} />
+    </LayerRe>
+  </>
+);
 export const DarkSpace: React.FC<{ glow?: string; tint?: number }> = ({ glow = "rgba(112,37,224,0.35)", tint = 0 }) => (
   <AbsoluteFill
     style={{
