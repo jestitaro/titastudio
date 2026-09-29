@@ -4,6 +4,7 @@ import { easeInOut, pop, range } from "../../lib/motion";
 import { camPath, LightStudio, toScreen } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { Toast } from "../ds/ui";
+import { Expand } from "../ds/transitions";
 import { S } from "../ds/tokens";
 import { QSLogo } from "../brand/QSLogo";
 import { fillTri } from "../brand/loader";
@@ -36,7 +37,7 @@ const cam = (f: number): Cam =>
 export const S13Offline: React.FC = () => {
   const f = useCurrentFrame();
   const c = cam(f);
-  const push = range(f, [SUM0, SUM0 + 14], [0, 1], easeInOut);
+  const push = range(f, [SUM0, SUM0 + 22], [0, 1], (t) => t);
   const toast = pop(f, 16, { damping: 16, stiffness: 110 }) * (1 - push);
   const L = range(f, LOAD, [0, 1], easeInOut);
   const reveal = range(f, [LOAD[0], LOAD[1] + 6], [0, 1], easeInOut);
@@ -48,7 +49,11 @@ export const S13Offline: React.FC = () => {
   const ls = interpolate(L, [0, 1], [0.05, LOADER_SCALE_END]);
   const content = (
     <>
-      <div style={{ position: "absolute", inset: 0, transform: `translateX(${-push * 30}%)` }}>
+      <Expand
+        p={push}
+        from={{ x: 16, y: 744, w: 358, h: 56, r: 28 }}
+        a={
+      <div style={{ position: "absolute", inset: 0 }}>
         <ScanScreen f={(S12_DUR - T0.scan) * 0.8 + f * 0.8} offline={range(f, [12, 22], [0, 1])} progress={f > 8 ? 100 : undefined} />
         {toast > 0.01 && (
           <div style={{ position: "absolute", left: S.lg, right: S.lg, top: 100, transform: `translateY(${(1 - toast) * -120}px)` }}>
@@ -56,11 +61,9 @@ export const S13Offline: React.FC = () => {
           </div>
         )}
       </div>
-      {push > 0 && (
-        <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - push) * 100}%)` }}>
-          <SummaryScreen f={(f - SUM0) * SUM_TS + SUM_OFFSET} />
-        </div>
-      )}
+        }
+        b={<SummaryScreen f={(f - SUM0) * SUM_TS + SUM_OFFSET} />}
+      />
     </>
   );
   return (

@@ -1,14 +1,16 @@
 import React from "react";
 import { Img, interpolate, staticFile } from "remotion";
-import { easeInOut, easeOut, osc, range } from "../../lib/motion";
-import { Bar, BottomNav, Card, Chip, Gauge, Header, Hero, KpiGaugeCard, ListRow, Screen, SegBar, Segmented, Sheet, Thumb } from "../ds/ui";
-import { C, R, S, SH, T } from "../ds/tokens";
-import { APP_W } from "../ds/Device";
+import { easeOut, osc, range } from "../../lib/motion";
+import { Bar, BottomNav, Card, Chip, Gauge, Header, Hero, KpiGaugeCard, ListRow, Screen, SegBar, Segmented, Sheet, Tap, Thumb } from "../ds/ui";
+import { Expand, Through } from "../ds/transitions";
+import { C, R, S, T } from "../ds/tokens";
 import { Icon, IconName } from "../ui/icons";
 import { ar, PROD, TODAY } from "./data";
 
 // Indicadores → Exhibición → OSA (capturas 5-1, 6, 7): azul único, hero con gauge,
 // hoja con selector arriba, cards cuadradas iguales. Valores con count-up y actualización en vivo.
+// Tarjeta "Exhibición" en la grilla de Indicadores (origen de la expansión).
+const EXHIB_CARD = { x: 201, y: 108, w: 173, h: 173, r: 16 };
 export const IND = { swipe1: [44, 56] as [number, number], swipe2: [86, 98] as [number, number], live1: 30, live2: 72, live3: 112 };
 
 const cnt = (f: number, r: [number, number], to: number, from = 0) => interpolate(f, r, [from, to], { easing: easeOut, extrapolateLeft: "clamp", extrapolateRight: "clamp" });
@@ -177,32 +179,20 @@ const Osa: React.FC<{ f: number }> = ({ f }) => {
   );
 };
 
+// Indicadores → (tap en la tarjeta Exhibición, que se expande) → Exhibición → (fundido) → OSA.
 export const IndicatorsFlow: React.FC<{ f: number }> = ({ f }) => {
-  const s1 = range(f, IND.swipe1, [0, 1], easeInOut);
-  const s2 = range(f, IND.swipe2, [0, 1], easeInOut);
-  const x = -(s1 + s2) * APP_W;
-  const swipe = (r: [number, number]) => {
-    const k = range(f, [r[0] - 6, r[1]], [0, 1], easeInOut);
-    if (f < r[0] - 8 || f > r[1] + 4) return null;
-    return <div style={{ position: "absolute", left: interpolate(k, [0, 1], [330, 70]) - 26, top: 540, width: 52, height: 52, borderRadius: R.pill, background: "rgba(255,255,255,0.55)", border: "3px solid rgba(255,255,255,0.95)", boxShadow: SH.float }} />;
-  };
+  const s1 = range(f, IND.swipe1, [0, 1], (t) => t);
+  const s2 = range(f, IND.swipe2, [0, 1], (t) => t);
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: APP_W * 3, transform: `translateX(${x}px)` }}>
-        {[Indicadores, Exhibicion, Osa].map((P, i) => (
-          <div key={i} style={{ position: "absolute", top: 0, bottom: 0, left: i * APP_W, width: APP_W, overflow: "hidden" }}>
-            <P f={f} />
-          </div>
-        ))}
-      </div>
+      <Through p={s2} a={<Expand p={s1} from={EXHIB_CARD} a={<Indicadores f={f} />} b={<Exhibicion f={f} />} />} b={<Osa f={f} />} />
+      <Tap f={f} at={IND.swipe1[0] - 4} x={EXHIB_CARD.x + EXHIB_CARD.w / 2} y={EXHIB_CARD.y + EXHIB_CARD.h / 2} />
       <div style={{ position: "absolute", left: "50%", bottom: 92, transform: "translateX(-50%)" }}>
         <Chip tone="violet" solid icon="clock">
           <span style={{ opacity: 0.6 + 0.4 * osc(f, 20, 1) }}>En vivo · actualizado hace 1 s</span>
         </Chip>
       </div>
       <BottomNav active={4} />
-      {swipe(IND.swipe1)}
-      {swipe(IND.swipe2)}
     </div>
   );
 };

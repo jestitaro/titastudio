@@ -1,9 +1,9 @@
 import React from "react";
-import { interpolate } from "remotion";
 import { easeInOut, easeOut, pop, range } from "../../lib/motion";
 import { Badge, Button, Card, Chip, Header, Input, ListRow, Screen, SectionTitle, Tap, Thumb } from "../ds/ui";
-import { C, R, S, SH, T } from "../ds/tokens";
+import { C, R, S, T } from "../ds/tokens";
 import { APP_W } from "../ds/Device";
+import { Expand, Through } from "../ds/transitions";
 import { Icon } from "../ui/icons";
 import { PDVS, PROD } from "./data";
 
@@ -158,22 +158,16 @@ const Breaks: React.FC<{ f: number }> = ({ f }) => (
 export const FormsFlow: React.FC<{ f: number }> = ({ f }) => {
   const b = range(f, FT.toForm, [0, 1], easeInOut);
   const c = range(f, FT.toBreaks, [0, 1], easeInOut);
+  // La tarjeta tocada se expande hasta ser el formulario; después, fundido al resumen de quiebres.
+  const form = (
+    <>
+      <FormLoad f={f} />
+      {f >= FT.success[0] && <Success f={f} />}
+    </>
+  );
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-      <div style={{ position: "absolute", inset: 0, transform: `translateX(${-b * 30}%)` }}>
-        <FormsList f={f} />
-      </div>
-      {b > 0 && (
-        <div style={{ position: "absolute", inset: 0, transform: `translateX(${interpolate(b, [0, 1], [APP_W, 0]) - c * APP_W * 0.3}px)`, boxShadow: SH.float }}>
-          <FormLoad f={f} />
-          {f >= FT.success[0] && <Success f={f} />}
-        </div>
-      )}
-      {c > 0 && (
-        <div style={{ position: "absolute", inset: 0, transform: `translateX(${interpolate(c, [0, 1], [APP_W, 0])}px)`, boxShadow: SH.float }}>
-          <Breaks f={f} />
-        </div>
-      )}
+      <Through p={c} a={<Expand p={b} from={{ x: 16, y: 300, w: APP_W - 32, h: 76, r: 16 }} a={<FormsList f={f} />} b={form} />} b={<Breaks f={f} />} />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { easeInOut, easeOut, pop, range } from "../../lib/motion";
 import { Avatar, Badge, BottomNav, Card, Chip, Fab, Header, Screen, SectionTitle, Tap } from "../ds/ui";
+import { Reveal } from "../ds/transitions";
 import { C, R, S, SH, T } from "../ds/tokens";
 import { Icon, IconName } from "../ui/icons";
 import { PDVS, TEAM, TODAY } from "./data";
@@ -179,15 +180,19 @@ export const VisitasScreen: React.FC<{ f: number }> = ({ f }) => {
         <ToggleRow map={map} />
       </Header>
       <div style={{ position: "absolute", left: 0, right: 0, top: 152, bottom: 80, overflow: "hidden" }}>
-        {/* Lista */}
-        <div style={{ position: "absolute", inset: 0, padding: S.lg, transform: `translateX(${-m * 30}%)`, opacity: 1 - m }}>
-          {PDVS.map((pv, i) => (
-            <PdvCard key={pv.name} p={pv} f={f} i={i} active={i === 0} />
-          ))}
-        </div>
-        {/* Mapa */}
-        {m > 0 && (
-          <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - m) * 100}%)` }}>
+        {/* Lista → mapa: el mapa se revela en círculo desde el botón de ruta del encabezado */}
+        <Reveal
+          p={m}
+          at={{ x: 356, y: -34 }}
+          a={
+            <div style={{ position: "absolute", inset: 0, padding: S.lg }}>
+              {PDVS.map((pv, i) => (
+                <PdvCard key={pv.name} p={pv} f={f} i={i} active={i === 0} />
+              ))}
+            </div>
+          }
+          b={
+          <div style={{ position: "absolute", inset: 0 }}>
             <MapView f={f} h={620} />
             <div style={{ position: "absolute", right: S.md, top: 260, display: "flex", flexDirection: "column", gap: S.sm }}>
               {(["search", "pin"] as IconName[]).map((ic) => (
@@ -217,7 +222,8 @@ export const VisitasScreen: React.FC<{ f: number }> = ({ f }) => {
               </Card>
             </div>
           </div>
-        )}
+          }
+        />
       </div>
       <BottomNav active={2} />
       {m < 1 && <Fab />}

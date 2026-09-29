@@ -4,6 +4,7 @@ import { easeInOut, range } from "../../lib/motion";
 import { Actor, camPath, Layer, LightStudio, POSE } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { Device } from "../ds/Device";
+import { Expand } from "../ds/transitions";
 import { Kinetic } from "../ui/Kinetic";
 import { es } from "../../i18n/es";
 import { FormsFlow, FT } from "../screens/Forms";
@@ -45,7 +46,7 @@ export const S09Capture: React.FC = () => {
   const f = useCurrentFrame();
   const c = cam(f);
   const wipe = range(f, [0, 40], [0, 1], easeInOut);
-  const nav = range(f, [FORMS0 - 6, FORMS0 + 6], [0, 1], easeInOut);
+  const nav = range(f, [FORMS0 - 12, FORMS0 + 10], [0, 1], (t) => t);
   const nico = 1 - range(f, [40, 88], [0, 1], easeInOut);
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -61,14 +62,8 @@ export const S09Capture: React.FC = () => {
           </div>
         )}
         <Device x={NICO_DEV.x} y={NICO_DEV.y} scale={NICO_DEV.s}>
-          <div style={{ position: "absolute", inset: 0, transform: `translateX(${-nav * 30}%)` }}>
-            <ChatScreen f={chatClock(S08_DUR + f)} mine="nico" />
-          </div>
-          {nav > 0 && (
-            <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - nav) * 100}%)` }}>
-              <FormsFlow f={Math.min(toForms(f), FT.success[1] + 30)} />
-            </div>
-          )}
+          {/* Del chat al formulario: el adjunto "Formulario" de la hoja se expande hasta ser la pantalla */}
+          <Expand p={nav} from={{ x: 150, y: 700, w: 90, h: 90, r: 20 }} a={<ChatScreen f={chatClock(S08_DUR + f)} mine="nico" />} b={<FormsFlow f={Math.min(toForms(f), FT.success[1] + 30)} />} />
         </Device>
       </Layer>
       <Kinetic f={f} text={es.video.kinetic.s09.text} at={62} out={180} x={130} y={520} accent={[3, 4]} eyebrow={es.video.kinetic.s09.eyebrow} size={60} plate />
