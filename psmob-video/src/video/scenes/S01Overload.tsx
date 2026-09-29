@@ -104,7 +104,7 @@ export const S01Overload: React.FC = () => {
         <div style={{ opacity: floorO }}>
           <Contact x={x} y={S01_FEET} w={320} />
         </div>
-        <Actor pose={pose} x={x} feetY={caroY} scale={S01_SCALE} f={f} walk={walking ? WALK_CARO : undefined} blink={!stress ? { pose: POSE.caroCelularBlink, at: [96, 126] } : undefined} />
+        <Actor pose={pose} x={x} feetY={caroY} scale={S01_SCALE} f={f} walk={walking ? WALK_CARO : undefined} />
         {ITEMS.map((it, i) => renderFloat(it.key, it.x, it.y, it.at, i, <IconTile icon={it.icon} tint={it.tint} label={it.label} />))}
         {renderFloat("alert", 1330, 820, B.alert, 4, <AlertCard />)}
       </Layer>

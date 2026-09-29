@@ -47,7 +47,7 @@ export const S10Realtime: React.FC = () => {
         <Layer cam={c} depth={1}>
           <Floor y={FLOOR_Y} />
           <Contact x={CARO_W.x} y={CARO_W.feet} />
-          <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [24, 120] }} />
+          <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} />
           {born > 0.01 && (
             <Device x={interpolate(born, [0, 1], [phone10.x, DEV10.x])} y={interpolate(born, [0, 1], [phone10.y, DEV10.y])} scale={interpolate(born, [0, 1], [0.05, DEV10.s])} opacity={Math.min(1, born * 4)}>
               <IndicatorsFlow f={(f - FLOW0) * TS} />

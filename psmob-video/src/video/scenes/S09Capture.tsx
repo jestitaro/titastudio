@@ -57,7 +57,7 @@ export const S09Capture: React.FC = () => {
       <Layer cam={c} depth={1}>
         {nico > 0.01 && (
           <div style={{ position: "absolute", inset: 0, opacity: nico }}>
-            <Actor pose={POSE.nicoCelular} x={NICO_W.x} feetY={NICO_W.feet} scale={NICO_W.scale} f={f} blink={{ pose: POSE.nicoCelularBlink, at: [20] }} />
+            <Actor pose={POSE.nicoCelular} x={NICO_W.x} feetY={NICO_W.feet} scale={NICO_W.scale} f={f} />
           </div>
         )}
         <Device x={NICO_DEV.x} y={NICO_DEV.y} scale={NICO_DEV.s}>

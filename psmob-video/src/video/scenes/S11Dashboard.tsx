@@ -71,7 +71,7 @@ export const S11Dashboard: React.FC = () => {
         )}
         <Contact x={CARO_W.x} y={CARO_W.feet} />
         <Contact x={NICO.x} y={NICO.feet} />
-        <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [60, 150] }} />
+        <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} />
         <Actor pose={POSE.nicoExplicando} x={NICO.x} feetY={NICO.feet} scale={NICO.scale} f={f} />
       </Layer>
     </AbsoluteFill>

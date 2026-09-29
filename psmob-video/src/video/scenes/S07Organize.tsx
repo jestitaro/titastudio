@@ -19,8 +19,9 @@ const Z0 = S06_UI_END.w / (APP_W * DEV7.s);
 export const camS07 = (f: number): Cam =>
   camPath(f, [
     { f: 0, x: DEV7.x - (S06_UI_END.x - 960) / Z0, y: DEV7.y - (S06_UI_END.y - 540) / Z0, zoom: Z0 },
-    { f: 90, x: 830, y: 540, zoom: 1.0 },
-    { f: 195, x: 850, y: 535, zoom: 1.05 },
+    { f: 30, x: DEV7.x - (S06_UI_END.x - 960) / Z0, y: DEV7.y - (S06_UI_END.y - 540) / Z0, zoom: Z0 * 0.97 },
+    { f: 165, x: 830, y: 540, zoom: 1.0 },
+    { f: 195, x: 835, y: 539, zoom: 1.01 },
   ]);
 
 const START = [
@@ -44,7 +45,8 @@ export const S07Organize: React.FC = () => {
       <Layer cam={cam} depth={1}>
         <Floor y={FLOOR_Y} />
         <Contact x={CARO_W.x} y={CARO_W.feet} />
-        <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [96, 170] }} />
+        {/* Caro aparece de a poco mientras la cámara se aleja despacio */}
+        <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} opacity={range(f, [40, 110], [0, 1], easeInOut)} />
         <Device x={DEV7.x} y={DEV7.y} scale={DEV7.s}>
           <VisitasScreen f={vf} />
         </Device>

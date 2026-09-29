@@ -67,8 +67,8 @@ export const S08Chat: React.FC = () => {
         <Floor y={FLOOR_Y} />
         <Contact x={CARO_W.x} y={CARO_W.feet} />
         <Contact x={NICO_W.x} y={NICO_W.feet} />
-        <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} blink={{ pose: POSE.caroCelularBlink, at: [40, 140] }} />
-        <Actor pose={POSE.nicoCelular} x={NICO_W.x} feetY={NICO_W.feet} scale={NICO_W.scale} f={f} blink={{ pose: POSE.nicoCelularBlink, at: [70, 150, 240] }} />
+        <Actor pose={POSE.caroCelular} x={CARO_W.x} feetY={CARO_W.feet} scale={CARO_W.scale} f={f} />
+        <Actor pose={POSE.nicoCelular} x={NICO_W.x} feetY={NICO_W.feet} scale={NICO_W.scale} f={f} />
         {/* El celular de la 7 vuelve a la mano de Caro */}
         {back < 1 && (
           <Device x={interpolate(back, [0, 1], [DEV7.x, caroPhoneW.x])} y={interpolate(back, [0, 1], [DEV7.y, caroPhoneW.y])} scale={interpolate(back, [0, 1], [DEV7.s, 0.06])} opacity={1 - range(back, [0.75, 1], [0, 1], (t) => t)}>

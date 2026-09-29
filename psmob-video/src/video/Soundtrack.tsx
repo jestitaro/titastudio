@@ -2,7 +2,7 @@ import React from "react";
 import { Audio, interpolate, Sequence, staticFile } from "remotion";
 import { VO } from "./vo";
 
-// Música + locución. La música baja (ducking) mientras suena la voz.
+// Locución (y música opcional, hoy desactivada). Si hay música, baja (ducking) mientras suena la voz.
 const MUSIC = 0.55;
 const DUCK = 0.22;
 
@@ -15,7 +15,7 @@ const musicVolume = (f: number) => {
   return v;
 };
 
-export const Soundtrack: React.FC<{ music?: boolean; voice?: boolean }> = ({ music = true, voice = true }) => (
+export const Soundtrack: React.FC<{ music?: boolean; voice?: boolean }> = ({ music = false, voice = true }) => (
   <>
     {music && <Audio src={staticFile("audio/music.mp3")} volume={musicVolume} />}
     {voice &&

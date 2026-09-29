@@ -129,7 +129,7 @@ export const S12World: React.FC<{ f: number; cam: Cam; device?: React.ReactNode;
         {walking ? (
           <Actor pose={POSE.nicoWalk1} x={nx} feetY={NICO12.feet} scale={NICO12.scale} f={f} walk={WALK_NICO} />
         ) : (
-          <Actor pose={POSE.nicoCelular} x={nx} feetY={NICO12.feet} scale={NICO12.scale} f={f} blink={{ pose: POSE.nicoCelularBlink, at: [150, 236] }} />
+          <Actor pose={POSE.nicoCelular} x={nx} feetY={NICO12.feet} scale={NICO12.scale} f={f} />
         )}
         {device && deviceState && deviceState.o > 0.001 && (
           <Device x={deviceState.x} y={deviceState.y} scale={deviceState.s} opacity={deviceState.o}>

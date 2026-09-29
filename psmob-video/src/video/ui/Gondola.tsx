@@ -1,159 +1,106 @@
 import React from "react";
 import { Img, staticFile } from "remotion";
 import { FONT_MONO } from "../ds/tokens";
-import { Bag, Box, Doypack, Jar, Squeeze } from "./Packs";
 
-// Góndola de supermercado simplificada con packaging genérico (sin marcas, sin textos).
-// Niveles: cuidado personal / limpieza / almacén / bultos. Incluye un faltante y un producto fuera de posición.
+// Góndola de supermercado solo con los productos provistos (PNG, sin marcas). Cada producto conserva su
+// tamaño real relativo: la altura sale de su medida aproximada en cm, no del estante. Por nivel:
+// cuidado personal chico / cuidado personal y limpieza liviana / limpieza / bidones.
+// Incluye un faltante y un producto fuera de posición en la zona que escanea Nico.
 
-type Sku =
-  | { t: "png"; src: string; ar: number; hue?: number }
-  | { t: "jar"; body: string; lid: string }
-  | { t: "doy"; body: string; cap?: string }
-  | { t: "sq"; body: string; cap: string }
-  | { t: "box"; body: string; band: string }
-  | { t: "bag"; body: string };
-
-const P = (src: string, ar: number, hue?: number): Sku => ({ t: "png", src: `productos/${src}.png`, ar, hue });
+type Sku = { src: string; ar: number; cm: number };
+const P = (src: string, ar: number, cm: number): Sku => ({ src: `productos/${src}.png`, ar, cm });
 const SKU = {
-  shampoo: P("shampoo-violeta", 0.3),
-  shampooTeal: P("shampoo-violeta", 0.3, 290),
-  pump: P("jabon-pump-violeta", 0.35),
-  aerosol: P("aerosol-celeste", 0.29),
-  aerosolPink: P("aerosol-celeste", 0.29, 130),
-  rollon: P("rollon-rosa", 0.45),
-  tubo: P("tubo-crema-celeste", 0.43),
-  crema: P("set-crema-rosa", 1.03),
-  detergente: P("detergente-liquido-celeste", 0.56),
-  detergentePink: P("detergente-liquido-celeste", 0.56, 140),
-  bidon: P("bidon-limpiador-amarillo", 0.45),
-  lavavajillas: P("lavavajillas-amarillo", 0.5),
-  lavavajillasGreen: P("lavavajillas-amarillo", 0.5, 60),
-  spray: P("spray-celeste", 0.5),
-  bano: P("limpiador-bano-celeste", 0.41),
-  aerosolVerde: P("aerosol-verde", 0.38),
-  dispensador: P("dispensador-jabon-celeste", 0.52),
-  salsa: { t: "jar", body: "#E4574B", lid: "#F2C94C" } as Sku,
-  pickles: { t: "jar", body: "#8DB36B", lid: "#E9E4D4" } as Sku,
-  ketchup: { t: "sq", body: "#E24B3B", cap: "#FFFFFF" } as Sku,
-  mostaza: { t: "sq", body: "#F2C84B", cap: "#E24B3B" } as Sku,
-  mayo: { t: "doy", body: "#F4E7B8", cap: "#3C7BE0" } as Sku,
-  salsaDoy: { t: "doy", body: "#E57A4E", cap: "#fff" } as Sku,
-  boxBlue: { t: "box", body: "#5B8DEF", band: "#FFFFFF" } as Sku,
-  boxViolet: { t: "box", body: "#9A7BE8", band: "#FFF4D6" } as Sku,
-  boxGreen: { t: "box", body: "#5CB88A", band: "#FFFFFF" } as Sku,
-  bagOrange: { t: "bag", body: "#F29A55" } as Sku,
-  bagYellow: { t: "bag", body: "#F5CF5C" } as Sku,
+  rollon: P("rollon-rosa", 0.45, 10),
+  crema: P("set-crema-rosa", 1.02, 9),
+  tubo: P("tubo-crema-celeste", 0.43, 17),
+  aerosol: P("aerosol-celeste", 0.29, 18),
+  dispensador: P("dispensador-jabon-celeste", 0.52, 17),
+  pump: P("jabon-pump-violeta", 0.35, 19),
+  shampoo: P("shampoo-violeta", 0.3, 22),
+  aerosolVerde: P("aerosol-verde", 0.38, 20),
+  lavavajillas: P("lavavajillas-amarillo", 0.49, 24),
+  bano: P("limpiador-bano-celeste", 0.41, 25),
+  spray: P("spray-celeste", 0.5, 26),
+  detergente: P("detergente-liquido-celeste", 0.56, 30),
+  bidon: P("bidon-limpiador-amarillo", 0.45, 31),
 };
 type SkuKey = keyof typeof SKU;
-const aspect = (s: Sku) => (s.t === "png" ? s.ar : s.t === "jar" ? 100 / 130 : s.t === "doy" ? 100 / 150 : s.t === "sq" ? 70 / 160 : s.t === "box" ? 110 / 150 : 110 / 130);
+const PX_CM = 7; // escala única para todos los productos
+const skuH = (k: SkuKey) => SKU[k].cm * PX_CM;
 
-export const GONDOLA = { top: 120, bases: [372, 612, 842, 1062], heights: [196, 204, 176, 192], width: 5400, bottom: 1144 };
+export const GONDOLA = { top: 120, bases: [300, 530, 790, 1062], width: 5400, bottom: 1144 };
 
-const ROWS: [SkuKey, number, string][][] = [
+// Patrón por nivel (producto, frentes, precio); se repite hasta completar el ancho de la góndola.
+const PATTERN: [SkuKey, number, string][][] = [
   [
-    ["shampoo", 4, "$ 3.410,50"],
-    ["pump", 3, "$ 2.890,00"],
-    ["aerosol", 4, "$ 2.310,00"],
-    ["tubo", 3, "$ 1.760,00"],
+    ["rollon", 4, "$ 1.760,00"],
     ["tubo", 3, "$ 2.450,00"],
     ["crema", 2, "$ 4.120,50"],
-    ["shampooTeal", 4, "$ 3.410,50"],
-    ["aerosolPink", 4, "$ 2.310,00"],
-    ["pump", 3, "$ 2.890,00"],
-    ["tubo", 3, "$ 2.450,00"],
-    ["shampoo", 4, "$ 3.410,50"],
-    ["tubo", 3, "$ 1.760,00"],
     ["aerosol", 4, "$ 2.310,00"],
-    ["crema", 2, "$ 4.120,50"],
-    ["shampooTeal", 4, "$ 3.410,50"],
-    ["pump", 3, "$ 2.890,00"],
-  ],
-  [
-    ["detergente", 3, "$ 5.032,00"],
-    ["bidon", 3, "$ 1.543,00"],
-    ["lavavajillas", 4, "$ 1.320,00"],
-    ["spray", 3, "$ 1.980,00"],
-    ["bano", 3, "$ 1.650,00"],
-    ["aerosolVerde", 4, "$ 2.100,00"],
-    ["detergentePink", 3, "$ 5.032,00"],
     ["dispensador", 3, "$ 1.890,00"],
-    ["lavavajillasGreen", 4, "$ 1.320,00"],
-    ["detergente", 3, "$ 5.032,00"],
-    ["bidon", 3, "$ 1.543,00"],
-    ["spray", 3, "$ 1.980,00"],
+    ["pump", 3, "$ 2.890,00"],
+  ],
+  [
+    ["shampoo", 4, "$ 3.410,50"],
+    ["aerosolVerde", 3, "$ 2.100,00"],
+    ["lavavajillas", 4, "$ 1.320,00"],
     ["bano", 3, "$ 1.650,00"],
   ],
   [
-    ["salsa", 4, "$ 1.480,00"],
-    ["salsaDoy", 4, "$ 1.150,00"],
-    ["pickles", 4, "$ 990,00"],
-    ["mayo", 4, "$ 1.650,00"],
-    ["pickles", 3, "$ 1.890,00"],
-    ["salsaDoy", 4, "$ 1.230,00"],
-    ["salsa", 4, "$ 1.480,00"],
-    ["salsaDoy", 4, "$ 1.150,00"],
-    ["mayo", 4, "$ 1.650,00"],
-    ["pickles", 4, "$ 990,00"],
-    ["pickles", 3, "$ 1.890,00"],
+    ["spray", 4, "$ 1.980,00"],
+    ["detergente", 3, "$ 5.032,00"],
+    ["lavavajillas", 3, "$ 1.320,00"],
   ],
   [
-    ["boxBlue", 3, "$ 6.890,00"],
-    ["bagOrange", 3, "$ 3.240,00"],
     ["bidon", 4, "$ 1.543,00"],
-    ["boxViolet", 3, "$ 7.120,00"],
-    ["bagYellow", 3, "$ 2.980,00"],
-    ["boxGreen", 3, "$ 6.450,00"],
-    ["bidon", 4, "$ 1.543,00"],
-    ["boxBlue", 3, "$ 6.890,00"],
-    ["bagOrange", 3, "$ 3.240,00"],
-    ["boxViolet", 3, "$ 7.120,00"],
+    ["detergente", 3, "$ 5.032,00"],
   ],
 ];
-
-export type Facing = { level: number; x: number; base: number; w: number; h: number; sku: SkuKey; kind: "ok" | "gap" | "wrong"; group: number };
-export type PriceTag = { level: number; x: number; y: number; price: string };
 
 // Fallas de planograma: la zona que escanea Nico (coords locales de la góndola).
 export const SCAN_ZONE = { from: 2060, to: 2800 };
 const GAP_X = { level: 1, x: 2330 };
-const WRONG_X = { level: 2, x: 2600, sku: "detergente" as SkuKey };
+const WRONG_X = { level: 2, x: 2600, sku: "shampoo" as SkuKey };
+
+export type Facing = { level: number; x: number; base: number; w: number; h: number; sku: SkuKey; kind: "ok" | "gap" | "wrong"; group: number };
+export type PriceTag = { level: number; x: number; y: number; price: string };
 
 export const { FACINGS, TAGS } = (() => {
   const facings: Facing[] = [];
   const tags: PriceTag[] = [];
-  ROWS.forEach((row, level) => {
+  PATTERN.forEach((pattern, level) => {
     let x = 40;
-    const h = GONDOLA.heights[level];
-    row.forEach(([key, n, price], group) => {
-      const w = aspect(SKU[key]) * h;
+    let group = 0;
+    while (x < GONDOLA.width - 200) {
+      const [key, n, price] = pattern[group % pattern.length];
+      const h = skuH(key);
+      const w = SKU[key].ar * h;
       const start = x;
       for (let i = 0; i < n; i++) {
         facings.push({ level, x: x + w / 2, base: GONDOLA.bases[level], w, h, sku: key, kind: "ok", group });
-        x += w + 6;
+        x += w + 8;
       }
-      tags.push({ level, x: (start + x - 6) / 2, y: GONDOLA.bases[level] + 16, price });
-      x += 22;
-    });
+      tags.push({ level, x: (start + x - 8) / 2, y: GONDOLA.bases[level] + 16, price });
+      x += 26;
+      group++;
+    }
   });
   const nearest = (level: number, x: number) => facings.filter((p) => p.level === level).reduce((a, b) => (Math.abs(b.x - x) < Math.abs(a.x - x) ? b : a));
   nearest(GAP_X.level, GAP_X.x).kind = "gap";
   const w = nearest(WRONG_X.level, WRONG_X.x);
   w.kind = "wrong";
   w.sku = WRONG_X.sku;
+  w.h = skuH(WRONG_X.sku);
+  w.w = SKU[WRONG_X.sku].ar * w.h;
   return { FACINGS: facings, TAGS: tags };
 })();
 
-const Product: React.FC<{ f: Facing; idx: number }> = ({ f, idx }) => {
+// Parte superior de cada nivel (el producto más alto), para ubicar rótulos.
+export const LEVEL_TOP = GONDOLA.bases.map((b, lv) => Math.min(...FACINGS.filter((p) => p.level === lv).map((p) => p.base - p.h)));
+
+const Product: React.FC<{ f: Facing }> = ({ f }) => {
   const s = SKU[f.sku];
-  const wrongH = f.kind === "wrong" ? f.h * 0.78 : f.h;
-  const w = aspect(s) * wrongH;
-  const style: React.CSSProperties = { position: "absolute", left: f.x - w / 2, top: f.base - wrongH, width: w, height: wrongH };
-  const id = `pk${idx}`;
-  if (s.t === "png") return <Img src={staticFile(s.src)} style={{ ...style, filter: s.hue ? `hue-rotate(${s.hue}deg)` : undefined }} />;
-  const inner =
-    s.t === "jar" ? <Jar w={w} h={wrongH} body={s.body} lid={s.lid} id={id} /> : s.t === "doy" ? <Doypack w={w} h={wrongH} body={s.body} cap={s.cap} id={id} /> : s.t === "sq" ? <Squeeze w={w} h={wrongH} body={s.body} cap={s.cap} id={id} /> : s.t === "box" ? <Box w={w} h={wrongH} body={s.body} band={s.band} id={id} /> : <Bag w={w} h={wrongH} body={s.body} id={id} />;
-  return <div style={style}>{inner}</div>;
+  return <Img src={staticFile(s.src)} style={{ position: "absolute", left: f.x - f.w / 2, top: f.base - f.h, width: f.w, height: f.h }} />;
 };
 
 export const Gondola: React.FC<{ from?: number; to?: number }> = ({ from = -200, to = 5000 }) => (
@@ -168,7 +115,7 @@ export const Gondola: React.FC<{ from?: number; to?: number }> = ({ from = -200,
       <div key={`s${i}`} style={{ position: "absolute", left: 300 + i * 1000, top: GONDOLA.top - 50, width: 220, height: 32, borderRadius: 16, background: "rgba(255,255,255,0.22)" }} />
     ))}
     {FACINGS.filter((p) => p.kind !== "gap" && p.x > from && p.x < to).map((p, i) => (
-      <Product key={`${p.level}-${Math.round(p.x)}`} f={p} idx={i} />
+      <Product key={`${p.level}-${Math.round(p.x)}`} f={p} />
     ))}
     <div style={{ position: "absolute", left: -20, top: GONDOLA.bases[3] + 38, width: GONDOLA.width + 40, height: 44, background: "linear-gradient(180deg, #8E9AB8, #6F7C9E)" }} />
     {GONDOLA.bases.map((y, level) => (

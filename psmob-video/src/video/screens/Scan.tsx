@@ -5,7 +5,7 @@ import { Button, Card, Chip, Header, ListRow, Screen, Tap, Thumb, Toast } from "
 import { C, FONT, R, S, T } from "../ds/tokens";
 import { QSLogo } from "../brand/QSLogo";
 import { fillTri } from "../brand/loader";
-import { FACINGS, Gondola, TAGS } from "../ui/Gondola";
+import { FACINGS, Gondola, LEVEL_TOP, TAGS } from "../ui/Gondola";
 import { Icon, IconName } from "../ui/icons";
 import { PROD } from "./data";
 
@@ -105,7 +105,7 @@ export const ScanScreen: React.FC<{ f: number; offline?: number; progress?: numb
     </Screen>
   );
 };
-const GONDOLA_TOP = (lv: number) => [176, 408, 666][lv];
+const GONDOLA_TOP = (lv: number) => LEVEL_TOP[lv];
 
 // Resumen offline: guardado local con feedback positivo, Enviar → Enviando (loader de marca).
 export const SUM = { toast: 4, tap: 40, sending: 44 };
