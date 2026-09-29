@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, random, useCurrentFrame } from "remotion";
-import { easeInOut, easeOut, osc, pop, range } from "../../lib/motion";
+import { easeInOut, osc, pop, range } from "../../lib/motion";
 import { Actor, Layer, Particles, POSE, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { C as DC, FONT } from "../ds/tokens";
@@ -11,15 +11,15 @@ import { Tile } from "./S01Overload";
 // Escena 5 — el tiempo pasa: Caro sentada y preocupada frente al escritorio, el reloj corre, los papeles
 // se apilan, la ventana pasa de día a noche; una pila de papeles cruza cámara y la encontramos dormida.
 // Agotamiento operativo, no tristeza.
-const DUR = 150;
+const DUR = 165;
 const DESK_Y = 660;
-const SLEEP = 94;
+const SLEEP = 104;
 const CARO = { x: 960, feet: 1075, scale: 0.6 };
 
 const cam = (f: number): Cam => ({
   x: 960 + range(f, [0, DUR], [-30, 30]),
-  y: range(f, [0, 24], [380, 520], easeOut) + range(f, [24, DUR], [0, 10]),
-  zoom: range(f, [0, SLEEP], [1.02, 1.12], (t) => t) + range(f, [SLEEP, DUR], [0, 0.06], (t) => t),
+  y: range(f, [0, 40], [440, 520], easeInOut) + range(f, [40, DUR], [0, 10]),
+  zoom: range(f, [0, DUR], [1.02, 1.12], (t) => t),
 });
 
 const mix = (a: string, b: string, t: number) => `color-mix(in srgb, ${b} ${Math.round(Math.min(1, Math.max(0, t)) * 100)}%, ${a})`;

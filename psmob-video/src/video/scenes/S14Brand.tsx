@@ -10,7 +10,7 @@ import { LOADER_END, LOADER_SCALE_END, LOGO, LOGO_H, logoLeftCentered } from "./
 
 // Escena 14 — cierre exclusivamente con QuartzSales. Los triángulos del loading se ensamblan en el
 // isotipo; el símbolo se desplaza y el wordmark aparece por máscara. La frase final se integra al cierre.
-const T = { assemble: [0, 14] as [number, number], slide: [18, 48] as [number, number], line: 50 };
+const T = { assemble: [0, 26] as [number, number], slide: [34, 80] as [number, number], line: 86 };
 const LOGO_LEFT_FINAL = 960 - LOGO.w / 2;
 const TOP = 540 - LOGO_H / 2 - 50;
 
@@ -43,8 +43,8 @@ export const S14Brand: React.FC = () => {
   const line = range(f, [T.line, T.line + 16], [0, 1], easeOut);
   const line2 = range(f, [T.line + 6, T.line + 22], [0, 1], easeOut);
   // Zoom out limpio desde el loader (continúa la escala con la que termina la 13) y respiración final muy leve.
-  const open = camRange(f, [0, 44], [LOADER_SCALE_END, 1]);
-  const settle = open * range(f, [T.line, 165], [1, 1.02], (t) => t);
+  const open = camRange(f, [0, 70], [LOADER_SCALE_END, 1]);
+  const settle = open * range(f, [T.line, 180], [1, 1.015], (t) => t);
   // Pulso de luz cuando el isotipo termina de ensamblarse.
   const flash = range(f, [T.assemble[1] - 4, T.assemble[1] + 2], [0, 1]) * (1 - range(f, [T.assemble[1] + 2, T.assemble[1] + 20], [0, 1]));
   return (

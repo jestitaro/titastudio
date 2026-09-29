@@ -1,8 +1,6 @@
 import React from "react";
-import { AbsoluteFill, Sequence, useCurrentFrame } from "remotion";
-import { range } from "../lib/motion";
-import { SCENES, SceneId, sceneStart, VO } from "./timing";
-import { VoRef } from "./lib/stage";
+import { AbsoluteFill, Sequence } from "remotion";
+import { SCENES, SceneId, sceneStart } from "./timing";
 import { TriangleWipe } from "./transitions/TriangleWipe";
 import { S01Overload } from "./scenes/S01Overload";
 import { S05Desk } from "./scenes/S05Desk";
@@ -30,19 +28,10 @@ const COMPONENTS: Record<SceneId, React.FC> = {
   s14: S14Brand,
 };
 
-const DARK_SCENES: SceneId[] = ["s01", "s05"];
-
-const VoLayer: React.FC<{ id: SceneId }> = ({ id }) => {
-  const f = useCurrentFrame();
-  const line = VO[id].find((l) => f >= l.from && f < l.to);
-  if (!line) return null;
-  const o = range(f, [line.from, line.from + 6], [0, 1]) * range(f, [line.to - 6, line.to], [1, 0]);
-  return <VoRef text={line.text} o={o} dark={DARK_SCENES.includes(id)} />;
-};
-
 export type PSMobVideoProps = { showVO: boolean };
 
-export const PSMobVideo: React.FC<PSMobVideoProps> = ({ showVO }) => {
+// `showVO` se mantiene por compatibilidad de props, pero el video no muestra texto de locución.
+export const PSMobVideo: React.FC<PSMobVideoProps> = () => {
   const wipeAt = sceneStart("s06");
   return (
     <AbsoluteFill style={{ background: "#0A0736" }}>
@@ -51,7 +40,6 @@ export const PSMobVideo: React.FC<PSMobVideoProps> = ({ showVO }) => {
         return (
           <Sequence key={s.id} from={sceneStart(s.id)} durationInFrames={s.dur} name={s.id}>
             <C />
-            {showVO && <VoLayer id={s.id} />}
           </Sequence>
         );
       })}

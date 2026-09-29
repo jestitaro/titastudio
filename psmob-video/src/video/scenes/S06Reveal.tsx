@@ -1,41 +1,42 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
-import { easeInOut, osc, range } from "../../lib/motion";
-import { camEase, camPath, Closeup, closeupScreen, Layer, LightStudio, Particles, QS, toScreen } from "../lib/stage";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { osc, range } from "../../lib/motion";
+import { camPath, Closeup, closeupScreen, Layer, LightStudio, Particles, QS, toScreen } from "../lib/stage";
 import type { Cam } from "../lib/stage";
-import { APP_H, Device, PngScreen } from "../ds/Device";
+import { PngScreen } from "../ds/Device";
 import { QSLogo } from "../brand/QSLogo";
 import { fillTri } from "../brand/loader";
 import { VisitasScreen } from "../screens/Field";
 
-// Escena 6 — alivio. Primer plano de Caro mostrando el celular (frontal). La pantalla se enciende con
-// el loading de marca y la app; la cámara empuja y el celular vectorial nace exactamente sobre la
-// pantalla del PNG y queda al centro, recto y frontal.
+// Escena 6 — alivio. Primer plano de Caro mostrando su celular (frontal). La pantalla se enciende con el
+// loading de marca y la app. Un solo movimiento: push-in lento hacia el teléfono, con su cara en cuadro.
 const CU = { right: 1960, top: -3, scale: 1 };
 const SCR = closeupScreen("caro", CU.right, CU.top, CU.scale);
-const DETACH: [number, number] = [58, 116];
-// Al final la UI ocupa la altura del cuadro (la escena 7 arranca así y abre para revelar más interfaz).
-export const S06_END = { x: 960, y: 540, s: 1.22 };
+const SCR_C = { x: SCR.x + SCR.w / 2, y: SCR.y + SCR.h / 2 };
 
-// Push-in continuo desde el primer plano de Caro hacia su teléfono.
 const cam = (f: number): Cam =>
   camPath(f, [
-    { f: 0, x: 1080, y: 560, zoom: 1 },
-    { f: 40, x: SCR.x + SCR.w / 2 + 30, y: SCR.y + SCR.h / 2, zoom: 1.08 },
-    { f: 120, x: SCR.x + SCR.w / 2, y: SCR.y + SCR.h / 2, zoom: 1.5 },
+    { f: 0, x: 1100, y: 560, zoom: 1 },
+    { f: 150, x: 1060, y: SCR_C.y, zoom: 1.32 },
   ]);
 
+// Rectángulo en pantalla de la UI al final (la escena 7 arranca con el celular exactamente ahí).
+export const S06_UI_END = (() => {
+  const s = toScreen(cam(150), 1, SCR_C);
+  return { x: s.x, y: s.y, w: SCR.w * s.z };
+})();
+
 const ScreenContent: React.FC<{ f: number }> = ({ f }) => {
-  const splash = range(f, [4, 10], [0, 1]) * (1 - range(f, [26, 32], [0, 1]));
-  const ui = range(f, [26, 34], [0, 1]);
+  const splash = range(f, [8, 16], [0, 1]) * (1 - range(f, [40, 50], [0, 1]));
+  const ui = range(f, [40, 54], [0, 1]);
   return (
     <div style={{ position: "absolute", inset: 0, background: "#fff" }}>
-      <div style={{ position: "absolute", inset: 0, opacity: ui, transform: `translateY(${(1 - ui) * 30}px)` }}>
+      <div style={{ position: "absolute", inset: 0, opacity: ui, transform: `translateY(${(1 - ui) * 24}px)` }}>
         <VisitasScreen f={0} />
       </div>
       {splash > 0 && (
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#fff", opacity: splash }}>
-          <QSLogo width={140} isoOnly id="s06iso" tri={fillTri(range(f, [6, 26], [0, 1]))} />
+          <QSLogo width={140} isoOnly id="s06iso" tri={fillTri(range(f, [10, 40], [0, 1]))} />
         </div>
       )}
     </div>
@@ -45,34 +46,20 @@ const ScreenContent: React.FC<{ f: number }> = ({ f }) => {
 export const S06Reveal: React.FC = () => {
   const f = useCurrentFrame();
   const c = cam(f);
-  const d = camEase((f - DETACH[0]) / (DETACH[1] - DETACH[0]));
-  const s0 = toScreen(c, 1, { x: SCR.x + SCR.w / 2, y: SCR.y + SCR.h / 2 });
-  const startScale = (SCR.w * s0.z) / 390;
-  const px = interpolate(d, [0, 1], [s0.x, S06_END.x]);
-  const py = interpolate(d, [0, 1], [s0.y + ((APP_H * startScale) / 2 - (SCR.h * s0.z) / 2), S06_END.y]);
-  const ps = interpolate(d, [0, 1], [startScale, S06_END.s]);
-  const caroOut = range(f, [DETACH[0] + 24, 118], [0, 1], easeInOut);
-  const glow = range(f, [4, 20], [0, 1]) * (1 - d);
+  const glow = range(f, [8, 30], [0, 1]) * (1 - range(f, [60, 100], [0, 1]));
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       <LightStudio f={f} />
       <Layer cam={c} depth={0.4}>
-        <Particles f={f} n={40} seed="s06" color={QS.violet} speed={0.4} size={[2, 5]} opacity={0.35} />
+        <Particles f={f} n={40} seed="s06" color={QS.violet} speed={0.3} size={[2, 5]} opacity={0.3} />
       </Layer>
-      <Layer cam={c} depth={1} blur={caroOut * 12}>
-        <div style={{ position: "absolute", inset: 0, opacity: 1 - caroOut, transform: `translate(${caroOut * 80}px, ${caroOut * 40}px)` }}>
-          <div style={{ position: "absolute", left: SCR.x - 120, top: SCR.y - 120, width: SCR.w + 240, height: SCR.h + 240, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(112,37,224,0.35), rgba(112,37,224,0))", opacity: glow * (0.8 + osc(f, 30, 0.2)) }} />
-          <Closeup who="caro" right={CU.right} top={CU.top} scale={CU.scale} />
-          <PngScreen x={SCR.x} y={SCR.y} w={SCR.w} h={SCR.h} radius={SCR.r}>
-            <ScreenContent f={f} />
-          </PngScreen>
-        </div>
+      <Layer cam={c} depth={1}>
+        <div style={{ position: "absolute", left: SCR.x - 120, top: SCR.y - 120, width: SCR.w + 240, height: SCR.h + 240, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(112,37,224,0.3), rgba(112,37,224,0))", opacity: glow * (0.85 + osc(f, 40, 0.15)) }} />
+        <Closeup who="caro" right={CU.right} top={CU.top} scale={CU.scale} />
+        <PngScreen x={SCR.x} y={SCR.y} w={SCR.w} h={SCR.h} radius={SCR.r}>
+          <ScreenContent f={f} />
+        </PngScreen>
       </Layer>
-      {f >= DETACH[0] && (
-        <Device x={px} y={py} scale={ps} opacity={range(f, [DETACH[0], DETACH[0] + 6], [0, 1])}>
-          <VisitasScreen f={0} />
-        </Device>
-      )}
     </AbsoluteFill>
   );
 };

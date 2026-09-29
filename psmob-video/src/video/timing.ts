@@ -5,17 +5,17 @@ import { es } from "../i18n/es";
 export const FPS = 30;
 
 export const SCENES = [
-  { id: "s01", dur: 300 }, // Escenas 1–4: sobrecarga + órbita (beats internos en BEATS_S01)
-  { id: "s05", dur: 150 }, // Escritorio, paso del tiempo
-  { id: "s06", dur: 120 }, // Caro muestra el celular → UI
-  { id: "s07", dur: 165 }, // Organización: visita → equipo → ruteo
-  { id: "s08", dur: 120 }, // Optimiza la comunicación
-  { id: "s09", dur: 120 }, // Agiliza la captura de datos
-  { id: "s10", dur: 150 }, // Información en tiempo real
-  { id: "s11", dur: 120 }, // Dashboard
-  { id: "s12", dur: 240 }, // AiFred en góndola
-  { id: "s13", dur: 120 }, // Sin conexión → enviando → loading de marca
-  { id: "s14", dur: 165 }, // Cierre QuartzSales
+  { id: "s01", dur: 330 }, // Escenas 1–4: caminata, tareas en el celular, sobrecarga + órbita
+  { id: "s05", dur: 165 }, // Escritorio, paso del tiempo
+  { id: "s06", dur: 150 }, // Caro muestra el celular → UI
+  { id: "s07", dur: 195 }, // Organización: equipo → ruteo
+  { id: "s08", dur: 165 }, // Optimiza la comunicación
+  { id: "s09", dur: 180 }, // Agiliza la captura de datos
+  { id: "s10", dur: 165 }, // Información en tiempo real
+  { id: "s11", dur: 165 }, // Dashboard
+  { id: "s12", dur: 270 }, // AiFred en góndola
+  { id: "s13", dur: 150 }, // Sin conexión → enviando → loading de marca
+  { id: "s14", dur: 180 }, // Cierre QuartzSales
 ] as const;
 
 export type SceneId = (typeof SCENES)[number]["id"];
@@ -34,31 +34,32 @@ export const sceneDur = (id: SceneId) => SCENES.find((s) => s.id === id)!.dur;
 export const TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);
 
 // Beats internos de la escena 1–4 (relativos al inicio del bloque).
-export const BEATS_S01 = { team: 120, pdv: 175, process: 225, drop: 282 };
+export const BEATS_S01 = { stop: 70, phone: 78, stress: 150, team: 168, pdv: 214, process: 258, drop: 298 };
 
-// Locución de referencia por escena (solo para el draft; frames relativos al bloque).
+// Locución de referencia por escena (frames relativos al bloque). No se muestra en el video: sirve para
+// retimear cuando llegue el audio final.
 export const VO: Record<SceneId, { text: string; from: number; to: number }[]> = {
   s01: [
-    { text: es.video.vo.s01a, from: 8, to: 112 },
-    { text: es.video.vo.s01b, from: 118, to: 170 },
-    { text: es.video.vo.s01c, from: 172, to: 222 },
-    { text: es.video.vo.s01d, from: 224, to: 298 },
+    { text: es.video.vo.s01a, from: 9, to: 123 },
+    { text: es.video.vo.s01b, from: 130, to: 187 },
+    { text: es.video.vo.s01c, from: 189, to: 244 },
+    { text: es.video.vo.s01d, from: 246, to: 328 },
   ],
-  s05: [{ text: es.video.vo.s05, from: 4, to: 146 }],
-  s06: [{ text: es.video.vo.s06, from: 6, to: 118 }],
-  s07: [{ text: es.video.vo.s07, from: 4, to: 160 }],
-  s08: [{ text: es.video.vo.s08, from: 10, to: 110 }],
-  s09: [{ text: es.video.vo.s09, from: 8, to: 110 }],
-  s10: [{ text: es.video.vo.s10, from: 8, to: 146 }],
-  s11: [{ text: es.video.vo.s11, from: 4, to: 116 }],
+  s05: [{ text: es.video.vo.s05, from: 4, to: 161 }],
+  s06: [{ text: es.video.vo.s06, from: 8, to: 148 }],
+  s07: [{ text: es.video.vo.s07, from: 5, to: 189 }],
+  s08: [{ text: es.video.vo.s08, from: 14, to: 151 }],
+  s09: [{ text: es.video.vo.s09, from: 12, to: 165 }],
+  s10: [{ text: es.video.vo.s10, from: 9, to: 161 }],
+  s11: [{ text: es.video.vo.s11, from: 6, to: 160 }],
   s12: [
     {
       text: es.video.vo.s12a,
       from: 4,
-      to: 130,
+      to: 146,
     },
-    { text: es.video.vo.s12b, from: 134, to: 236 },
+    { text: es.video.vo.s12b, from: 151, to: 266 },
   ],
-  s13: [{ text: es.video.vo.s13, from: 6, to: 90 }],
-  s14: [{ text: es.video.vo.s14, from: 10, to: 150 }],
+  s13: [{ text: es.video.vo.s13, from: 8, to: 112 }],
+  s14: [{ text: es.video.vo.s14, from: 11, to: 164 }],
 };
