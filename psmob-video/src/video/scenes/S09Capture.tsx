@@ -1,89 +1,78 @@
 import React from "react";
-import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { color } from "../../design/psmob-tokens";
-import { easeInOut, osc, pop, range } from "../../lib/motion";
-import { Char, Layer, LightStudio, Particles, POSE, QS } from "../lib/stage";
+import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { easeInOut, easeOut, pop, range } from "../../lib/motion";
+import { Actor, Layer, POSE, posePoint } from "../lib/stage";
 import type { Cam } from "../lib/stage";
-import { catSrc, PRODUCTS } from "../data";
-import { Icon } from "../ui/icons";
+import { Device } from "../ds/Device";
+import { Chip } from "../ds/ui";
 import { Kinetic } from "../ui/Kinetic";
 import { es } from "../../i18n/es";
-import { Phone } from "../ui/Phone";
-import { ChatSheet } from "../ui/screens/Chat";
-import { FORM_T, FormsFlow, MARKS } from "../ui/screens/Forms";
-import { OrganizeScreen } from "../ui/screens/Organize";
-import { NICO8, S08_END } from "./S08Chat";
+import { FormsFlow, FT } from "../screens/Forms";
+import { Gondola } from "../ui/Gondola";
 
-// Escena 9 — "Agiliza la captura de datos". Nico sale de cuadro, el celular cruza a la derecha
-// y el flujo de formulario ocurre dentro de la app; los productos marcados saltan fuera del teléfono.
-export const S09_END = { x: 1180, y: 540, s: 1 };
+// Escena 9 — "Agiliza la captura de datos". Nico en el PDV toca el celular → la app crece desde su mano
+// (derecha y frontal) → formulario, marcas, enviar, check → vuelve a su mano y Nico sigue caminando.
+const NICO = { x: 380, feet: 1190, scale: 0.74 };
+const FLOW0 = 22; // inicio del flujo de formulario
+const RETRACT: [number, number] = [FLOW0 + FT.success[1] + 2, FLOW0 + FT.success[1] + 14];
+export const S09_PHONE = { x: 1400, y: 540, s: 0.9 };
+
+const phone = (() => {
+  const p = posePoint(POSE.nicoCelular, NICO.scale, { x: 275, y: 460 });
+  return { x: NICO.x + p.x, y: NICO.feet + p.y };
+})();
+
+export const StoreBackdrop: React.FC<{ cam: Cam; blur?: number; offset?: number }> = ({ cam, blur = 6, offset = 1200 }) => (
+  <>
+    <AbsoluteFill style={{ background: "linear-gradient(180deg, #EEF0FA 0%, #E2E6F4 60%, #D3D9EC 100%)" }} />
+    <Layer cam={cam} depth={0.55} blur={blur}>
+      <div style={{ position: "absolute", left: -offset, top: 40, transform: "scale(0.9)", transformOrigin: "0 0" }}>
+        <Gondola from={offset - 400} to={offset + 2800} />
+      </div>
+      <div style={{ position: "absolute", left: -400, top: 1010, width: 3000, height: 400, background: "#C9D0E4" }} />
+    </Layer>
+  </>
+);
 
 export const S09Capture: React.FC = () => {
   const f = useCurrentFrame();
-  const k = range(f, [0, 20], [0, 1], easeInOut);
-  const px = interpolate(k, [0, 1], [S08_END.x, S09_END.x]);
-  const ps = interpolate(k, [0, 1], [S08_END.s, S09_END.s]);
-  const nicoOut = range(f, [0, 18], [0, 1], easeInOut);
-  const cam: Cam = { x: 960 + nicoOut * 120, y: 540, zoom: 1 };
-  const successP = pop(f, FORM_T.success[0] + 2, { damping: 10, stiffness: 150 });
+  const born = range(f, [14, 32], [0, 1], easeInOut);
+  const ret = range(f, RETRACT, [0, 1], easeInOut);
+  const k = born * (1 - ret);
+  const walk = f >= RETRACT[1] - 2;
+  const walkX = interpolate(f, [RETRACT[1] - 2, 120], [NICO.x, NICO.x + 420], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cam: Cam = { x: 960 + range(f, [RETRACT[1], 120], [0, 60]), y: 540, zoom: 1 + range(f, [0, 30], [0.06, 0], easeOut) };
+  const done = pop(f, FLOW0 + FT.success[0] + 4, { damping: 11, stiffness: 150 });
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
-      <LightStudio f={f + 405} />
-      <Layer cam={cam} depth={0.4}>
-        <Particles f={f} n={30} seed="s09" color={QS.indigo} speed={0.3} size={[2, 5]} opacity={0.3} />
-      </Layer>
-      {nicoOut < 1 && (
-        <Layer cam={cam} depth={1}>
-          <div style={{ position: "absolute", inset: 0, transform: `translateX(${-nicoOut * 700}px)` }}>
-            <Char pose={POSE.nicoCelular} x={NICO8.x} feetY={NICO8.feet} scale={NICO8.scale} />
-          </div>
-        </Layer>
-      )}
-
-      <Phone x={px} y={540} scale={ps}>
-        <FormsFlow
+      <StoreBackdrop cam={cam} offset={2200} />
+      <Layer cam={cam} depth={1}>
+        <div style={{ position: "absolute", left: (walk ? walkX : NICO.x) - 200, top: NICO.feet - 16, width: 400, height: 32, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(19,13,93,0.18), rgba(19,13,93,0))" }} />
+        <Actor
+          pose={walk ? POSE.nicoCaminando : POSE.nicoCelular}
+          x={walk ? walkX : NICO.x}
+          feetY={NICO.feet}
+          scale={NICO.scale}
           f={f}
-          under={
-            <>
-              <OrganizeScreen f={165} />
-              <ChatSheet f={120 + f} closeAt={120} />
-            </>
-          }
+          blink={walk ? undefined : { pose: POSE.nicoCelularBlink, at: [6, 60] }}
+          walk={walk ? { poses: [POSE.nicoCaminando], period: 8, bob: 8 } : undefined}
         />
-      </Phone>
-
-      {/* Cada producto marcado salta fuera del teléfono con su estado */}
-      {FORM_T.marks.map((m, i) => {
-        const p = pop(f, m + 2, { damping: 11, stiffness: 150, mass: 0.7 });
-        if (p <= 0.01) return null;
-        const pr = PRODUCTS[i];
-        const bad = MARKS[i] === 1;
-        const pos = [
-          { x: 1560, y: 250 },
-          { x: 1620, y: 520 },
-          { x: 1550, y: 790 },
-        ][i];
-        const fade = 1 - range(f, [FORM_T.toBreaks[0], FORM_T.toBreaks[1]], [0, 1]);
-        return (
-          <div key={m} style={{ position: "absolute", left: pos.x, top: pos.y + osc(f, 70, 8, i * 25), transform: `translate(-50%, -50%) scale(${p * (0.6 + 0.4 * fade)})`, opacity: fade }}>
-            <div style={{ position: "relative", width: 150, height: 150, borderRadius: 40, background: "#fff", boxShadow: "0 20px 44px rgba(19,13,93,0.16)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Img src={staticFile(catSrc(pr.cat))} style={{ width: 118, height: 118 }} />
-              <div style={{ position: "absolute", right: -10, top: -10, width: 46, height: 46, borderRadius: 23, background: bad ? color.danger : color.success, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 4px #fff" }}>
-                <Icon name={bad ? "x" : "check"} size={26} color="#fff" fill={false} sw={2.8} />
-              </div>
-            </div>
+        {done > 0.01 && (
+          <div style={{ position: "absolute", left: (walk ? walkX : NICO.x) + 10, top: 150, transform: `translate(-50%, 0) scale(${done})` }}>
+            <Chip tone="success" solid icon="check">
+              Formulario enviado
+            </Chip>
           </div>
-        );
-      })}
-      {successP > 0.01 && (
-        <div style={{ position: "absolute", left: S09_END.x - 300, top: 300, transform: `translate(-50%, -50%) scale(${successP * (1 - range(f, [FORM_T.toBreaks[0], FORM_T.toBreaks[1]], [0, 1]))})` }}>
-          <div style={{ width: 110, height: 110, borderRadius: 55, background: color.success, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 18px 40px rgba(46,125,50,0.35)" }}>
-            <Icon name="check" size={70} color="#fff" fill={false} sw={2.4} />
-          </div>
-        </div>
+        )}
+        {/* Toque en el teléfono */}
+        {f >= 6 && f < 20 && <div style={{ position: "absolute", left: phone.x - 20 - (f - 6) * 5, top: phone.y - 20 - (f - 6) * 5, width: 40 + (f - 6) * 10, height: 40 + (f - 6) * 10, borderRadius: "50%", border: "4px solid #7025E0", opacity: 1 - (f - 6) / 14 }} />}
+      </Layer>
+      {k > 0.01 && (
+        <Device x={interpolate(k, [0, 1], [phone.x, S09_PHONE.x])} y={interpolate(k, [0, 1], [phone.y, S09_PHONE.y])} scale={interpolate(k, [0, 1], [0.07, S09_PHONE.s])} opacity={Math.min(1, k * 5)}>
+          <FormsFlow f={Math.min(f - FLOW0, FT.success[1] + 6)} />
+        </Device>
       )}
-
-      <Kinetic f={f} text={es.video.kinetic.s09.text} at={16} out={108} x={170} y={540} accent={[3, 4]} eyebrow={es.video.kinetic.s09.eyebrow} />
+      <Kinetic f={f} text={es.video.kinetic.s09.text} at={24} out={96} x={640} y={500} accent={[3, 4]} eyebrow={es.video.kinetic.s09.eyebrow} size={56} />
     </AbsoluteFill>
   );
 };

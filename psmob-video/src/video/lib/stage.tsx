@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Img, random, staticFile } from "remotion";
-import { nunito } from "./fonts";
+import { FONT } from "../ds/tokens";
 
 export { Layer, project, shake, toScreen, W, H } from "../../motion-test/camera";
 export type { Cam } from "../../motion-test/camera";
@@ -22,7 +22,7 @@ export const QS = {
 
 // ——— Personajes PNG (assets finales: solo posición, escala y máscaras) ———
 // axisX / feetY medidos sobre el PNG para anclar poses sin saltos.
-export type Pose = { file: string; w: number; h: number; axisX: number; feetY: number };
+export type Pose = { file: string; w: number; h: number; axisX: number; feetY: number; k?: number };
 
 export const POSE = {
   caroEstres: { file: "caro-estres.png", w: 1024, h: 1536, axisX: 508, feetY: 1514 },
@@ -32,7 +32,24 @@ export const POSE = {
   caroFeliz: { file: "caro-feliz.png", w: 1024, h: 1536, axisX: 498, feetY: 1507 },
   nicoCelular: { file: "nico-celular.png", w: 941, h: 1672, axisX: 514, feetY: 1641 },
   nicoExplicando: { file: "nico-explicando.png", w: 941, h: 1672, axisX: 526, feetY: 1644 },
+  // Ojos cerrados (parpadeo). Caro comparte canvas con caro-celular; el de Nico viene en otro canvas y
+  // escala: axis/feet calculados por registro de máscaras (k = 1.072) para que el parpadeo no salte.
+  caroCelularBlink: { file: "caro-celular-sonriendo.png", w: 1024, h: 1536, axisX: 493, feetY: 1512 },
+  nicoCelularBlink: { file: "nico-celular-sonriendo.png", w: 1024, h: 1536, axisX: 546.6, feetY: 1528.9, k: 1.072 },
+  caroCaminandoA: { file: "caro-caminando.png", w: 1024, h: 1536, axisX: 522, feetY: 1486 },
+  caroCaminandoB: { file: "caro-caminando-cerca.png", w: 1024, h: 1536, axisX: 539, feetY: 1491 },
+  nicoCaminando: { file: "nico-caminando.png", w: 1024, h: 1536, axisX: 539, feetY: 1506 },
+  caroSentada: { file: "caro-sentada.png", w: 1086, h: 1448, axisX: 552, feetY: 1396 },
+  caroDurmiendo: { file: "caro-durmiendo.png", w: 1086, h: 1448, axisX: 566, feetY: 1416 },
+  nicoSentado: { file: "nico-sentado.png", w: 1086, h: 1448, axisX: 571, feetY: 1408 },
 } satisfies Record<string, Pose>;
+
+// Primeros planos mostrando el celular (PNG apaisados recortados en los bordes derecho/arriba/abajo).
+// Se anclan al borde derecho del cuadro; `screen` = pantalla en blanco del celular (coords del PNG).
+export const CLOSEUP = {
+  caro: { file: "caro-mostrando-celu.png", w: 1448, h: 1086, screen: { x0: 313, y0: 219, x1: 661, y1: 907, r: 40 } },
+  nico: { file: "nico-mostrando-celu.png", w: 1448, h: 1086, screen: { x0: 397, y0: 317, x1: 671, y1: 888, r: 34 } },
+} as const;
 
 // Pantalla en blanco del celular que Caro muestra (coords del PNG).
 export const CARO_SCREEN = { x0: 338, y0: 217, x1: 428, y1: 404 };
@@ -51,20 +68,70 @@ export const Char: React.FC<{
   opacity?: number;
   flip?: boolean;
   style?: React.CSSProperties;
-}> = ({ pose, x, feetY, scale, opacity = 1, style }) => (
-  <Img
-    src={staticFile(`personajes/${pose.file}`)}
-    style={{
-      position: "absolute",
-      left: x - pose.axisX * scale,
-      top: feetY - pose.feetY * scale,
-      width: pose.w * scale,
-      height: pose.h * scale,
-      opacity,
-      ...style,
-    }}
-  />
-);
+}> = ({ pose, x, feetY, scale: s0, opacity = 1, style }) => {
+  const scale = s0 * (pose.k ?? 1);
+  return (
+    <Img
+      src={staticFile(`personajes/${pose.file}`)}
+      style={{
+        position: "absolute",
+        left: x - pose.axisX * scale,
+        top: feetY - pose.feetY * scale,
+        width: pose.w * scale,
+        height: pose.h * scale,
+        opacity,
+        ...style,
+      }}
+    />
+  );
+};
+
+// Parpadeo: intercala el PNG de ojos cerrados durante 3 frames en los frames indicados.
+export const isBlink = (f: number, at: number[]) => at.some((a) => f >= a && f < a + 3);
+
+// Actor: personaje PNG con parpadeo opcional y ciclo de caminata (alterna PNG de pasos + rebote vertical).
+// Contenedor con tamaño (inset 0) para que el Img nunca quede en un padre de tamaño cero.
+export const Actor: React.FC<{
+  pose: Pose;
+  x: number;
+  feetY: number;
+  scale: number;
+  f: number;
+  blink?: { pose: Pose; at: number[] };
+  walk?: { poses: Pose[]; period: number; bob: number };
+  opacity?: number;
+}> = ({ pose, x, feetY, scale, f, blink, walk, opacity = 1 }) => {
+  let p = pose;
+  let y = feetY;
+  if (walk) {
+    const step = Math.floor(f / walk.period);
+    p = walk.poses[step % walk.poses.length];
+    const phase = (f % walk.period) / walk.period;
+    y = feetY - Math.sin(phase * Math.PI) * walk.bob;
+  } else if (blink && isBlink(f, blink.at)) {
+    p = blink.pose;
+  }
+  return (
+    <div style={{ position: "absolute", inset: 0, opacity }}>
+      <Char pose={p} x={x} feetY={y} scale={scale} />
+    </div>
+  );
+};
+
+// Primer plano anclado al borde derecho (x = borde derecho del PNG en el mundo).
+export const Closeup: React.FC<{ who: keyof typeof CLOSEUP; right: number; top: number; scale: number }> = ({ who, right, top, scale }) => {
+  const c = CLOSEUP[who];
+  return (
+    <div style={{ position: "absolute", inset: 0 }}>
+      <Img src={staticFile(`personajes/${c.file}`)} style={{ position: "absolute", left: right - c.w * scale, top, width: c.w * scale, height: c.h * scale }} />
+    </div>
+  );
+};
+export const closeupScreen = (who: keyof typeof CLOSEUP, right: number, top: number, scale: number) => {
+  const c = CLOSEUP[who];
+  const left = right - c.w * scale;
+  return { x: left + c.screen.x0 * scale, y: top + c.screen.y0 * scale, w: (c.screen.x1 - c.screen.x0) * scale, h: (c.screen.y1 - c.screen.y0) * scale, r: c.screen.r * scale };
+};
 
 export const Shadow: React.FC<{ x: number; y: number; w?: number; o?: number; dark?: boolean }> = ({ x, y, w = 380, o = 1, dark }) => (
   <div
@@ -172,7 +239,7 @@ export const VoRef: React.FC<{ text: string; o: number; dark?: boolean }> = ({ t
       right: 0,
       bottom: 30,
       textAlign: "center",
-      fontFamily: nunito,
+      fontFamily: FONT,
       fontSize: 24,
       fontWeight: 600,
       color: dark ? "rgba(255,255,255,0.8)" : "rgba(19,13,93,0.7)",

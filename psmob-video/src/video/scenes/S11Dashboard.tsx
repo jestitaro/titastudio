@@ -1,19 +1,26 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
-import { color } from "../../design/psmob-tokens";
 import { easeInOut, easeOut, pop, range } from "../../lib/motion";
-import { Char, Layer, LightStudio, POSE, QS } from "../lib/stage";
+import { Char, Layer, LightStudio, POSE } from "../lib/stage";
 import type { Cam } from "../lib/stage";
-import { nunito, roboto } from "../lib/fonts";
-import { ar, CAT, EXHIB } from "../data";
+import { C as color, FONT } from "../ds/tokens";
+import { ar } from "../screens/data";
 import { Icon, IconName } from "../ui/icons";
-import { Phone, PHONE_OUTER_H, PHONE_OUTER_W } from "../ui/Phone";
-import { RealtimeFlow } from "../ui/screens/Realtime";
+import { Device, DEVICE_H, DEVICE_W } from "../ds/Device";
+import { IndicatorsFlow } from "../screens/Indicators";
 import { S10_END } from "./S10Realtime";
 
 // Escena 11 — el dashboard es protagonista. El celular se transforma en el panel (morph de rectángulo);
 // Caro y Nico acompañan en las esquinas, fuera de las áreas de gráficos.
-const PANEL = { x: 330, y: 70, w: 1230, h: 830 };
+const PANEL = { x: 395, y: 70, w: 1110, h: 830 };
+const EXHIB = [
+  { name: "Aderezos", pct: 50.74 },
+  { name: "Deos", pct: 73.55 },
+  { name: "Jabón", pct: 53.03 },
+  { name: "Ropa", pct: 67.82 },
+  { name: "Suavizantes", pct: 70.92 },
+  { name: "Lavavajillas", pct: 58.24 },
+];
 const MORPH: [number, number] = [0, 22];
 const IN = 16; // arranque del contenido del dashboard
 
@@ -35,17 +42,17 @@ const Kpi: React.FC<{ f: number; at: number; icon: IconName; label: string; valu
   return (
     <div style={{ flex: 1, background: "#fff", borderRadius: 18, border: "1px solid #E8EAF3", padding: "16px 18px", transform: `translateY(${(1 - p) * 20}px)`, opacity: Math.min(1, p * 2) }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 38, height: 38, borderRadius: 12, background: QS.lilac2, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon name={icon} size={22} color={QS.violet} />
+        <div style={{ width: 38, height: 38, borderRadius: 12, background: color.violetSoft, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Icon name={icon} size={22} color={color.violet} />
         </div>
         <div style={{ fontSize: 15, color: "#64748b", fontWeight: 500 }}>{label}</div>
       </div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 10 }}>
-        <div style={{ fontFamily: nunito, fontSize: 38, fontWeight: 900, color: QS.dark }}>
+        <div style={{ fontFamily: FONT, fontSize: 38, fontWeight: 900, color: color.dark }}>
           {ar(v, dec)}
           {suffix}
         </div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: good ? color.successDark : color.dangerDark }}>{delta}</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: good ? color.success : color.error }}>{delta}</div>
       </div>
     </div>
   );
@@ -63,7 +70,7 @@ const BarChart: React.FC<{ f: number; at: number; w: number; h: number }> = ({ f
       {[0, 25, 50, 75, 100].map((t) => (
         <g key={t}>
           <line x1={34} x2={w} y1={base - (t / max) * (base - 20)} y2={base - (t / max) * (base - 20)} stroke="#EEF0F6" strokeWidth={1} />
-          <text x={0} y={base - (t / max) * (base - 20) + 4} fontSize={12} fill="#94a3b8" fontFamily={roboto}>
+          <text x={0} y={base - (t / max) * (base - 20) + 4} fontSize={12} fill="#94a3b8" fontFamily={FONT}>
             {t}
           </text>
         </g>
@@ -75,15 +82,15 @@ const BarChart: React.FC<{ f: number; at: number; w: number; h: number }> = ({ f
         const top = base - bh;
         const best = i === 1;
         return (
-          <g key={e.cat}>
-            <path d={`M${x} ${base} V${top + 6} Q${x} ${top} ${x + 6} ${top} H${x + bw - 6} Q${x + bw} ${top} ${x + bw} ${top + 6} V${base} Z`} fill={best ? QS.violet : "#B9A6F5"} />
+          <g key={e.name}>
+            <path d={`M${x} ${base} V${top + 6} Q${x} ${top} ${x + 6} ${top} H${x + bw - 6} Q${x + bw} ${top} ${x + bw} ${top + 6} V${base} Z`} fill={best ? color.violet : "#B9A6F5"} />
             {best && k > 0.9 && (
-              <text x={x + bw / 2} y={top - 10} textAnchor="middle" fontSize={16} fontWeight={700} fill={QS.dark} fontFamily={roboto}>
+              <text x={x + bw / 2} y={top - 10} textAnchor="middle" fontSize={16} fontWeight={700} fill={color.dark} fontFamily={FONT}>
                 {ar(e.pct)}%
               </text>
             )}
-            <text x={x + bw / 2} y={base + 22} textAnchor="middle" fontSize={12.5} fill="#64748b" fontFamily={roboto}>
-              {CAT[e.cat].name.split(" ")[0]}
+            <text x={x + bw / 2} y={base + 22} textAnchor="middle" fontSize={12.5} fill="#64748b" fontFamily={FONT}>
+              {e.name}
             </text>
           </g>
         );
@@ -108,27 +115,27 @@ const LineChart: React.FC<{ f: number; at: number; w: number; h: number }> = ({ 
       {[60, 70, 80, 90, 100].map((t) => (
         <g key={t}>
           <line x1={x0} x2={w} y1={y(t)} y2={y(t)} stroke="#EEF0F6" />
-          <text x={0} y={y(t) + 4} fontSize={12} fill="#94a3b8" fontFamily={roboto}>
+          <text x={0} y={y(t) + 4} fontSize={12} fill="#94a3b8" fontFamily={FONT}>
             {t}
           </text>
         </g>
       ))}
-      <line x1={x0} x2={w - 50} y1={y(85)} y2={y(85)} stroke={color.successDark} strokeWidth={1.5} strokeDasharray="6 6" opacity={0.7} />
-      <text x={w - 46} y={y(85) + 4} fontSize={12} fill={color.successDark} fontFamily={roboto}>
+      <line x1={x0} x2={w - 50} y1={y(85)} y2={y(85)} stroke={color.success} strokeWidth={1.5} strokeDasharray="6 6" opacity={0.7} />
+      <text x={w - 46} y={y(85) + 4} fontSize={12} fill={color.success} fontFamily={FONT}>
         Meta
       </text>
       <path d={`${d} L${x(data.length - 1)} ${base} L${x0} ${base} Z`} fill="rgba(112,37,224,0.08)" opacity={k} />
-      <path d={d} fill="none" stroke={QS.violet} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" pathLength={1} strokeDasharray="1" strokeDashoffset={1 - k} />
+      <path d={d} fill="none" stroke={color.violet} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" pathLength={1} strokeDasharray="1" strokeDashoffset={1 - k} />
       <g transform={`translate(${x(data.length - 1)} ${y(data[data.length - 1])}) scale(${endP})`}>
-        <circle r={8} fill={QS.violet} stroke="#fff" strokeWidth={3} />
+        <circle r={8} fill={color.violet} stroke="#fff" strokeWidth={3} />
       </g>
       {endP > 0.5 && (
-        <text x={x(data.length - 1) - 8} y={y(data[data.length - 1]) - 16} textAnchor="end" fontSize={16} fontWeight={700} fill={QS.dark} fontFamily={roboto}>
+        <text x={x(data.length - 1) - 8} y={y(data[data.length - 1]) - 16} textAnchor="end" fontSize={16} fontWeight={700} fill={color.dark} fontFamily={FONT}>
           89,2%
         </text>
       )}
       {["S32", "S33", "S34", "S35", "S36", "S37", "S38", "S39"].map((s, i) => (
-        <text key={s} x={x(i)} y={base + 22} textAnchor="middle" fontSize={12} fill="#94a3b8" fontFamily={roboto}>
+        <text key={s} x={x(i)} y={base + 22} textAnchor="middle" fontSize={12} fill="#94a3b8" fontFamily={FONT}>
           {s}
         </text>
       ))}
@@ -154,7 +161,7 @@ const Ranking: React.FC<{ f: number; at: number }> = ({ f, at }) => {
               <b>{Math.round(v * k)}%</b>
             </div>
             <div style={{ height: 8, borderRadius: 4, background: "#EEF0F6" }}>
-              <div style={{ width: `${v * k}%`, height: "100%", borderRadius: 4, background: i === 0 ? QS.violet : "#B9A6F5" }} />
+              <div style={{ width: `${v * k}%`, height: "100%", borderRadius: 4, background: i === 0 ? color.violet : "#B9A6F5" }} />
             </div>
           </div>
         );
@@ -168,7 +175,7 @@ const Card: React.FC<{ title: string; sub?: string; children: React.ReactNode; s
   return (
     <div style={{ background: "#fff", borderRadius: 20, border: "1px solid #E8EAF3", padding: "18px 20px", transform: `translateY(${(1 - p) * 24}px)`, opacity: Math.min(1, p * 2), ...style }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
-        <div style={{ fontFamily: nunito, fontSize: 19, fontWeight: 800, color: QS.dark }}>{title}</div>
+        <div style={{ fontFamily: FONT, fontSize: 19, fontWeight: 800, color: color.dark }}>{title}</div>
         {sub && <div style={{ fontSize: 13, color: "#94a3b8" }}>{sub}</div>}
       </div>
       {children}
@@ -177,8 +184,8 @@ const Card: React.FC<{ title: string; sub?: string; children: React.ReactNode; s
 };
 
 const Dashboard: React.FC<{ f: number }> = ({ f }) => (
-  <div style={{ position: "absolute", inset: 0, display: "flex", fontFamily: roboto, background: "#F6F7FC" }}>
-    <div style={{ width: 70, background: QS.dark, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 26, gap: 26 }}>
+  <div style={{ position: "absolute", inset: 0, display: "flex", fontFamily: FONT, background: "#F6F7FC" }}>
+    <div style={{ width: 70, background: color.dark, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 26, gap: 26 }}>
       {(["dashboard", "users", "pin", "form", "chart", "camera"] as IconName[]).map((ic, i) => (
         <div key={ic} style={{ width: 42, height: 42, borderRadius: 12, background: i === 0 ? "rgba(255,255,255,0.16)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon name={ic} size={24} color={i === 0 ? "#fff" : "rgba(255,255,255,0.55)"} fill={false} />
@@ -188,7 +195,7 @@ const Dashboard: React.FC<{ f: number }> = ({ f }) => (
     <div style={{ flex: 1, padding: "22px 26px", display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", opacity: range(f, [IN, IN + 8], [0, 1]) }}>
         <div>
-          <div style={{ fontFamily: nunito, fontSize: 28, fontWeight: 900, color: QS.dark }}>Tablero de Trade Marketing</div>
+          <div style={{ fontFamily: FONT, fontSize: 28, fontWeight: 900, color: color.dark }}>Tablero de Trade Marketing</div>
           <div style={{ fontSize: 14, color: "#64748b" }}>Semana 39 · 22/09/2026 – 28/09/2026</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -207,11 +214,11 @@ const Dashboard: React.FC<{ f: number }> = ({ f }) => (
       </div>
       <div style={{ display: "flex", gap: 14, flex: 1 }}>
         <Card f={f} at={IN + 12} title="Exhibición por categoría" sub="% de cumplimiento" style={{ flex: 1.15 }}>
-          <BarChart f={f} at={IN + 20} w={560} h={300} />
+          <BarChart f={f} at={IN + 20} w={500} h={300} />
         </Card>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 14 }}>
           <Card f={f} at={IN + 16} title="OSA · últimas 8 semanas" sub="%">
-            <LineChart f={f} at={IN + 24} w={470} h={150} />
+            <LineChart f={f} at={IN + 24} w={420} h={150} />
           </Card>
           <Card f={f} at={IN + 20} title="Top PDV" sub="cumplimiento" style={{ flex: 1 }}>
             <Ranking f={f} at={IN + 28} />
@@ -226,7 +233,7 @@ export const S11Dashboard: React.FC = () => {
   const f = useCurrentFrame();
   const c = cam(f);
   const m = range(f, MORPH, [0, 1], easeInOut);
-  const start = { x: S10_END.x - PHONE_OUTER_W / 2, y: 540 - PHONE_OUTER_H / 2, w: PHONE_OUTER_W, h: PHONE_OUTER_H };
+  const start = { x: S10_END.x - (DEVICE_W * S10_END.s) / 2, y: 540 - (DEVICE_H * S10_END.s) / 2, w: DEVICE_W * S10_END.s, h: DEVICE_H * S10_END.s };
   const r = {
     x: interpolate(m, [0, 1], [start.x, PANEL.x]),
     y: interpolate(m, [0, 1], [start.y, PANEL.y]),
@@ -234,7 +241,7 @@ export const S11Dashboard: React.FC = () => {
     h: interpolate(m, [0, 1], [start.h, PANEL.h]),
   };
   const phoneO = 1 - range(f, [2, 12], [0, 1]);
-  const charIn = (d: number) => range(f, [24 + d, 48 + d], [0, 1], easeOut);
+  const charIn = (d: number) => range(f, [0 + d, 18 + d], [0, 1], easeOut);
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       <LightStudio f={f + 675} />
@@ -259,19 +266,19 @@ export const S11Dashboard: React.FC = () => {
         </div>
         {phoneO > 0 && (
           <div style={{ position: "absolute", inset: 0, opacity: phoneO }}>
-            <Phone x={S10_END.x} y={540} scale={1}>
-              <RealtimeFlow f={150} />
-            </Phone>
+            <Device x={S10_END.x} y={540} scale={S10_END.s}>
+              <IndicatorsFlow f={130} />
+            </Device>
           </div>
         )}
       </Layer>
       {/* Personajes acompañando, parcialmente en cuadro y fuera de los gráficos */}
       <Layer cam={c} depth={1.08}>
-        <div style={{ position: "absolute", inset: 0, transform: `translateY(${(1 - charIn(0)) * 500}px)` }}>
-          <Char pose={POSE.caroExplicando} x={150} feetY={1220} scale={0.52} />
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - charIn(0)) * -500}px)` }}>
+          <Char pose={POSE.caroExplicando} x={180} feetY={1190} scale={0.62} />
         </div>
-        <div style={{ position: "absolute", inset: 0, transform: `translateY(${(1 - charIn(6)) * 500}px)` }}>
-          <Char pose={POSE.nicoExplicando} x={1790} feetY={1220} scale={0.48} />
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - charIn(4)) * 500}px)` }}>
+          <Char pose={POSE.nicoExplicando} x={1765} feetY={1190} scale={0.57} />
         </div>
       </Layer>
     </AbsoluteFill>

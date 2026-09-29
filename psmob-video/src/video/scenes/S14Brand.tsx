@@ -2,24 +2,17 @@ import React from "react";
 import { AbsoluteFill, interpolate, random, useCurrentFrame } from "remotion";
 import { easeInOut, easeOut, range } from "../../lib/motion";
 import { LightStudio, QS } from "../lib/stage";
-import { nunito } from "../lib/fonts";
+import { FONT } from "../ds/tokens";
 import { es } from "../../i18n/es";
 import { QSLogo } from "../brand/QSLogo";
-import { loaderTri } from "../brand/loader";
-import { LOGO, LOGO_H, logoLeftCentered } from "./S13Offline";
+import { fillTri } from "../brand/loader";
+import { LOADER_END, LOGO, LOGO_H, logoLeftCentered } from "./S13Offline";
 
 // Escena 14 — cierre exclusivamente con QuartzSales. Los triángulos del loading se ensamblan en el
 // isotipo; el símbolo se desplaza y el wordmark aparece por máscara. La frase final se integra al cierre.
-const T = { assemble: [0, 36] as [number, number], slide: [38, 70] as [number, number], line: 72 };
+const T = { assemble: [0, 14] as [number, number], slide: [18, 48] as [number, number], line: 50 };
 const LOGO_LEFT_FINAL = 960 - LOGO.w / 2;
 const TOP = 540 - LOGO_H / 2 - 50;
-
-// Spin continuo desde la escena 13 (f*0.12 al final de s13 = 120 frames) que desacelera al ensamblarse.
-const spinAt = (f: number) => {
-  const base = 120 * 0.12;
-  const k = range(f, T.assemble, [0, 1], (t) => t);
-  return base + 0.12 * T.assemble[1] * (k - (k * k) / 2);
-};
 
 // Triángulos pequeños de fondo (eco del isotipo), muy sutiles.
 const Shards: React.FC<{ f: number }> = ({ f }) => (
@@ -70,14 +63,14 @@ export const S14Brand: React.FC = () => {
           }}
         />
         <div style={{ position: "absolute", left, top }}>
-          <QSLogo width={LOGO.w} tri={loaderTri(spinAt(f), assemble)} word={word} wordShift={wordShift} id="s14" />
+          <QSLogo width={LOGO.w} tri={fillTri(LOADER_END + (1 - LOADER_END) * assemble)} word={word} wordShift={wordShift} id="s14" />
         </div>
-        <div style={{ position: "absolute", left: 0, right: 0, top: TOP + LOGO_H + 56, textAlign: "center", fontFamily: nunito }}>
+        <div style={{ position: "absolute", left: 0, right: 0, top: TOP + LOGO_H + 56, textAlign: "center", fontFamily: FONT }}>
           <div style={{ overflow: "hidden" }}>
-            <div style={{ fontSize: 34, fontWeight: 700, color: QS.dark, transform: `translateY(${(1 - line) * 110}%)` }}>{es.video.closing.line1}</div>
+            <div style={{ fontSize: 34, fontWeight: 600, color: QS.dark, transform: `translateY(${(1 - line) * 110}%)` }}>{es.video.closing.line1}</div>
           </div>
           <div style={{ overflow: "hidden", marginTop: 4 }}>
-            <div style={{ fontSize: 34, fontWeight: 700, color: QS.dark, transform: `translateY(${(1 - line2) * 110}%)` }}>
+            <div style={{ fontSize: 34, fontWeight: 600, color: QS.dark, transform: `translateY(${(1 - line2) * 110}%)` }}>
               {es.video.closing.line2} <span style={{ color: QS.violet }}>{es.video.closing.line2Accent}</span>
             </div>
           </div>

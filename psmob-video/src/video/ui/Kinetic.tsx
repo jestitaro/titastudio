@@ -1,7 +1,7 @@
 import React from "react";
 import { interpolate, spring } from "remotion";
 import { QS } from "../lib/stage";
-import { nunito } from "../lib/fonts";
+import { FONT } from "../ds/tokens";
 
 // Kinetic typography moderada: palabras que entran por máscara, escalonadas; salida por máscara hacia arriba.
 // `accent` = índices de palabras en violeta de marca (color sólido; el gradiente queda reservado al isotipo).
@@ -32,7 +32,7 @@ export const Kinetic: React.FC<{
         top: y,
         transform: `translate(${tx}, -50%)`,
         textAlign: align,
-        fontFamily: nunito,
+        fontFamily: FONT,
       }}
     >
       {eyebrow && (
@@ -40,7 +40,7 @@ export const Kinetic: React.FC<{
           <div
             style={{
               fontSize: 18,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: 3,
               color: accentC,
               transform: `translateY(${(1 - bar) * 100 + outP * -100}%)`,
@@ -61,7 +61,7 @@ export const Kinetic: React.FC<{
                 style={{
                   fontSize: size,
                   lineHeight: 1.08,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: -0.5,
                   color: accent.includes(i) ? accentC : base,
                   transform: `translateY(${(1 - p) * 110 - po * 110}%)`,
