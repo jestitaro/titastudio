@@ -13,7 +13,7 @@ import { VisitasScreen } from "../screens/Field";
 // se funde con el celular vectorial y Caro desaparece con un fade suave (el teléfono nunca queda huérfano:
 // lo sostiene ella hasta que ocupa todo el cuadro). El PNG está recortado a la derecha: su borde queda
 // siempre fuera de cuadro para que no se vea el pelo cortado.
-const CU = { right: 2110, top: -3, scale: 1 };
+const CU = { right: 2200, top: -60, scale: 1.1 }; // bordes recortados del PNG siempre fuera de cuadro
 const SCR = closeupScreen("caro", CU.right, CU.top, CU.scale);
 const SCR_C = { x: SCR.x + SCR.w / 2, y: SCR.y + SCR.h / 2 };
 const DEV_S = SCR.h / APP_H; // celular vectorial a la misma altura que la pantalla del PNG
@@ -23,8 +23,8 @@ const cam = (f: number): Cam =>
   camPath(f, [
     { f: 0, x: 1110, y: 560, zoom: 1 },
     { f: 24, x: 1110, y: 560, zoom: 1.01 },
-    { f: 150, x: SCR_C.x, y: SCR_C.y, zoom: 1.42 },
-    { f: 165, x: SCR_C.x, y: SCR_C.y, zoom: 1.43 },
+    { f: 150, x: SCR_C.x, y: SCR_C.y, zoom: 1.3 },
+    { f: 165, x: SCR_C.x, y: SCR_C.y, zoom: 1.31 },
   ]);
 
 // Rectángulo en pantalla de la UI al final (la escena 7 arranca con el celular exactamente ahí).

@@ -75,17 +75,15 @@ export const S08Chat: React.FC = () => {
             <VisitasScreen f={S07_VF_END} />
           </Device>
         )}
-        {/* Conversación: cada uno habla junto a su cabeza; el globo anterior del mismo personaje se va */}
+        {/* Conversación en cascada, como un chat: cada globo entra más abajo que el anterior, alineado
+            hacia quien habla (Caro a la izquierda, Nico a la derecha), y todos quedan hasta el push-in. */}
         {talkOut > 0 &&
           CONVO.map((m, i) => {
-            const at = LINES[i];
-            const next = LINES[i + 2] ?? 1e9;
-            const p = pop(f, at, { damping: 15, stiffness: 120 });
-            const o = (1 - range(f, [next - 4, next + 6], [0, 1])) * talkOut;
-            if (p <= 0.01 || o <= 0) return null;
+            const p = pop(f, LINES[i], { damping: 15, stiffness: 120 });
+            if (p <= 0.01) return null;
             const caro = m.from === "caro";
             return (
-              <div key={i} style={{ position: "absolute", left: caro ? CARO_W.x + 140 : NICO_W.x - 150, top: 230, transform: `translate(${caro ? 0 : -100}%, -100%)`, opacity: o }}>
+              <div key={i} style={{ position: "absolute", left: caro ? CARO_W.x + 190 : NICO_W.x - 190, top: 110 + i * 108 + (1 - Math.min(1, p)) * 20, transform: `translateX(${caro ? 0 : -100}%)`, opacity: talkOut }}>
                 <Speech text={m.text} side={caro ? "left" : "right"} p={p} />
               </div>
             );

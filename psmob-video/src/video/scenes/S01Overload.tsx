@@ -102,7 +102,7 @@ export const S01Overload: React.FC = () => {
         {/* Debajo del estudio: el mundo se oscurece hacia el escritorio (la cámara baja con la caída) */}
         <div style={{ position: "absolute", left: -1500, top: 1020, width: 5000, height: 2400, background: "linear-gradient(180deg, rgba(238,241,250,0) 0px, #3A2FA0 420px, #221A78 900px)" }} />
         <div style={{ opacity: floorO }}>
-          <Contact x={x} y={S01_FEET} w={320} />
+          <Contact x={x} y={S01_FEET} w={280} />
         </div>
         <Actor pose={pose} x={x} feetY={caroY} scale={S01_SCALE} f={f} walk={walking ? WALK_CARO : undefined} />
         {ITEMS.map((it, i) => renderFloat(it.key, it.x, it.y, it.at, i, <IconTile icon={it.icon} tint={it.tint} label={it.label} />))}

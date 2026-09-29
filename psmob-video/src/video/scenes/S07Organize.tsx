@@ -51,7 +51,8 @@ export const S07Organize: React.FC = () => {
           <VisitasScreen f={vf} />
         </Device>
         {TEAM.map((t, i) => {
-          const at = VIS.assign[0] / TS + i * 9;
+          // Aterriza justo cuando el avatar aparece en la lista (sin duplicarse).
+          const at = (VIS.assign[0] + i * 6 + 14) / TS - 22;
           const appear = pop(f, 4 + i * 5, { damping: 16, stiffness: 100 });
           const k = range(f, [at, at + 22], [0, 1], easeInOut);
           if (k >= 1) return null;

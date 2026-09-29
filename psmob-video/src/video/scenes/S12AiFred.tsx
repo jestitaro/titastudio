@@ -125,7 +125,7 @@ export const S12World: React.FC<{ f: number; cam: Cam; device?: React.ReactNode;
         </GondolaSpace>
       </Layer>
       <Layer cam={c} depth={DEPTH_N}>
-        <Contact x={nx} y={NICO12.feet} w={320} />
+        <Contact x={nx} y={NICO12.feet} w={280} />
         {walking ? (
           <Actor pose={POSE.nicoWalk1} x={nx} feetY={NICO12.feet} scale={NICO12.scale} f={f} walk={WALK_NICO} />
         ) : (

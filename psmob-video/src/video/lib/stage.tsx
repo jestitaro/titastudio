@@ -175,8 +175,9 @@ export const FLOOR_HORIZON = 46;
 export const Floor: React.FC<{ y: number; color?: string; o?: number }> = ({ y, color = "rgba(19,13,93,0.10)", o = 1 }) => (
   <div style={{ position: "absolute", left: -2000, top: y - FLOOR_HORIZON, width: 6000, height: 900, opacity: o, background: "linear-gradient(180deg, rgba(226,230,244,0.9), rgba(244,241,255,0.4) 400px)", borderTop: `2px solid ${color}` }} />
 );
-export const Contact: React.FC<{ x: number; y: number; w?: number; o?: number }> = ({ x, y, w = 300, o = 1 }) => (
-  <div style={{ position: "absolute", left: x - w / 2, top: y - w * 0.06, width: w, height: w * 0.12, borderRadius: "50%", opacity: o, background: "radial-gradient(closest-side, rgba(19,13,93,0.22), rgba(19,13,93,0))" }} />
+// Sombra de contacto plana y pegada a los pies (poco difuminada, núcleo más marcado).
+export const Contact: React.FC<{ x: number; y: number; w?: number; o?: number }> = ({ x, y, w = 260, o = 1 }) => (
+  <div style={{ position: "absolute", left: x - w / 2, top: y - w * 0.035, width: w, height: w * 0.07, borderRadius: "50%", opacity: o, background: "radial-gradient(closest-side, rgba(19,13,93,0.30) 0%, rgba(19,13,93,0.22) 55%, rgba(19,13,93,0) 100%)" }} />
 );
 
 // ——— Fondos ———

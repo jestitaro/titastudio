@@ -48,7 +48,7 @@ export const S11Dashboard: React.FC = () => {
         <Floor y={FLOOR_Y} />
         {/* Monitor de pie: pie y base apoyados en el piso */}
         <div style={{ opacity: frame }}>
-          <Contact x={cx} y={FLOOR_Y} w={520} />
+          <Contact x={cx} y={FLOOR_Y} w={420} />
           <div style={{ position: "absolute", left: cx - 30, top: PANEL.y + PANEL.h + BEZEL - 4, width: 60, height: standH * frame, background: "linear-gradient(90deg, #2A2F55, #3A4070 50%, #2A2F55)", borderRadius: 6 }} />
           <div style={{ position: "absolute", left: cx - 190, top: FLOOR_Y - 16, width: 380, height: 16, borderRadius: 8, background: "#2A2F55", transform: `scaleX(${frame})` }} />
           <div style={{ position: "absolute", left: PANEL.x - BEZEL, top: PANEL.y - BEZEL, width: PANEL.w + BEZEL * 2, height: PANEL.h + BEZEL * 2, borderRadius: 22, background: "#1F2340", boxShadow: "0 40px 80px rgba(19,13,93,0.28)" }} />
