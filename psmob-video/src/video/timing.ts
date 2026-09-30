@@ -34,7 +34,8 @@ export const sceneDur = (id: SceneId) => SCENES.find((s) => s.id === id)!.dur;
 export const TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);
 
 // Beats internos de la escena 1–4 (relativos al inicio del bloque).
-export const BEATS_S01 = { team: 30, pdv: 62, open: [70, 150] as [number, number], check: 112, data: 142, stress: 150, alert: 180, drop: 290 };
+// Las tareas llegan de a una (cada ~14 frames) y se acumulan; Caro se estresa recién con 9 en pantalla.
+export const BEATS_S01 = { first: 20, every: 14, open: [60, 150] as [number, number], stress: 142, alert: 196, drop: 290 };
 
 // Locución de referencia por escena (frames relativos al bloque). No se muestra en el video: sirve para
 // retimear cuando llegue el audio final.

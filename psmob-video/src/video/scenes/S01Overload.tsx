@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { easeInOut, osc, pop, range } from "../../lib/motion";
+import { easeInOut, osc, range } from "../../lib/motion";
 import { BEATS_S01 } from "../timing";
 import { Actor, camPath, Contact, DotStudio, Layer, POSE } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -38,12 +38,22 @@ const cam = (f: number): Cam => {
 };
 
 type Item = { key: string; label: string; icon: IconName; tint: string; x: number; y: number; at: number };
-const ITEMS: Item[] = [
-  { key: "team", label: "Equipo", icon: "users", tint: C.primary, x: 620, y: 330, at: B.team },
-  { key: "pdv", label: "Puntos de venta", icon: "pin", tint: C.violet, x: 1310, y: 300, at: B.pdv },
-  { key: "check", label: "Checklist", icon: "checklist", tint: C.primary, x: 1330, y: 610, at: B.check },
-  { key: "data", label: "Análisis", icon: "chart", tint: C.violet, x: 600, y: 640, at: B.data },
-];
+// Orden de llegada: primero las cercanas a su cara (se ven en el primer plano), después las de afuera.
+const ITEMS: Item[] = (
+  [
+    ["team", "Equipo", "users", C.primary, 590, 250],
+    ["pdv", "Puntos de venta", "pin", C.violet, 1350, 240],
+    ["check", "Checklist", "checklist", C.primary, 1360, 520],
+    ["data", "Análisis", "chart", C.violet, 580, 540],
+    ["route", "Rutas", "route", C.primary, 330, 400],
+    ["price", "Precios", "dollar", C.violet, 1600, 380],
+    ["form", "Formularios", "form", C.primary, 340, 690],
+    ["photo", "Fotos", "camera", C.violet, 1610, 660],
+    ["chat", "Mensajes", "chat", C.primary, 730, 125],
+    ["stock", "Stock", "box", C.violet, 1200, 125],
+    ["report", "Reportes", "dashboard", C.primary, 590, 820],
+  ] as [string, string, IconName, string, number, number][]
+).map(([key, label, icon, tint, x, y], i) => ({ key, label, icon, tint, x, y, at: B.first + i * B.every }));
 
 // Tarjeta de un solo ícono (estilo del primer video).
 const IconTile: React.FC<{ icon: IconName; tint: string; label: string }> = ({ icon, tint, label }) => (
@@ -79,13 +89,14 @@ export const S01Overload: React.FC = () => {
   const caroY = S01_FEET + (falling ? fallY(f, B.drop + 6) : 0);
   const warm = range(f, [B.stress, B.drop], [0, 1], easeInOut);
   const floorO = 1 - range(f, [B.drop + 10, B.drop + 30], [0, 1]);
+  // Entrada suave: fundido + leve subida + escala 0,85→1 + desenfoque que se aclara (sin rebotes).
   const renderFloat = (key: string, px: number, py: number, at: number, i: number, node: React.ReactNode) => {
-    const p = pop(f, at, { damping: 15, stiffness: 110 });
-    if (p <= 0.01) return null;
-    const fy = fallY(f, B.drop + i * 3);
-    const rot = Math.max(0, f - B.drop - i * 3) * (i % 2 ? 0.8 : -0.9);
+    const t = range(f, [at, at + 22], [0, 1], (x) => 1 - Math.pow(1 - x, 3));
+    if (t <= 0) return null;
+    const fy = fallY(f, B.drop + (i % 6) * 3);
+    const rot = Math.max(0, f - B.drop - (i % 6) * 3) * (i % 2 ? 0.8 : -0.9);
     return (
-      <div key={key} style={{ position: "absolute", left: px, top: py + osc(f, 90, 6, i * 17) + fy, transform: `translate(-50%, -50%) scale(${0.6 + 0.4 * Math.min(p, 1.15)}) rotate(${rot}deg)`, opacity: Math.min(1, p * 1.6) }}>
+      <div key={key} style={{ position: "absolute", left: px, top: py + (1 - t) * 28 + osc(f, 110, 5 * t, i * 17) + fy, transform: `translate(-50%, -50%) scale(${0.85 + 0.15 * t}) rotate(${rot}deg)`, opacity: t, filter: t < 1 ? `blur(${(1 - t) * 6}px)` : undefined }}>
         {node}
       </div>
     );
@@ -103,7 +114,7 @@ export const S01Overload: React.FC = () => {
         </div>
         <Actor pose={pose} x={x} feetY={caroY} scale={S01_SCALE} f={f} />
         {ITEMS.map((it, i) => renderFloat(it.key, it.x, it.y, it.at, i, <IconTile icon={it.icon} tint={it.tint} label={it.label} />))}
-        {renderFloat("alert", 1330, 820, B.alert, 4, <AlertCard />)}
+        {renderFloat("alert", 1380, 850, B.alert, 11, <AlertCard />)}
       </Layer>
     </AbsoluteFill>
   );
