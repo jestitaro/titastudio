@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, interpolate, random, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate, random } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, osc, range } from "../../lib/motion";
 import { Actor, Layer, Particles, POSE, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -144,7 +145,7 @@ const PaperCard: React.FC<{ p: Paper }> = ({ p }) =>
 const fallFeet = (f: number) => -520 + FALL_V0 * f + 0.5 * f * f;
 
 export const S05Desk: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = cam(f);
   const asleep = f >= SLEEP;
   const falling = f < LAND;

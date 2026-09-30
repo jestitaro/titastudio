@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, easeOut, range } from "../../lib/motion";
 import { LightStudio, QS } from "../lib/stage";
 import { FONT } from "../ds/tokens";
@@ -16,7 +17,7 @@ const LOGO_LEFT_FINAL = 960 - LOGO.w / 2;
 const TOP = 540 - LOGO_H / 2 - 50;
 
 export const S14Brand: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   // Un solo movimiento continuo y lento: el isotipo termina de llenarse, después se aleja (zoom 1.2 → 1),
   // se desplaza y el wordmark aparece con la misma curva. Sin destellos ni rebotes.
   const assemble = range(f, T.assemble, [0, 1], easeInOut);

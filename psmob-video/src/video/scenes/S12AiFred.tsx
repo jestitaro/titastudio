@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, pop, range } from "../../lib/motion";
 import { Actor, camPath, Contact, Layer, POSE, posePoint, WALK_NICO } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -143,7 +144,7 @@ export const S12World: React.FC<{ f: number; cam: Cam; device?: React.ReactNode;
 };
 
 export const S12AiFred: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = s12Cam(f);
   const born = range(f, T0.born, [0, 1], easeInOut);
   const dev = { x: interpolate(born, [0, 1], [phone12.x, DEV12.x]), y: interpolate(born, [0, 1], [phone12.y, DEV12.y]), s: interpolate(born, [0, 1], [0.03, DEV12.s]), o: Math.min(1, born * 4) };

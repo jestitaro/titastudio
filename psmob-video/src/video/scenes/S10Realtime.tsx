@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, range } from "../../lib/motion";
 import { Actor, camPath, Contact, Floor, Layer, LightStudio, Particles, POSE, posePoint, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -31,7 +32,7 @@ export const camS10 = (f: number): Cam =>
   ]);
 
 export const S10Realtime: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = camS10(f);
   const wipe = range(f, [0, 40], [0, 1], easeInOut);
   const born = range(f, BORN, [0, 1], easeInOut);

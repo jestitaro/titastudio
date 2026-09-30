@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, pop, range } from "../../lib/motion";
 import { camPath, LightStudio, toScreen } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -35,7 +36,7 @@ const cam = (f: number): Cam =>
   ]);
 
 export const S13Offline: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = cam(f);
   const push = range(f, [SUM0, SUM0 + 22], [0, 1], (t) => t);
   const toast = pop(f, 16, { damping: 16, stiffness: 110 }) * (1 - push);

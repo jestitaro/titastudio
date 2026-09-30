@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, pop, range } from "../../lib/motion";
 import { Actor, camPath, Contact, Floor, Layer, LightStudio, Particles, POSE, posePoint, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -52,7 +53,7 @@ const Speech: React.FC<{ text: string; side: "left" | "right"; p: number }> = ({
 );
 
 export const S08Chat: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = camS08(f);
   const back = range(f, [0, 30], [0, 1], easeInOut);
   const chat = range(f, CHAT_IN, [0, 1], easeInOut);

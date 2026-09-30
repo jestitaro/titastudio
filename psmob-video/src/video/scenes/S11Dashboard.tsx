@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, range } from "../../lib/motion";
 import { Actor, camPath, Contact, Floor, Layer, LightStudio, Particles, POSE, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -30,7 +31,7 @@ const cam = (f: number): Cam =>
   ]);
 
 export const S11Dashboard: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = cam(f);
   const m = range(f, MORPH, [0, 1], easeInOut);
   const frame = range(f, [16, 44], [0, 1], easeInOut);

@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, osc, range } from "../../lib/motion";
 import { camPath, Closeup, closeupScreen, Layer, LightStudio, Particles, QS, toScreen } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -52,7 +53,7 @@ const ScreenContent: React.FC<{ f: number }> = ({ f }) => {
 };
 
 export const S06Reveal: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = cam(f);
   const glow = range(f, [8, 30], [0, 1]) * (1 - range(f, [60, 100], [0, 1]));
   const swap = range(f, SWAP, [0, 1], easeInOut);

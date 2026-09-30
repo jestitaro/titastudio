@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, osc, pop, range } from "../../lib/motion";
 import { Actor, camPath, Contact, Floor, Layer, LightStudio, Particles, POSE, QS } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -32,7 +33,7 @@ const START = [
 ];
 
 export const S07Organize: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const cam = camS07(f);
   const vf = f * TS;
   const slotWorld = (p: { x: number; y: number }) => ({ x: DEV7.x + (p.x - APP_W / 2) * DEV7.s, y: DEV7.y + (p.y - CARO_APP_H / 2) * DEV7.s });

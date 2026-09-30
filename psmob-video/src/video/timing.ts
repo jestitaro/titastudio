@@ -4,18 +4,20 @@ import { es } from "../i18n/es";
 // para retimear con la locución final alcanza con cambiar `dur` (y los beats internos, que son relativos).
 export const FPS = 30;
 
+// Duraciones ajustadas a la locución (58 s). `orig` = duración con la que se animó la escena; `trim` =
+// frames iniciales que se saltean. La escena se reproduce comprimida: velocidad = (orig - trim) / dur.
 export const SCENES = [
-  { id: "s01", dur: 360 }, // Escenas 1–4: caminata, tareas en el celular, sobrecarga + órbita
-  { id: "s05", dur: 255 }, // Escritorio, paso del tiempo
-  { id: "s06", dur: 165 }, // Caro muestra el celular → UI
-  { id: "s07", dur: 195 }, // Organización: equipo → ruteo
-  { id: "s08", dur: 255 }, // Optimiza la comunicación
-  { id: "s09", dur: 210 }, // Agiliza la captura de datos
-  { id: "s10", dur: 180 }, // Información en tiempo real
-  { id: "s11", dur: 195 }, // Dashboard
-  { id: "s12", dur: 300 }, // AiFred en góndola
-  { id: "s13", dur: 165 }, // Sin conexión → enviando → loading de marca
-  { id: "s14", dur: 225 }, // Cierre QuartzSales
+  { id: "s01", dur: 270, orig: 360, trim: 0 }, // "Gestionar a tu equipo…" + sobrecarga + caída
+  { id: "s05", dur: 200, orig: 255, trim: 0 }, // "Coordinar tareas… tiempo y dinero"
+  { id: "s06", dur: 132, orig: 165, trim: 0 }, // "Ahora, con la nueva versión…"
+  { id: "s07", dur: 138, orig: 195, trim: 0 }, // "Tu equipo puede encargarse…"
+  { id: "s08", dur: 168, orig: 255, trim: 0 }, // pausa musical (charla) → "Optimiza la comunicación"
+  { id: "s09", dur: 114, orig: 210, trim: 0 }, // "Agiliza la captura de datos"
+  { id: "s10", dur: 120, orig: 180, trim: 0 }, // "Y ofrece información en tiempo real…"
+  { id: "s11", dur: 138, orig: 195, trim: 0 }, // "…para una mejor toma de decisiones" + "Además, con AiFred…"
+  { id: "s12", dur: 200, orig: 300, trim: 60 }, // "…al siguiente nivel: escanea estantes, reconoce precios…"
+  { id: "s13", dur: 80, orig: 165, trim: 0 }, // "e incluso funciona sin conexión"
+  { id: "s14", dur: 171, orig: 225, trim: 0 }, // "Implementá QuartzSales Trade Marketing…"
 ] as const;
 
 export type SceneId = (typeof SCENES)[number]["id"];

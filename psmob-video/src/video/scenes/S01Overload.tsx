@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, osc, range } from "../../lib/motion";
 import { BEATS_S01 } from "../timing";
 import { Actor, camPath, Contact, DotStudio, Layer, POSE } from "../lib/stage";
@@ -80,7 +81,7 @@ const AlertCard: React.FC = () => (
 );
 
 export const S01Overload: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = cam(f);
   const falling = f >= B.drop + 6;
   const stress = f >= B.stress;

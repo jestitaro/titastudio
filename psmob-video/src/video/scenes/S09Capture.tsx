@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill } from "remotion";
+import { useSceneFrame } from "../lib/sceneClock";
 import { easeInOut, range } from "../../lib/motion";
 import { Actor, camPath, Layer, LightStudio, POSE } from "../lib/stage";
 import type { Cam } from "../lib/stage";
@@ -43,7 +44,7 @@ export const StoreBackdrop: React.FC<{ cam: Cam; blur?: number; offset?: number 
 );
 
 export const S09Capture: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useSceneFrame();
   const c = cam(f);
   const wipe = range(f, [0, 40], [0, 1], easeInOut);
   const nav = range(f, [FORMS0 - 12, FORMS0 + 10], [0, 1], (t) => t);

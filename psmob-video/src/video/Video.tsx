@@ -3,6 +3,7 @@ import { AbsoluteFill, Sequence } from "remotion";
 import { SCENES, SceneId, sceneStart } from "./timing";
 import { TriangleWipe } from "./transitions/TriangleWipe";
 import { Soundtrack } from "./Soundtrack";
+import { SceneClock } from "./lib/sceneClock";
 import { S01Overload } from "./scenes/S01Overload";
 import { S05Desk } from "./scenes/S05Desk";
 import { S06Reveal } from "./scenes/S06Reveal";
@@ -40,7 +41,9 @@ export const PSMobVideo: React.FC<PSMobVideoProps> = () => {
         const C = COMPONENTS[s.id];
         return (
           <Sequence key={s.id} from={sceneStart(s.id)} durationInFrames={s.dur} name={s.id}>
-            <C />
+            <SceneClock speed={(s.orig - s.trim) / s.dur} trim={s.trim}>
+              <C />
+            </SceneClock>
           </Sequence>
         );
       })}
