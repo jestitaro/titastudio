@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { easeInOut, osc, pop, range } from "../../lib/motion";
 import { BEATS_S01 } from "../timing";
 import { Actor, camPath, Contact, DotStudio, Layer, POSE, WALK_CARO } from "../lib/stage";
@@ -16,7 +16,9 @@ export const S01_FEET = 940;
 export const S01_SCALE = 0.56;
 const CX = 960;
 
-const walkX = (f: number) => interpolate(f, [0, B.stop], [-360, CX], { easing: (t) => 1 - Math.pow(1 - t, 1.6), extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+// Avance lineal a la velocidad del ciclo de pasos (los pies no patinan).
+const WALK_V = WALK_CARO.speed * S01_SCALE;
+const walkX = (f: number) => Math.min(CX, CX - WALK_V * (B.stop - f));
 
 // Gravedad de la caída (continúa en la escena 5 con la misma velocidad).
 export const FALL_G = 1.0;
@@ -26,12 +28,10 @@ const fallY = (f: number, at: number) => {
 };
 
 const cam = (f: number): Cam => {
-  // Caminata en plano medio (cintura para arriba) con la cámara acompañándola: las piernas quedan fuera
-  // de cuadro. Cuando se frena, la cámara abre a cuerpo entero con los pies apoyados.
-  if (f <= B.stop) return { x: Math.max(260, walkX(f) + 110), y: 300, zoom: 1.8 };
+  // Cuerpo entero: la cámara la acompaña apenas mientras camina hasta el centro y después se acerca lento.
   const base = camPath(f, [
-    { f: B.stop, x: CX + 110, y: 300, zoom: 1.8 },
-    { f: B.open, x: CX, y: 530, zoom: 1.02 },
+    { f: 0, x: 700, y: 530, zoom: 1 },
+    { f: B.stop + 10, x: CX, y: 530, zoom: 1.02 },
     { f: B.drop, x: CX, y: 510, zoom: 1.12 },
   ]);
   // Tilt hacia abajo siguiendo la caída.

@@ -16,8 +16,8 @@ import { ScanScreen } from "../screens/Scan";
 // detecciones, precios validados y, al final, faltante y producto fuera de posición.
 // Escala y horizonte: la góndola va en segundo plano (zócalo apoyado en la línea de piso) y Nico más
 // adelante, con los pies sobre el piso y sombra de contacto.
-export const S12_DUR = 330;
-export const T0 = { walk: [0, 130] as [number, number], open: 176, born: [168, 202] as [number, number], scan: 202, det1: 214, det2: 242, prices: 270, plano: 290 };
+export const S12_DUR = 300;
+export const T0 = { walk: [0, 112] as [number, number], open: 118, born: [128, 162] as [number, number], scan: 162, det1: 172, det2: 198, prices: 224, plano: 244 };
 const GS = 0.74; // escala de la góndola en el mundo
 const G_FLOOR = 845; // línea de piso donde apoya la góndola
 const GY = G_FLOOR - GONDOLA.bottom * GS;
@@ -26,16 +26,17 @@ export const DEPTH_N = 1;
 export const NICO12 = { feet: 1000, scale: 0.52 };
 const WIDE = { x: 2500, y: 540, zoom: 1 };
 
-// Nico camina por delante de la góndola (entra por la izquierda) y se frena.
-const nicoX = (f: number) => interpolate(f, T0.walk, [1250, 2990], { easing: (t) => 1 - Math.pow(1 - t, 1.6), extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+// Nico camina de cuerpo entero por delante de la góndola (entra por la izquierda) y se frena, a la
+// velocidad del ciclo de pasos para que los pies no patinen.
+const NICO_STOP_X = 2990;
+const WALK_V = WALK_NICO.speed * NICO12.scale;
+const nicoX = (f: number) => NICO_STOP_X - WALK_V * Math.max(0, T0.walk[1] - f);
 
-// Travelling en plano medio (cintura para arriba) mientras camina: las piernas quedan fuera de cuadro y
-// la góndola pasa detrás. Al frenarse, la cámara abre y se lo ve entero, con los pies en el piso.
-const walkCam = (f: number): Cam => ({ x: Math.max(2050, nicoX(f) + 150), y: 430, zoom: 1.7 });
+// Travelling suave: la cámara avanza más despacio que Nico, así él cruza el cuadro de izquierda a derecha
+// con la góndola pasando detrás, y termina parado a la derecha.
 export const s12Cam = (f: number): Cam => {
-  if (f <= T0.walk[1]) return walkCam(f);
+  if (f <= T0.open) return { x: interpolate(f, [0, T0.open], [1300, WIDE.x], { easing: (t) => 1 - Math.pow(1 - t, 2), extrapolateRight: "clamp" }), y: 540, zoom: 1 };
   return camPath(f, [
-    { f: T0.walk[1], ...walkCam(T0.walk[1]) },
     { f: T0.open, ...WIDE },
     { f: S12_DUR, x: WIDE.x - 20, y: 535, zoom: 1.04 },
   ]);
@@ -127,7 +128,7 @@ export const S12World: React.FC<{ f: number; cam: Cam; device?: React.ReactNode;
       <Layer cam={c} depth={DEPTH_N}>
         <Contact x={nx} y={NICO12.feet} w={280} />
         {walking ? (
-          <Actor pose={POSE.nicoWalk1} x={nx} feetY={NICO12.feet} scale={NICO12.scale} f={f} walk={WALK_NICO} />
+          <Actor pose={POSE.nicoPaso1} x={nx} feetY={NICO12.feet} scale={NICO12.scale} f={f} walk={WALK_NICO} />
         ) : (
           <Actor pose={POSE.nicoCelular} x={nx} feetY={NICO12.feet} scale={NICO12.scale} f={f} />
         )}

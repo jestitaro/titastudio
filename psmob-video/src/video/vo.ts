@@ -13,7 +13,7 @@ export const VO_LINES: { id: string; scene: SceneId; at: number; text: string }[
   { id: "06", scene: "s09", at: 60, text: "Agiliza la captura de datos." },
   { id: "07", scene: "s10", at: 90, text: "Y ofrece información en tiempo real para una mejor toma de decisiones." },
   { id: "08", scene: "s11", at: 170, text: "Además, con AiFred, nuestro asistente con Inteligencia Artificial, llevamos la automatización al siguiente nivel:" },
-  { id: "09", scene: "s12", at: 214, text: "escanea estantes, reconoce precios, valida planogramas" },
+  { id: "09", scene: "s12", at: 172, text: "escanea estantes, reconoce precios, valida planogramas" },
   { id: "10", scene: "s13", at: 16, text: "e incluso funciona sin conexión." },
   { id: "11", scene: "s14", at: 60, text: "Implementá QuartzSales Trade Marketing y llevá tu negocio al futuro." },
 ];

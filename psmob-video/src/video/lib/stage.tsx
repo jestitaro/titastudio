@@ -55,14 +55,28 @@ export const POSE = {
   nicoWalk2: { file: "nico-walk-2.png", w: 1024, h: 1536, axisX: 520, feetY: 1468 },
   nicoWalk3: { file: "nico-walk-3.png", w: 1024, h: 1536, axisX: 534, feetY: 1474 },
   nicoWalk4: { file: "nico-walk-4.png", w: 1024, h: 1536, axisX: 536, feetY: 1494 },
+  // Ciclo de caminata de 6 fotogramas (lienzo más chico: k iguala la altura con las poses de pie).
+  // Eje = centro de cadera de cada fotograma (el torso avanza parejo), pies = línea de apoyo.
+  caroPaso1: { file: "caro-paso-1.png", w: 1024, h: 1536, axisX: 457, feetY: 1417, k: 1.18 },
+  caroPaso2: { file: "caro-paso-2.png", w: 1024, h: 1536, axisX: 454, feetY: 1415, k: 1.18 },
+  caroPaso3: { file: "caro-paso-3.png", w: 1024, h: 1536, axisX: 473, feetY: 1415, k: 1.18 },
+  caroPaso4: { file: "caro-paso-4.png", w: 1024, h: 1536, axisX: 491, feetY: 1417, k: 1.18 },
+  caroPaso5: { file: "caro-paso-5.png", w: 1024, h: 1536, axisX: 465, feetY: 1415, k: 1.18 },
+  caroPaso6: { file: "caro-paso-6.png", w: 1024, h: 1536, axisX: 461, feetY: 1417, k: 1.18 },
+  nicoPaso1: { file: "nico-paso-1.png", w: 1024, h: 1536, axisX: 517, feetY: 1451, k: 1.26 },
+  nicoPaso2: { file: "nico-paso-2.png", w: 1024, h: 1536, axisX: 506, feetY: 1451, k: 1.26 },
+  nicoPaso3: { file: "nico-paso-3.png", w: 1024, h: 1536, axisX: 520, feetY: 1451, k: 1.26 },
+  nicoPaso4: { file: "nico-paso-4.png", w: 1024, h: 1536, axisX: 510, feetY: 1451, k: 1.26 },
+  nicoPaso5: { file: "nico-paso-5.png", w: 1024, h: 1536, axisX: 518, feetY: 1451, k: 1.26 },
+  nicoPaso6: { file: "nico-paso-6.png", w: 1024, h: 1536, axisX: 506, feetY: 1450, k: 1.26 },
   // Caída (cara de sorpresa). Ancla en el centro del cuerpo.
   caroCaida: { file: "caro-caida.png", w: 1024, h: 1536, axisX: 520, feetY: 1273 },
 } satisfies Record<string, Pose>;
 
-// Caminata: los fotogramas nuevos comparten la misma fase de paso, así que se alternan solo los dos de
-// altura casi idéntica (sin saltos), a un ritmo de paso natural (~2 pasos/s), con un rebote suave.
-export const WALK_CARO = { poses: [POSE.caroWalk5, POSE.caroWalk2], period: 8, bob: 4 };
-export const WALK_NICO = { poses: [POSE.nicoWalk4, POSE.nicoWalk1], period: 8, bob: 4 };
+// Caminata con el ciclo real de 6 fotogramas. El rebote ya está dibujado (sin bob extra).
+// `speed` = avance en px de mundo por frame a escala 1 del personaje, para que los pies no patinen.
+export const WALK_CARO = { poses: [POSE.caroPaso1, POSE.caroPaso2, POSE.caroPaso3, POSE.caroPaso4, POSE.caroPaso5, POSE.caroPaso6], period: 3, bob: 0, speed: 28 };
+export const WALK_NICO = { poses: [POSE.nicoPaso1, POSE.nicoPaso2, POSE.nicoPaso3, POSE.nicoPaso4, POSE.nicoPaso5, POSE.nicoPaso6], period: 5, bob: 0, speed: 50 };
 
 // Primeros planos mostrando el celular (PNG apaisados recortados en los bordes derecho/arriba/abajo).
 // Se anclan al borde derecho del cuadro; `screen` = pantalla en blanco del celular (coords del PNG).

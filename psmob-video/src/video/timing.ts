@@ -13,7 +13,7 @@ export const SCENES = [
   { id: "s09", dur: 210 }, // Agiliza la captura de datos
   { id: "s10", dur: 180 }, // Información en tiempo real
   { id: "s11", dur: 195 }, // Dashboard
-  { id: "s12", dur: 330 }, // AiFred en góndola
+  { id: "s12", dur: 300 }, // AiFred en góndola
   { id: "s13", dur: 165 }, // Sin conexión → enviando → loading de marca
   { id: "s14", dur: 225 }, // Cierre QuartzSales
 ] as const;
