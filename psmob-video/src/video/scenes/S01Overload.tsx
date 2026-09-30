@@ -2,23 +2,20 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { easeInOut, osc, pop, range } from "../../lib/motion";
 import { BEATS_S01 } from "../timing";
-import { Actor, camPath, Contact, DotStudio, Layer, POSE, WALK_CARO } from "../lib/stage";
+import { Actor, camPath, Contact, DotStudio, Layer, POSE } from "../lib/stage";
 import type { Cam } from "../lib/stage";
 import { C, FONT, R, SH } from "../ds/tokens";
 import { Icon, IconName } from "../ui/icons";
 
-// Escenas 1–4. Estudio claro del primer video (puntos + círculos suaves). Caro entra caminando desde fuera
-// de cuadro y se detiene exactamente en el centro. Mira su celular (sin mostrar la pantalla) y, de a una,
-// aparecen las cosas que tiene que hacer: Equipo, PDV, Checklist, Análisis y la alerta de visita vencida.
-// Una sola cámara: push-in lento. Al final todo cae y Caro cae con ello (la cámara baja con ella).
+// Escenas 1–4. Estudio claro del primer video (puntos + círculos suaves). Arranca cerca de Caro mirando su
+// celular (sin mostrar la pantalla); le empiezan a llegar tareas de a una (Equipo, PDV), la cámara se aleja
+// hasta cuerpo entero, siguen llegando (Checklist, Análisis, visita vencida) y aparece preocupada. Después
+// push-in lento; al final todo cae y Caro cae con ello (la cámara baja con ella).
 const B = BEATS_S01;
 export const S01_FEET = 940;
 export const S01_SCALE = 0.56;
 const CX = 960;
 
-// Avance lineal a la velocidad del ciclo de pasos (los pies no patinan).
-const WALK_V = WALK_CARO.speed * S01_SCALE;
-const walkX = (f: number) => Math.min(CX, CX - WALK_V * (B.stop - f));
 
 // Gravedad de la caída (continúa en la escena 5 con la misma velocidad).
 export const FALL_G = 1.0;
@@ -28,10 +25,11 @@ const fallY = (f: number, at: number) => {
 };
 
 const cam = (f: number): Cam => {
-  // Cuerpo entero: la cámara la acompaña apenas mientras camina hasta el centro y después se acerca lento.
+  // Plano cercano (cara + celular) → se aleja a cuerpo entero → push-in lento.
   const base = camPath(f, [
-    { f: 0, x: 700, y: 530, zoom: 1 },
-    { f: B.stop + 10, x: CX, y: 530, zoom: 1.02 },
+    { f: 0, x: 1000, y: 300, zoom: 1.9 },
+    { f: B.open[0], x: 1000, y: 305, zoom: 1.84 },
+    { f: B.open[1], x: CX, y: 530, zoom: 1.0 },
     { f: B.drop, x: CX, y: 510, zoom: 1.12 },
   ]);
   // Tilt hacia abajo siguiendo la caída.
@@ -74,10 +72,9 @@ const AlertCard: React.FC = () => (
 export const S01Overload: React.FC = () => {
   const f = useCurrentFrame();
   const c = cam(f);
-  const walking = f < B.stop;
   const falling = f >= B.drop + 6;
   const stress = f >= B.stress;
-  const x = walking ? walkX(f) : CX;
+  const x = CX;
   const pose = falling ? POSE.caroCaida : stress ? POSE.caroEstres : POSE.caroCelular;
   const caroY = S01_FEET + (falling ? fallY(f, B.drop + 6) : 0);
   const warm = range(f, [B.stress, B.drop], [0, 1], easeInOut);
@@ -104,7 +101,7 @@ export const S01Overload: React.FC = () => {
         <div style={{ opacity: floorO }}>
           <Contact x={x} y={S01_FEET} w={280} />
         </div>
-        <Actor pose={pose} x={x} feetY={caroY} scale={S01_SCALE} f={f} walk={walking ? WALK_CARO : undefined} />
+        <Actor pose={pose} x={x} feetY={caroY} scale={S01_SCALE} f={f} />
         {ITEMS.map((it, i) => renderFloat(it.key, it.x, it.y, it.at, i, <IconTile icon={it.icon} tint={it.tint} label={it.label} />))}
         {renderFloat("alert", 1330, 820, B.alert, 4, <AlertCard />)}
       </Layer>

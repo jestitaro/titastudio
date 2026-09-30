@@ -34,7 +34,7 @@ export const sceneDur = (id: SceneId) => SCENES.find((s) => s.id === id)!.dur;
 export const TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);
 
 // Beats internos de la escena 1–4 (relativos al inicio del bloque).
-export const BEATS_S01 = { stop: 80, open: 124, team: 128, stress: 150, pdv: 158, check: 188, data: 216, alert: 244, drop: 290 };
+export const BEATS_S01 = { team: 30, pdv: 62, open: [70, 150] as [number, number], check: 112, data: 142, stress: 150, alert: 180, drop: 290 };
 
 // Locución de referencia por escena (frames relativos al bloque). No se muestra en el video: sirve para
 // retimear cuando llegue el audio final.

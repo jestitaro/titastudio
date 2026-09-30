@@ -18,15 +18,15 @@ const PANEL = { x: 970, y: 150, w: 860, h: 593 };
 const K = PANEL.w / REPORT.w;
 const BEZEL = 16;
 const MORPH: [number, number] = [0, 40];
-const NICO = { x: 2300, feet: FLOOR_Y, scale: 0.5 };
+const NICO = { x: 2250, feet: FLOOR_Y, scale: 0.5 }; // simétrico a Caro respecto del monitor
 
 const cam = (f: number): Cam =>
   camPath(f, [
     { f: 0, ...camS10(180) },
-    { f: 56, x: 1450, y: 340, zoom: 1.55 },
-    { f: 100, x: 1450, y: 345, zoom: 1.56 },
-    { f: 170, x: 1450, y: 540, zoom: 0.8 },
-    { f: 195, x: 1450, y: 540, zoom: 0.81 },
+    { f: 56, x: 1400, y: 350, zoom: 1.7 },
+    { f: 100, x: 1400, y: 352, zoom: 1.71 },
+    { f: 170, x: 1400, y: 540, zoom: 0.8 },
+    { f: 195, x: 1400, y: 540, zoom: 0.81 },
   ]);
 
 export const S11Dashboard: React.FC = () => {

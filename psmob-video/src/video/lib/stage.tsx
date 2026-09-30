@@ -76,7 +76,7 @@ export const POSE = {
 // Caminata con el ciclo real de 6 fotogramas. El rebote ya está dibujado (sin bob extra).
 // `speed` = avance en px de mundo por frame a escala 1 del personaje, para que los pies no patinen.
 export const WALK_CARO = { poses: [POSE.caroPaso1, POSE.caroPaso2, POSE.caroPaso3, POSE.caroPaso4, POSE.caroPaso5, POSE.caroPaso6], period: 3, bob: 0, speed: 28 };
-export const WALK_NICO = { poses: [POSE.nicoPaso1, POSE.nicoPaso2, POSE.nicoPaso3, POSE.nicoPaso4, POSE.nicoPaso5, POSE.nicoPaso6], period: 5, bob: 0, speed: 50 };
+export const WALK_NICO = { poses: [POSE.nicoPaso1, POSE.nicoPaso2, POSE.nicoPaso3, POSE.nicoPaso4, POSE.nicoPaso5, POSE.nicoPaso6], period: 7, bob: 0, speed: 36 };
 
 // Primeros planos mostrando el celular (PNG apaisados recortados en los bordes derecho/arriba/abajo).
 // Se anclan al borde derecho del cuadro; `screen` = pantalla en blanco del celular (coords del PNG).

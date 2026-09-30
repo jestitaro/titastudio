@@ -58,8 +58,8 @@ export const Kinetic: React.FC<{
       <div style={{ display: "flex", flexWrap: "wrap", gap: `0 ${size * 0.26}px`, justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start", maxWidth: size * 9.5 }}>
         {words.map((w, i) => {
           const p = spring({ frame: f - at - i * 4, fps: 30, config: { damping: 17, stiffness: 130, mass: 0.8 } });
-          const o = interpolate(f, [out ?? 1e9, (out ?? 1e9) + 10], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-          const po = Math.min(1, Math.max(0, o - i * 0.08));
+          // Salida escalonada: cada palabra sale completa (no queda ningún resto en pantalla).
+          const po = out === undefined ? 0 : interpolate(f, [out + i * 2, out + i * 2 + 10], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
           return (
             <div key={i} style={{ overflow: "hidden", paddingBottom: size * 0.12, marginBottom: -size * 0.12 }}>
               <div

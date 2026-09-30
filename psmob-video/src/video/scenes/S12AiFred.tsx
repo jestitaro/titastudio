@@ -35,7 +35,7 @@ const nicoX = (f: number) => NICO_STOP_X - WALK_V * Math.max(0, T0.walk[1] - f);
 // Travelling suave: la cámara avanza más despacio que Nico, así él cruza el cuadro de izquierda a derecha
 // con la góndola pasando detrás, y termina parado a la derecha.
 export const s12Cam = (f: number): Cam => {
-  if (f <= T0.open) return { x: interpolate(f, [0, T0.open], [1300, WIDE.x], { easing: (t) => 1 - Math.pow(1 - t, 2), extrapolateRight: "clamp" }), y: 540, zoom: 1 };
+  if (f <= T0.open) return { x: interpolate(f, [0, T0.open], [1900, WIDE.x], { easing: (t) => 1 - Math.pow(1 - t, 2), extrapolateRight: "clamp" }), y: 540, zoom: 1 };
   return camPath(f, [
     { f: T0.open, ...WIDE },
     { f: S12_DUR, x: WIDE.x - 20, y: 535, zoom: 1.04 },
