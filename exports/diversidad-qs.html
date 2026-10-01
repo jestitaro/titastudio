@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diversidad Cultural — e·Saurio & QuartzSales</title>
+<style>
+:root{
+  --bg1:#0c0840;--bg2:#130D5D;--text:#eef3ff;--muted:#a6b4cf;
+  --green:#6aff9d;--cyan:#5de2ff;--pink:#ff5fa2;--yellow:#ffd166;
+  --violet:#8f7cff;--mint:#64f4ac;--orange:#ff8c42;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0c0840;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{display:grid;place-items:center}
+.frame{position:relative;width:min(100vw,177.777vh);aspect-ratio:16/9;overflow:hidden;color:var(--text);background:
+radial-gradient(circle at 18% 22%,rgba(60,159,241,.20),transparent 32%),
+radial-gradient(circle at 82% 28%,rgba(112,37,224,.30),transparent 30%),
+radial-gradient(circle at 68% 80%,rgba(70,61,225,.18),transparent 28%),
+linear-gradient(135deg,var(--bg1),var(--bg2));}
+.grid,.noise{position:absolute;inset:0;pointer-events:none}
+.grid{background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center,black 52%,transparent 88%)}
+.noise{opacity:.04;background-image:radial-gradient(circle at 25% 25%,#fff 1px,transparent 1px),radial-gradient(circle at 75% 35%,#fff 1px,transparent 1px),radial-gradient(circle at 45% 75%,#fff 1px,transparent 1px);background-size:180px 180px;animation:drift 12s linear infinite}
+.content{position:absolute;inset:0;display:grid;place-items:center;padding:6%}
+.inner{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;gap:28px}
+.eyebrow{font-size:clamp(12px,1.05vw,18px);letter-spacing:.28em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.word-wrap{min-height:190px;width:100%;display:flex;align-items:center;justify-content:center;overflow:visible}
+.word{display:flex;align-items:center;justify-content:center;gap:clamp(0px,.18vw,5px);white-space:nowrap}
+.letter{display:inline-flex;align-items:center;justify-content:center;min-width:.61em;font-size:clamp(52px,7.35vw,122px);font-weight:800;line-height:1;letter-spacing:-.035em;color:var(--text);transform-origin:center;transition:all .28s ease}
+.letter.hidden{opacity:0;transform:translateY(8px)}
+.mode-code .letter{font-family:"Courier New",monospace;color:var(--green);text-shadow:0 0 12px rgba(106,255,157,.16)}
+.mode-tech .letter{font-family:"Courier New",monospace;color:var(--cyan);text-shadow:0 0 12px rgba(93,226,255,.16)}
+.mode-design .fixed{font-family:Inter,system-ui,sans-serif;color:rgba(238,243,255,.94)}
+.variable{position:relative}
+.style-code{font-family:"Courier New",monospace!important;color:var(--green)!important}
+.style-tech{font-family:"Courier New",monospace!important;color:var(--cyan)!important}
+.style-pink{color:var(--pink)!important;font-style:italic;font-weight:900;transform:rotate(-7deg) scale(1.09)}
+.style-yellow{color:var(--yellow)!important;font-weight:900;transform:scale(1.12)}
+.style-violet{color:var(--violet)!important;font-family:Georgia,"Times New Roman",serif!important;font-style:italic;transform:rotate(5deg) scale(1.08)}
+.style-mint{color:var(--mint)!important;font-weight:900;transform:scale(1.11)}
+.style-orange{color:var(--orange)!important;font-family:"Trebuchet MS",sans-serif!important;font-style:italic;transform:rotate(-4deg) scale(1.06)}
+.style-outline{color:transparent!important;-webkit-text-stroke:2px #fff;transform:scale(1.08)}
+.style-rainbow{background:linear-gradient(90deg,#ff5fa2,#ffd166,#64f4ac,#8f7cff);-webkit-background-clip:text;background-clip:text;color:transparent!important;font-weight:900;transform:scale(1.12)}
+.caption{min-height:52px;font-size:clamp(18px,2vw,32px);line-height:1.25;color:var(--text);opacity:0;transform:translateY(10px);transition:opacity .65s ease,transform .65s ease}
+.caption.show{opacity:1;transform:translateY(0)}
+.footer{position:absolute;left:0;right:0;bottom:26px;text-align:center;font-size:clamp(11px,.8vw,14px);letter-spacing:.16em;text-transform:none;color:rgba(166,180,207,.78)}
+.glitch{animation:glitch .2s linear 1}
+@keyframes drift{0%{transform:translate(0,0)}50%{transform:translate(-18px,9px)}100%{transform:translate(0,0)}}
+@keyframes glitch{0%{transform:translate(0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,1px)}100%{transform:translate(0)}}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="grid"></div>
+  <div class="noise"></div>
+  <div class="content">
+    <div class="inner">
+      <div class="eyebrow">12 de octubre · Día del Respeto a la Diversidad Cultural</div>
+      <div class="word-wrap"><div class="word mode-code" id="word"></div></div>
+      <div class="caption" id="caption">Un mundo hecho de muchas formas de verlo</div>
+    </div>
+  </div>
+  <div class="footer">e·Saurio &amp; QuartzSales</div>
+</div>
+<script>
+const WORD = [..."DIVERSIDAD"];
+const TARGET_INDEX = 6; // segunda I
+const wordEl = document.getElementById('word');
+const captionEl = document.getElementById('caption');
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+function renderWord(visible=WORD.length){
+  wordEl.innerHTML='';
+  WORD.forEach((ch,i)=>{
+    const s=document.createElement('span');
+    s.className='letter '+(i===TARGET_INDEX?'variable':'fixed')+(i>=visible?' hidden':'');
+    s.textContent=ch;
+    wordEl.appendChild(s);
+  });
+}
+function variable(){return wordEl.querySelector('.variable')}
+function setMode(mode){wordEl.classList.remove('mode-code','mode-tech','mode-design');wordEl.classList.add(mode)}
+function setVariable(ch,cls=''){
+  const el=variable(); if(!el)return;
+  el.textContent=ch;
+  el.className='letter variable'+(cls?' '+cls:'');
+}
+async function typing(){
+  captionEl.classList.remove('show');
+  setMode('mode-code');
+  renderWord(0);
+  for(let i=1;i<=WORD.length;i++){
+    renderWord(i); setMode('mode-code');
+    if(i>TARGET_INDEX) setVariable('I','style-code');
+    await sleep(115);
+  }
+  await sleep(420);
+}
+async function codePhase(){
+  setMode('mode-code');
+  for(const ch of ['I','|','I','!','I']){setVariable(ch,'style-code');await sleep(180)}
+  await sleep(220);
+}
+async function techPhase(){
+  setMode('mode-tech');
+  wordEl.classList.add('glitch');setTimeout(()=>wordEl.classList.remove('glitch'),210);
+  for(const ch of ['I','1','I','|','I']){setVariable(ch,'style-tech');await sleep(170)}
+  await sleep(260);
+}
+async function designPhase(){
+  setMode('mode-design');
+  const variants=[
+    ['I','style-pink'],['I','style-yellow'],['I','style-violet'],
+    ['I','style-mint'],['I','style-orange'],['I','style-outline'],['I','style-rainbow']
+  ];
+  for(const [ch,cls] of variants){setVariable(ch,cls);await sleep(230)}
+  setVariable('I','style-rainbow');
+  await sleep(450);
+}
+async function resolve(){
+  captionEl.classList.add('show');
+  await sleep(2600);
+}
+async function loop(){
+  while(true){
+    await typing();
+    await codePhase();
+    await techPhase();
+    await designPhase();
+    await resolve();
+    captionEl.classList.remove('show');
+    await sleep(500);
+  }
+}
+renderWord(0);loop();
+</script>
+</body>
+</html>
