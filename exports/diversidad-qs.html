@@ -25,15 +25,12 @@ linear-gradient(135deg,var(--bg1),var(--bg2));}
 .inner{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;gap:28px}
 .eyebrow{font-size:clamp(12px,1.05vw,18px);letter-spacing:.28em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
 .word-wrap{min-height:190px;width:100%;display:flex;align-items:center;justify-content:center;overflow:visible}
-.word{display:flex;align-items:center;justify-content:center;gap:clamp(0px,.18vw,5px);white-space:nowrap}
-.letter{display:inline-flex;align-items:center;justify-content:center;min-width:.61em;font-size:clamp(52px,7.35vw,122px);font-weight:800;line-height:1;letter-spacing:-.035em;color:var(--text);transform-origin:center;transition:all .28s ease}
-.letter.hidden{opacity:0;transform:translateY(8px)}
-.mode-code .letter{font-family:"Courier New",monospace;color:var(--green);text-shadow:0 0 12px rgba(106,255,157,.16)}
-.mode-tech .letter{font-family:"Courier New",monospace;color:var(--cyan);text-shadow:0 0 12px rgba(93,226,255,.16)}
-.mode-design .fixed{font-family:Inter,system-ui,sans-serif;color:rgba(238,243,255,.94)}
-.variable{position:relative}
-.style-code{font-family:"Courier New",monospace!important;color:var(--green)!important}
-.style-tech{font-family:"Courier New",monospace!important;color:var(--cyan)!important}
+.word{display:block;text-align:center;white-space:nowrap;font-size:clamp(52px,7.35vw,122px);font-weight:800;line-height:1;letter-spacing:-.035em}
+.letter{font-family:Inter,system-ui,sans-serif;color:rgba(238,243,255,.94);transition:opacity .28s ease}
+.letter.hidden{opacity:0}
+.variable{display:inline-block;position:relative;padding:0 .05em;text-align:center;transform-origin:center;transition:all .28s ease}
+.style-code{font-family:"Courier New",monospace!important;color:var(--green)!important;text-shadow:0 0 12px rgba(106,255,157,.16)}
+.style-tech{font-family:"Courier New",monospace!important;color:var(--cyan)!important;text-shadow:0 0 12px rgba(93,226,255,.16)}
 .style-pink{color:var(--pink)!important;font-style:italic;font-weight:900;transform:rotate(-7deg) scale(1.09)}
 .style-yellow{color:var(--yellow)!important;font-weight:900;transform:scale(1.12)}
 .style-violet{color:var(--violet)!important;font-family:Georgia,"Times New Roman",serif!important;font-style:italic;transform:rotate(5deg) scale(1.08)}
@@ -73,10 +70,19 @@ function renderWord(visible=WORD.length){
   wordEl.innerHTML='';
   WORD.forEach((ch,i)=>{
     const s=document.createElement('span');
-    s.className='letter '+(i===TARGET_INDEX?'variable':'fixed')+(i>=visible?' hidden':'');
+    s.className='letter '+(i===TARGET_INDEX?'variable style-code':'fixed')+(i>=visible?' hidden':'');
     s.textContent=ch;
     wordEl.appendChild(s);
   });
+  const v=variable(); v.style.width=measure(v.textContent,'style-code')+'px';
+}
+// ancho natural del glifo para que las letras vecinas se acomoden sin saltos
+function measure(ch,cls){
+  const p=document.createElement('span');
+  p.className='letter variable '+cls;
+  p.style.cssText='position:absolute;visibility:hidden;transition:none;width:auto';
+  p.textContent=ch; wordEl.appendChild(p);
+  const w=p.offsetWidth; p.remove(); return w;
 }
 function variable(){return wordEl.querySelector('.variable')}
 function setMode(mode){wordEl.classList.remove('mode-code','mode-tech','mode-design');wordEl.classList.add(mode)}
@@ -84,6 +90,7 @@ function setVariable(ch,cls=''){
   const el=variable(); if(!el)return;
   el.textContent=ch;
   el.className='letter variable'+(cls?' '+cls:'');
+  el.style.width=measure(ch,cls)+'px';
 }
 async function typing(){
   captionEl.classList.remove('show');
@@ -103,7 +110,7 @@ async function codePhase(){
 }
 async function techPhase(){
   setMode('mode-tech');
-  wordEl.classList.add('glitch');setTimeout(()=>wordEl.classList.remove('glitch'),210);
+  variable().animate([{translate:'0 0'},{translate:'-2px 1px'},{translate:'2px -1px'},{translate:'-1px 1px'},{translate:'0 0'}],{duration:200});
   for(const ch of ['I','1','I','|','I']){setVariable(ch,'style-tech');await sleep(170)}
   await sleep(260);
 }
