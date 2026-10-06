@@ -9,7 +9,7 @@ import { Abs, Badge, Button, Icon, mix, Sk } from "../../qs-kit/ui/primitives";
 const HEAD = ["Fecha", "Numero de Pedido", "Cliente", "Sucursal", "Total", "Estado", "Acciones"];
 const SORTABLE = [true, true, false, false, false, false, false];
 // Misma alineación para título y contenido de cada columna.
-const ALIGN: ("left" | "center")[] = ["left", "left", "left", "left", "left", "center", "center"];
+const ALIGN: ("left" | "center")[] = ["left", "left", "left", "left", "left", "left", "left"];
 const colX = (i: number) => LIST.cols.slice(0, i).reduce((a, b) => a + b, 0);
 
 const NEW_ORDER: OrderRow = {
@@ -61,8 +61,8 @@ const Row: React.FC<{
           {cell(2, <Sk w={170} h={10} />)}
           {cell(3, <Sk w={140} h={10} />)}
           {cell(4, <Sk w={80} h={10} />)}
-          {cell(5, <Sk w={96} h={16} r={6} />, "center")}
-          {cell(6, <Sk w={66} h={22} r={6} />, "center")}
+          {cell(5, <Sk w={96} h={20} r={6} />)}
+          {cell(6, <Sk w={74} h={26} r={6} />)}
         </div>
       ) : null}
       <div style={{ position: "absolute", inset: 0, opacity: reveal, transform: `translateY(${(1 - reveal) * 6}px)`, fontSize: 12.5, color: c.text }}>
@@ -74,10 +74,10 @@ const Row: React.FC<{
         {cell(
           5,
           <div style={{ position: "relative" }}>
-            <Sk w={96} h={16} r={6} style={{ position: "absolute", left: "50%", top: 2, marginLeft: -48, opacity: 1 - badge }} />
+            <Sk w={96} h={20} r={6} style={{ position: "absolute", left: 0, top: 0, opacity: 1 - badge }} />
             <Badge tone={STATUS_TONE[row.status]} label={STATUS_LABEL[row.status]} style={{ opacity: badge, transform: `scale(${0.9 + 0.1 * badge})` }} />
           </div>,
-          "center",
+          
         )}
         {cell(
           6,
@@ -89,7 +89,7 @@ const Row: React.FC<{
             fontSize={11.5}
             style={{ padding: "0 10px", gap: 5 }}
           />,
-          "center",
+          
         )}
       </div>
     </div>
@@ -146,12 +146,12 @@ export const OrderList: React.FC<{ s: SceneState; total: number }> = ({ s, total
 
       {/* Filtros + Exportar */}
       <Abs x={CARD.list.x + CARD.list.w - 20 - 140} y={LIST.headerY} style={{ opacity: L.search.o, transform: `translateY(${L.search.y}px)` }}>
-        <Button label="Mostrar Filtros" variant="outlined" height={30} fontSize={12.5} style={{ width: 140 }}>
+        <Button label="Mostrar Filtros" variant="outlined" height={32} fontSize={12.5} style={{ width: 140 }}>
           <Icon name="filter-fill" size={11} />
         </Button>
       </Abs>
-      <Abs x={CARD.list.x + CARD.list.w - 20 - 140 - 12 - 130} y={LIST.headerY + 1} style={{ opacity: L.search.o, transform: `translateY(${L.search.y}px)` }}>
-        <Button label="Exportar a excel" variant="secondary" height={28} fontSize={12} style={{ width: 130 }}>
+      <Abs x={CARD.list.x + CARD.list.w - 20 - 140 - 10 - 138} y={LIST.headerY} style={{ opacity: L.search.o, transform: `translateY(${L.search.y}px)` }}>
+        <Button label="Exportar a excel" variant="secondary" height={32} fontSize={12.5} style={{ width: 138 }}>
           <Icon name="file-excel" size={11} color={c.muted} />
         </Button>
       </Abs>

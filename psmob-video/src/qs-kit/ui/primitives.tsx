@@ -13,12 +13,20 @@ export const mix = (a: string, b: string, t: number) => {
   return "#" + pa.map((v, i) => Math.round(v + (pb[i] - v) * k).toString(16).padStart(2, "0")).join("");
 };
 
+// Poppins tiene métricas verticales asimétricas: centrar con line-height normal deja el texto
+// corrido. Para textos que se centran en una caja (botones, chips, círculos) usar <Centered>:
+// line-height 1 + corrección óptica medida (QS-Kit-Specimen: 1,5 % del cuerpo).
+export const OPTICAL_Y = 0.015;
+export const Centered: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
+  <span style={{ display: "block", lineHeight: 1, transform: `translateY(${OPTICAL_Y}em)`, whiteSpace: "nowrap", ...style }}>{children}</span>
+);
+
 export const Icon: React.FC<{ name: string; size?: number; color?: string; style?: React.CSSProperties }> = ({
   name,
   size = 12,
   color,
   style,
-}) => <i className={`pi pi-${name}`} style={{ fontSize: size, color, lineHeight: 1, ...style }} />;
+}) => <i className={`pi pi-${name}`} style={{ fontSize: size, color, lineHeight: 1, display: "block", ...style }} />;
 
 type BtnProps = {
   label: string;
@@ -84,7 +92,7 @@ export const Button: React.FC<BtnProps> = ({
     >
       {children}
       {icon && !children ? <Icon name={icon} size={fontSize - 1} /> : null}
-      <span>{label}</span>
+      {label ? <Centered>{label}</Centered> : null}
     </div>
   );
 };
@@ -95,23 +103,40 @@ export const Badge: React.FC<{ tone: BadgeTone; label: string; style?: React.CSS
   return (
     <span
       style={{
-        display: "inline-block",
-        padding: "2px 7px",
+        display: "inline-flex",
+        alignItems: "center",
+        height: Math.round(size * 1.9),
+        padding: "0 8px",
+        boxSizing: "border-box",
         borderRadius: radius.badge,
         background: col.bg,
         color: col.fg,
         fontFamily: font,
         fontSize: size,
         fontWeight: 700,
-        whiteSpace: "nowrap",
-        lineHeight: 1.45,
         ...style,
       }}
     >
-      {label}
+      <Centered>{label}</Centered>
     </span>
   );
 };
+
+// Indicador de validez (total del pedido): check verde o "!" naranja, dibujados en SVG
+// para que queden centrados al píxel.
+export const StatusDot: React.FC<{ invalid: number; size?: number }> = ({ invalid, size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" style={{ display: "block", flexShrink: 0 }}>
+    <g opacity={1 - invalid}>
+      <circle cx="8" cy="8" r="8" fill={c.success} />
+      <path d="M4.6 8.3l2.2 2.2 4.6-4.8" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+    <g opacity={invalid}>
+      <circle cx="8" cy="8" r="8" fill={c.warn} />
+      <path d="M8 4.2v4.6" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" />
+      <circle cx="8" cy="11.6" r="1.1" fill="#fff" />
+    </g>
+  </svg>
+);
 
 type FieldProps = {
   width: number | string;

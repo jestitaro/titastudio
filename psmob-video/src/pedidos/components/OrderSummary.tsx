@@ -5,9 +5,8 @@ import { FORM, PRODUCTS_L, qtyStepper, SUMMARY } from "../animation/layout";
 import { SceneState } from "../animation/scene-state";
 import { c, font } from "../../qs-kit/design/tokens";
 import { FINAL_LINES, money, ORDER, orderTotal, orderUnits, PRODUCTS } from "../data/mock-data";
-import { StatusDot } from "./CartSummary";
 import { colX, ProductValues, QtyStepper } from "./ProductTable";
-import { Abs, Badge, Button, Icon, mix } from "../../qs-kit/ui/primitives";
+import { Abs, Badge, Button, Icon, mix, StatusDot } from "../../qs-kit/ui/primitives";
 
 const Sep = () => <span style={{ color: c.textStrong, margin: "0 12px" }}>|</span>;
 
@@ -75,31 +74,9 @@ export const OrderSummary: React.FC<{ s: SceneState }> = ({ s }) => {
 
       {/* Cabecera */}
       <Abs x={FORM.innerX} y={SUMMARY.headY} w={FORM.innerW} h={24} style={{ opacity: S.head, fontSize: 12, fontWeight: 600 }}>
-        {(
-          [
-            ["Producto", "left"],
-            ["UxB", "center"],
-            ["Pres.", "center"],
-            ["PSL", "right"],
-            ["Desc. %", "center"],
-            ["P/Desc.", "right"],
-            ["Cantidad", "center"],
-          ] as const
-        ).map(([h, align], i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: colX(i) + (align === "left" ? 16 : 0),
-              width: PRODUCTS_L.cols[i] - (align === "left" ? 16 : 0),
-              display: "flex",
-              justifyContent: align === "left" ? "flex-start" : align === "right" ? "flex-end" : "center",
-              paddingRight: align === "right" ? 16 : 0,
-              boxSizing: "border-box",
-              color: c.muted,
-              fontSize: 11.5,
-            }}
-          >
+        {/* Todos los títulos a la izquierda, en el mismo x que su contenido */}
+        {["Producto", "UxB", "Pres.", "PSL", "Desc. %", "P/Desc.", "Cantidad"].map((h, i) => (
+          <div key={h} style={{ position: "absolute", left: colX(i) + 16, width: PRODUCTS_L.cols[i] - 16, color: c.muted, fontSize: 11.5 }}>
             {h}
           </div>
         ))}
@@ -128,7 +105,7 @@ export const OrderSummary: React.FC<{ s: SceneState }> = ({ s }) => {
             }}
           >
             <ProductValues p={PRODUCTS[line.index]} h={h - 2} />
-            <div style={{ position: "absolute", left: qx - 14, top: (h - 2 - PRODUCTS_L.stepH) / 2 }}>
+            <div style={{ position: "absolute", left: qx, top: (h - 2 - PRODUCTS_L.stepH) / 2 }}>
               <QtyStepper value={String(line.qty)} active={1} />
             </div>
             <Icon name="trash" size={12} color={c.danger} style={{ position: "absolute", right: 12, top: (h - 2) / 2 - 6, opacity: m }} />

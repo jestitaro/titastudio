@@ -38,7 +38,9 @@ Independientes de PSMob. Trabajan a 60 fps sobre un viewport lógico de 1600×90
 - **Flujo de entrega:** primero preview en baja (`--scale=0.5 --crf=30`, por ejemplo `npm run pedidos:preview`). Recién con OK, render en alta (`--crf=16`).
 - **Frames sueltos:** `COMP=<Composición> node scripts/stills.mjs <frames…>`.
 - **Reglas acordadas:**
-  - Títulos de columna con la misma alineación que su contenido.
+  - Tablas: títulos y contenido de todas las columnas alineados a la izquierda (valores, chips y acciones también).
+  - Texto centrado en una caja (botones, chips, números de pasos): usar `<Centered>` de `qs-kit/ui/primitives` (line-height 1 + corrección óptica de Poppins). Íconos de estado, en SVG (`StatusDot`).
+  - Controles de una misma fila del header (botones, buscador): misma altura (32) y mismo y.
   - Título de sección alineado con el buscador o chip de la misma fila.
   - Total arriba en el panel lateral.
   - Sin zoom a botones.

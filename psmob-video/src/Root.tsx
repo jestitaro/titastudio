@@ -12,6 +12,7 @@ import { AnimTestV4 } from "./characters/v4/AnimTest";
 import { S01Headache, S01_DURATION } from "./scenes/S01Headache";
 import { S10AiFred, S10_TEST_DURATION } from "./scenes/S10AiFred";
 import { PedidosFlow } from "./pedidos/PedidosFlow";
+import { Specimen } from "./qs-kit/Specimen";
 import { DURATION as PEDIDOS_DURATION, FPS as PEDIDOS_FPS } from "./pedidos/animation/timeline";
 
 const CharacterSheet: React.FC = () => (
@@ -36,6 +37,7 @@ const CharacterSheet: React.FC = () => (
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition id="QS-Kit-Specimen" component={Specimen} durationInFrames={1} fps={60} width={1400} height={400} />
       <Composition id="Pedidos-Flow" component={PedidosFlow} durationInFrames={PEDIDOS_DURATION} fps={PEDIDOS_FPS} width={1920} height={1080} />
       <Composition id="S01-Headache" component={S01Headache} durationInFrames={S01_DURATION} fps={30} width={1920} height={1080} defaultProps={{ showSubtitles: true }} />
       <Composition id="S10-AiFred-Test" component={S10AiFred} durationInFrames={S10_TEST_DURATION} fps={30} width={1920} height={1080} defaultProps={{ showSubtitles: true }} />

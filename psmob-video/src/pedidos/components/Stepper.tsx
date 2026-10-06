@@ -3,7 +3,7 @@ import React from "react";
 import { STEPPER } from "../animation/layout";
 import { SceneState, StepState } from "../animation/scene-state";
 import { c, font, shadow } from "../../qs-kit/design/tokens";
-import { mix } from "../../qs-kit/ui/primitives";
+import { Centered, mix } from "../../qs-kit/ui/primitives";
 
 const LABELS = ["Información General", "Selección de Productos", "Resumen de Pedido"];
 
@@ -38,7 +38,7 @@ const StepCircle: React.FC<{ n: number; st: StepState }> = ({ n, st }) => {
           opacity: 1 - st.done,
         }}
       >
-        {n}
+        <Centered>{n}</Centered>
       </div>
       {/* Check dibujado */}
       <svg width="24" height="24" viewBox="0 0 24 24" style={{ position: "absolute", inset: 0 }}>

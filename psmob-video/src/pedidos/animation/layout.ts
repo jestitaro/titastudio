@@ -94,7 +94,7 @@ export const PRODUCTS_L = {
 export const productColX = (i: number) => PRODUCTS_L.cols.slice(0, i).reduce((a, b) => a + b, 0);
 // Stepper de cantidad [− n +] en la fila `row`.
 export const qtyStepper = (row: number): Rect => ({
-  x: mx + productColX(6) + (PRODUCTS_L.cols[6] - PRODUCTS_L.stepW) / 2,
+  x: mx + productColX(6) + 16, // alineado a la izquierda con el título "Cantidad"
   y: PRODUCTS_L.rowsY + row * PRODUCTS_L.rowH + (PRODUCTS_L.rowH - PRODUCTS_L.stepH) / 2,
   w: PRODUCTS_L.stepW,
   h: PRODUCTS_L.stepH,

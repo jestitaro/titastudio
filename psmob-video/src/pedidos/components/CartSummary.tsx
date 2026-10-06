@@ -6,18 +6,7 @@ import { SceneState } from "../animation/scene-state";
 import { c, font, shadow } from "../../qs-kit/design/tokens";
 import { money } from "../data/mock-data";
 import { QtyStepper, Thumb } from "./ProductTable";
-import { Icon, mix } from "../../qs-kit/ui/primitives";
-
-export const StatusDot: React.FC<{ invalid: number; size?: number }> = ({ invalid, size = 13 }) => (
-  <div style={{ position: "relative", width: size, height: size }}>
-    <div style={{ position: "absolute", inset: 0, borderRadius: size, background: c.success, opacity: 1 - invalid, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <Icon name="check" size={size * 0.55} color="#fff" style={{ fontWeight: 700 }} />
-    </div>
-    <div style={{ position: "absolute", inset: 0, borderRadius: size, background: c.warn, opacity: invalid, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: size * 0.7, fontWeight: 700 }}>
-      !
-    </div>
-  </div>
-);
+import { Centered, Icon, mix, StatusDot } from "../../qs-kit/ui/primitives";
 
 const Stat: React.FC<{ icon: string; label: string; value: number; flash: number }> = ({ icon, label, value, flash }) => (
   <div
@@ -82,10 +71,10 @@ export const CartSummary: React.FC<{ s: SceneState }> = ({ s }) => {
           paddingBottom: 8,
         }}
       >
-        <span style={{ fontSize: 14.5, fontWeight: 600 }}>Total</span>
+        <Centered style={{ fontSize: 14.5, fontWeight: 600 }}>Total</Centered>
         <StatusDot invalid={C.invalid} size={14} />
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 19, fontWeight: 600, fontVariantNumeric: "tabular-nums", color: mix(c.textStrong, c.primary, flashTotal) }}>{money(C.total)}</span>
+        <Centered style={{ fontSize: 19, fontWeight: 600, fontVariantNumeric: "tabular-nums", color: mix(c.textStrong, c.primary, flashTotal) }}>{money(C.total)}</Centered>
       </div>
 
       {/* Métricas */}

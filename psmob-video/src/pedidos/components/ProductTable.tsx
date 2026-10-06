@@ -13,12 +13,12 @@ import { Abs, Button, Caret, Icon, mix, Sk } from "../../qs-kit/ui/primitives";
 type Align = "left" | "center" | "right";
 const HEAD: { label: string; sort?: boolean; align: Align }[] = [
   { label: "Producto", sort: true, align: "left" },
-  { label: "UxB", align: "center" },
-  { label: "Pres.", align: "center" },
-  { label: "PSL", align: "right" },
-  { label: "Desc. %", align: "center" },
-  { label: "P/Desc.", align: "right" },
-  { label: "Cantidad", align: "center" },
+  { label: "UxB", align: "left" },
+  { label: "Pres.", align: "left" },
+  { label: "PSL", align: "left" },
+  { label: "Desc. %", align: "left" },
+  { label: "P/Desc.", align: "left" },
+  { label: "Cantidad", align: "left" },
 ];
 export const colX = productColX;
 const CELL_PAD = 16;
@@ -54,6 +54,8 @@ const cell = (i: number, children: React.ReactNode, align: Align, h: number) => 
       alignItems: "center",
       justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
       paddingRight: align === "right" ? CELL_PAD : 0,
+      // Columna 0 trae su propio padding (thumbnail); el resto arranca en el mismo x que su título.
+      paddingLeft: align === "left" && i > 0 ? CELL_PAD : 0,
       boxSizing: "border-box",
       whiteSpace: "nowrap",
       fontVariantNumeric: "tabular-nums",
@@ -66,11 +68,11 @@ const cell = (i: number, children: React.ReactNode, align: Align, h: number) => 
 export const ProductValues: React.FC<{ p: Product; h?: number }> = ({ p, h = PRODUCTS_L.rowH }) => (
   <>
     {cell(0, <ProductCell p={p} />, "left", h)}
-    {cell(1, <span style={{ fontSize: 12, color: c.text }}>{p.uxb}</span>, "center", h)}
-    {cell(2, <span style={{ fontSize: 12, color: c.text }}>{p.pres}</span>, "center", h)}
-    {cell(3, <span style={{ fontSize: 12.5, color: c.text }}>{money(p.psl)}</span>, "right", h)}
-    {cell(4, <span style={{ fontSize: 11.5, color: c.faint }}>—</span>, "center", h)}
-    {cell(5, <span style={{ fontSize: 12.5, fontWeight: 600, color: c.textStrong }}>{money(p.psl)}</span>, "right", h)}
+    {cell(1, <span style={{ fontSize: 12, color: c.text }}>{p.uxb}</span>, "left", h)}
+    {cell(2, <span style={{ fontSize: 12, color: c.text }}>{p.pres}</span>, "left", h)}
+    {cell(3, <span style={{ fontSize: 12.5, color: c.text }}>{money(p.psl)}</span>, "left", h)}
+    {cell(4, <span style={{ fontSize: 11.5, color: c.faint }}>—</span>, "left", h)}
+    {cell(5, <span style={{ fontSize: 12.5, fontWeight: 600, color: c.textStrong }}>{money(p.psl)}</span>, "left", h)}
   </>
 );
 
@@ -273,12 +275,9 @@ export const ProductTable: React.FC<{ s: SceneState }> = ({ s }) => {
                   <Sk w={36} h={40} r={8} style={{ position: "absolute", left: CELL_PAD, top: 6 }} />
                   <Sk w={[150, 130, 170, 120][i % 4]} h={10} style={{ position: "absolute", left: CELL_PAD + 48, top: 14 }} />
                   <Sk w={110} h={8} style={{ position: "absolute", left: CELL_PAD + 48, top: 31 }} />
-                  {/* Misma alineación que título y contenido: UxB/Pres. centrados, precios a la derecha */}
-                  {[1, 2].map((k) => (
-                    <Sk key={k} w={22} h={9} style={{ position: "absolute", left: colX(k) + PRODUCTS_L.cols[k] / 2 - 11, top: 21 }} />
-                  ))}
-                  {[3, 5].map((k) => (
-                    <Sk key={k} w={64} h={9} style={{ position: "absolute", left: colX(k) + PRODUCTS_L.cols[k] - CELL_PAD - 64, top: 21 }} />
+                  {/* Misma alineación que título y contenido: todo a la izquierda */}
+                  {[1, 2, 3, 5].map((k) => (
+                    <Sk key={k} w={k >= 3 ? 64 : 22} h={9} style={{ position: "absolute", left: colX(k) + CELL_PAD, top: 21 }} />
                   ))}
                   <Sk w={PRODUCTS_L.stepW} h={PRODUCTS_L.stepH} r={8} style={{ position: "absolute", left: st.x - FORM.innerX, top: (RH - PRODUCTS_L.stepH) / 2 }} />
                 </div>
