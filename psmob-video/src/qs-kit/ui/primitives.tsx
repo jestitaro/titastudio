@@ -1,9 +1,9 @@
-// Primitivas visuales de QuartzSales (PrimeNG Lara): botón, input, select, badge, ícono.
+// Primitivas visuales de QuartzSales (PrimeNG Lara): botón, input, badge, ícono, skeleton.
+// Kit compartido: no importar nada de un video puntual desde acá.
 // Reproducen el lenguaje de las capturas; los estados llegan como números 0..1.
 import React from "react";
 import { useCurrentFrame } from "remotion";
 import { badge as badgeColors, c, font, radius } from "../design/tokens";
-import { OrderStatus, STATUS_LABEL } from "../data/mock-data";
 
 // Mezcla lineal de dos colores hex (#rrggbb). Devuelve hex para poder encadenar mezclas.
 export const mix = (a: string, b: string, t: number) => {
@@ -89,8 +89,9 @@ export const Button: React.FC<BtnProps> = ({
   );
 };
 
-export const Badge: React.FC<{ status: OrderStatus; style?: React.CSSProperties; size?: number }> = ({ status, style, size = 10.5 }) => {
-  const col = badgeColors[status];
+export type BadgeTone = keyof typeof badgeColors;
+export const Badge: React.FC<{ tone: BadgeTone; label: string; style?: React.CSSProperties; size?: number }> = ({ tone, label, style, size = 10.5 }) => {
+  const col = badgeColors[tone];
   return (
     <span
       style={{
@@ -107,7 +108,7 @@ export const Badge: React.FC<{ status: OrderStatus; style?: React.CSSProperties;
         ...style,
       }}
     >
-      {STATUS_LABEL[status]}
+      {label}
     </span>
   );
 };

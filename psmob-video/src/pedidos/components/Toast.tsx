@@ -2,9 +2,9 @@
 import React from "react";
 import { TOAST } from "../animation/layout";
 import { SceneState } from "../animation/scene-state";
-import { font, shadow } from "../design/tokens";
+import { font, shadow } from "../../qs-kit/design/tokens";
 import { ORDER } from "../data/mock-data";
-import { Icon } from "./ui";
+import { Icon } from "../../qs-kit/ui/primitives";
 
 export const Toast: React.FC<{ s: SceneState }> = ({ s }) => {
   const t = s.toast;

@@ -10,7 +10,7 @@ import {
   pressScale,
   progress,
   pulse,
-} from "./easing";
+} from "../../qs-kit/motion/easing";
 import { getCamera } from "./camera";
 import { CursorState, getCursor } from "./cursor";
 import { CARD, FORM, LIST, lerpRect, panelRect, PRODUCTS_L, Rect, SUMMARY } from "./layout";
@@ -130,7 +130,7 @@ export const getSceneState = (frame: number) => {
     contentOpacity: modalOpen * (1 - progress(f, T.modalContentOut[0], T.modalContentOut[1], easeOutCubic)),
     trad: {
       hover: hoverWindow(f, T.cursorToTrad[1] - 8, T.clickTrad + 20),
-      scale: pressScale(f, T.clickTrad),
+      scale: pressScale(f, T.clickTrad, 0.02),
     },
   };
 

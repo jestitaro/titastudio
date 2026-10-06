@@ -1,18 +1,10 @@
 // Geometría de la UI en el viewport lógico (1600×900, escalado ×1.2 a 1920×1080).
 // Cursor y cámara apuntan a estas mismas coordenadas: una sola fuente de verdad.
 
-export const VIEW = { w: 1600, h: 900, scale: 1.2 };
+import { Rect, SHELL, VIEW } from "../../qs-kit/motion/viewport";
 
-export type Rect = { x: number; y: number; w: number; h: number };
-export const center = (r: Rect): [number, number] => [r.x + r.w / 2, r.y + r.h / 2];
-export const lerpRect = (a: Rect, b: Rect, t: number): Rect => ({
-  x: a.x + (b.x - a.x) * t,
-  y: a.y + (b.y - a.y) * t,
-  w: a.w + (b.w - a.w) * t,
-  h: a.h + (b.h - a.h) * t,
-});
-
-export const SHELL = { sidebarW: 208, topbarH: 64 };
+export { center, lerpRect, SHELL, VIEW } from "../../qs-kit/motion/viewport";
+export type { Rect } from "../../qs-kit/motion/viewport";
 
 const top = 76;
 const bottom = 884;
@@ -26,7 +18,7 @@ export const CARD = {
   side: { x: left + 1004 + 20, y: top, w: right - (left + 1004 + 20), h: bottom - top } as Rect,
   sideCompact: { x: left + 1004 + 20, y: top, w: right - (left + 1004 + 20), h: 304 } as Rect,
   cart: { x: left + 1004 + 20, y: top + 324, w: right - (left + 1004 + 20), h: bottom - top - 324 } as Rect,
-  modal: { x: 608, y: 354, w: 384, h: 184 } as Rect,
+  modal: { x: 590, y: 318, w: 420, h: 256 } as Rect,
 };
 
 export const PAD = 24;
@@ -41,16 +33,16 @@ export const LIST = {
   headerY: CARD.list.y + 20,
   newBtn: { x: lx + 72, y: CARD.list.y + 20, w: 124, h: 32 } as Rect,
   search: { x: CARD.list.x + CARD.list.w / 2 - 240, y: CARD.list.y + 20, w: 480, h: 32 } as Rect,
-  tableHeadY: CARD.list.y + 100,
-  rowsY: CARD.list.y + 132,
+  tableHeadY: CARD.list.y + 70,
+  rowsY: CARD.list.y + 102,
   rowH: 42,
   cols: [112, 150, 250, 330, 150, 190, 130], // Fecha, Nº, Cliente, Sucursal, Total, Estado, Acciones
 };
 
 // ── Modal tipo de pedido ────────────────────────────────────────
 export const MODAL = {
-  trad: { x: CARD.modal.x + CARD.modal.w / 2 - 50, y: CARD.modal.y + 96, w: 100, h: 30 } as Rect,
-  esp: { x: CARD.modal.x + CARD.modal.w / 2 - 50, y: CARD.modal.y + 134, w: 100, h: 30 } as Rect,
+  trad: { x: CARD.modal.x + 24, y: CARD.modal.y + 92, w: CARD.modal.w - 48, h: 64 } as Rect,
+  esp: { x: CARD.modal.x + 24, y: CARD.modal.y + 92 + 76, w: CARD.modal.w - 48, h: 64 } as Rect,
 };
 
 // ── Información general ─────────────────────────────────────────
@@ -84,7 +76,8 @@ export const optionCenter = (field: Rect, i: number): [number, number] => [
 // Versión con más aire: filas de 52 px, thumbnails reales, stepper de cantidad.
 export const PRODUCTS_L = {
   titleY: top + 70,
-  search: { x: mx + 440, y: top + 62, w: 450, h: 32 } as Rect,
+  // Alineado verticalmente con el título de sección (centro en titleY).
+  search: { x: mx + 506, y: top + 54, w: 450, h: 32 } as Rect,
   chip: { x: mx, y: top + 104, w: 84, h: 36 } as Rect,
   headY: top + 160,
   rowsY: top + 192,
@@ -120,12 +113,11 @@ const CPAD = 20;
 export const CART = {
   innerX: CARD.cart.x + CPAD,
   innerW: CARD.cart.w - CPAD * 2,
-  titleY: CARD.cart.y + 20,
-  statsY: CARD.cart.y + 56,
+  totalY: CARD.cart.y + 18, // el total encabeza el panel (como en el producto)
+  statsY: CARD.cart.y + 70,
   statsH: 46,
-  itemsY: CARD.cart.y + 118,
+  itemsY: CARD.cart.y + 132,
   itemH: 76,
-  footerY: CARD.cart.y + CARD.cart.h - 70,
   // Geometría interna de cada ítem (relativa a su esquina superior izquierda)
   item: { thumbW: 40, thumbH: 44, textX: 52, stepY: 44, stepW: 88, stepH: 24, stepBtn: 24, trash: 26 },
 };

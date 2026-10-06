@@ -3,8 +3,8 @@
 import React from "react";
 import { FORM } from "../animation/layout";
 import { SceneState } from "../animation/scene-state";
-import { c, font } from "../design/tokens";
-import { Abs, Button, Icon } from "./ui";
+import { c, font } from "../../qs-kit/design/tokens";
+import { Abs, Button, Icon } from "../../qs-kit/ui/primitives";
 
 export const SectionHeader: React.FC<{ s: SceneState }> = ({ s }) => {
   const H = s.shared;
@@ -18,7 +18,7 @@ export const SectionHeader: React.FC<{ s: SceneState }> = ({ s }) => {
       </Abs>
       {H.titles.map((t) =>
         t.o > 0.001 ? (
-          <Abs key={t.text} x={FORM.innerX} y={FORM.titleY - 12} style={{ opacity: t.o, transform: `translateY(${t.y}px)`, fontSize: 16.5, fontWeight: 600, color: c.textStrong }}>
+          <Abs key={t.text} x={FORM.innerX} y={FORM.titleY - 12} h={24} style={{ opacity: t.o, transform: `translateY(${t.y}px)`, fontSize: 16.5, lineHeight: "24px", fontWeight: 600, color: c.textStrong, whiteSpace: "nowrap" }}>
             {t.text}
           </Abs>
         ) : null,

@@ -8,9 +8,9 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { cameraTransform } from "./animation/camera";
 import { VIEW } from "./animation/layout";
 import { getSceneState, SceneState } from "./animation/scene-state";
-import { Sidebar, Topbar } from "./components/AppShell";
+import { Sidebar, Topbar } from "../qs-kit/ui/AppShell";
 import { CartSummary } from "./components/CartSummary";
-import { Cursor } from "./components/Cursor";
+import { Cursor } from "../qs-kit/ui/Cursor";
 import { GeneralInfo } from "./components/GeneralInfo";
 import { OrderList } from "./components/OrderList";
 import { OrderSummary } from "./components/OrderSummary";
@@ -19,7 +19,7 @@ import { ProductTable } from "./components/ProductTable";
 import { SectionHeader } from "./components/SectionHeader";
 import { Stepper } from "./components/Stepper";
 import { Toast } from "./components/Toast";
-import { c, shadow } from "./design/tokens";
+import { c, shadow } from "../qs-kit/design/tokens";
 import { orderTotal } from "./data/mock-data";
 
 const Surface: React.FC<{ rect: { x: number; y: number; w: number; h: number }; opacity: number; style?: React.CSSProperties }> = ({ rect, opacity, style }) =>
@@ -45,8 +45,8 @@ export const Screen: React.FC<{ s: SceneState }> = ({ s }) => {
   const main = s.cards.main;
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: VIEW.w, height: VIEW.h, background: c.ground, overflow: "hidden" }}>
-      <Sidebar />
-      <Topbar />
+      <Sidebar active="Pedidos" />
+      <Topbar crumbs={["Pedidos", "Pedidos"]} />
 
       {/* Listado */}
       <Surface rect={s.cards.list.rect} opacity={s.cards.list.opacity} />
@@ -77,7 +77,7 @@ export const Screen: React.FC<{ s: SceneState }> = ({ s }) => {
       {s.list.phaseB ? <OrderList s={s} total={orderTotal()} /> : null}
 
       <Toast s={s} />
-      <Cursor s={s} />
+      <Cursor cursor={s.cursor} />
     </div>
   );
 };

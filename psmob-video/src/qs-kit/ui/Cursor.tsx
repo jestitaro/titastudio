@@ -1,6 +1,6 @@
 // Cursor de sistema (flecha / mano / I-beam) con feedback de click mínimo.
 import React from "react";
-import { SceneState } from "../animation/scene-state";
+import type { CursorState } from "../motion/cursor";
 
 const Arrow = () => (
   <svg width="22" height="26" viewBox="0 0 22 26" style={{ position: "absolute", left: -3, top: -2 }}>
@@ -28,8 +28,7 @@ const Beam = () => (
   </svg>
 );
 
-export const Cursor: React.FC<{ s: SceneState }> = ({ s }) => {
-  const k = s.cursor;
+export const Cursor: React.FC<{ cursor: CursorState }> = ({ cursor: k }) => {
   if (k.opacity <= 0) return null;
   const ringR = 5 + 13 * k.ring;
   return (

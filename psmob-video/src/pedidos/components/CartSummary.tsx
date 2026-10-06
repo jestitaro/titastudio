@@ -3,10 +3,10 @@
 import React from "react";
 import { CART } from "../animation/layout";
 import { SceneState } from "../animation/scene-state";
-import { c, font, shadow } from "../design/tokens";
+import { c, font, shadow } from "../../qs-kit/design/tokens";
 import { money } from "../data/mock-data";
 import { QtyStepper, Thumb } from "./ProductTable";
-import { Icon, mix } from "./ui";
+import { Icon, mix } from "../../qs-kit/ui/primitives";
 
 export const StatusDot: React.FC<{ invalid: number; size?: number }> = ({ invalid, size = 13 }) => (
   <div style={{ position: "relative", width: size, height: size }}>
@@ -67,12 +67,25 @@ export const CartSummary: React.FC<{ s: SceneState }> = ({ s }) => {
         overflow: "hidden",
       }}
     >
-      {/* Encabezado */}
-      <div style={{ position: "absolute", left: rx(CART.innerX), width: CART.innerW, top: ry(CART.titleY), display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ fontSize: 14.5, fontWeight: 600 }}>Resumen del Pedido</span>
-        <span style={{ fontSize: 10.5, fontWeight: 600, color: c.primary, background: c.primary50, borderRadius: 10, padding: "2px 8px", opacity: C.count > 0 ? 1 : 0.0 }}>
-          {C.count} {C.count === 1 ? "producto" : "productos"}
-        </span>
+      {/* Total (encabeza el panel, como en el producto) */}
+      <div
+        style={{
+          position: "absolute",
+          left: rx(CART.innerX),
+          width: CART.innerW,
+          top: ry(CART.totalY),
+          height: 36,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          borderBottom: `1px solid ${c.border}`,
+          paddingBottom: 8,
+        }}
+      >
+        <span style={{ fontSize: 14.5, fontWeight: 600 }}>Total</span>
+        <StatusDot invalid={C.invalid} size={14} />
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: 19, fontWeight: 600, fontVariantNumeric: "tabular-nums", color: mix(c.textStrong, c.primary, flashTotal) }}>{money(C.total)}</span>
       </div>
 
       {/* Métricas */}
@@ -155,16 +168,6 @@ export const CartSummary: React.FC<{ s: SceneState }> = ({ s }) => {
           </div>
         );
       })}
-
-      {/* Total */}
-      <div style={{ position: "absolute", left: rx(CART.innerX), width: CART.innerW, top: ry(CART.footerY), borderTop: `1px solid ${c.border}`, paddingTop: 14 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: c.muted }}>Total</span>
-          <StatusDot invalid={C.invalid} size={14} />
-          <div style={{ flex: 1 }} />
-          <span style={{ fontSize: 19, fontWeight: 600, fontVariantNumeric: "tabular-nums", color: mix(c.textStrong, c.primary, flashTotal) }}>{money(C.total)}</span>
-        </div>
-      </div>
     </div>
   );
 };

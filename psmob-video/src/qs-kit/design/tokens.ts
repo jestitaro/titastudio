@@ -1,4 +1,4 @@
-// Tokens de QuartzSales (Apollo · Angular/PrimeNG, tema Lara violeta).
+// Tokens de QuartzSales (Apollo · Angular/PrimeNG, tema Lara violeta). Compartidos por todos los videos.
 // Valores muestreados de las capturas del flujo de pedidos.
 import "@fontsource/poppins/400.css";
 import "@fontsource/poppins/500.css";
@@ -40,13 +40,14 @@ export const c = {
   skeletonHi: "#f4f6f9",
 };
 
+// Tonos de badge (tag de PrimeNG). Cada video mapea sus estados a estos tonos.
 export const badge = {
-  completo: { bg: "#d4f8e5", fg: "#157a4b" },
-  parcial: { bg: "#fdf0c6", fg: "#b45309" },
-  rechazado: { bg: "#fce4ef", fg: "#be185d" },
-  noCreado: { bg: "#fde2e2", fg: "#b91c1c" },
-  transmitido: { bg: "#ede5fd", fg: "#6d28d9" },
-  borrador: { bg: "#eef1f6", fg: "#334155" },
+  success: { bg: "#d4f8e5", fg: "#157a4b" },
+  warn: { bg: "#fdf0c6", fg: "#b45309" },
+  rose: { bg: "#fce4ef", fg: "#be185d" },
+  danger: { bg: "#fde2e2", fg: "#b91c1c" },
+  info: { bg: "#ede5fd", fg: "#6d28d9" },
+  neutral: { bg: "#eef1f6", fg: "#334155" },
 } as const;
 
 export const radius = { card: 12, control: 6, badge: 6 };

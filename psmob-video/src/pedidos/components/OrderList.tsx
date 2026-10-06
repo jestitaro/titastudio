@@ -2,12 +2,14 @@
 import React from "react";
 import { CARD, LIST } from "../animation/layout";
 import { SceneState } from "../animation/scene-state";
-import { c, font } from "../design/tokens";
-import { money, ORDER, OrderRow, ORDERS } from "../data/mock-data";
-import { Abs, Badge, Button, Icon, mix, Sk } from "./ui";
+import { c, font } from "../../qs-kit/design/tokens";
+import { money, ORDER, OrderRow, ORDERS, STATUS_LABEL, STATUS_TONE } from "../data/mock-data";
+import { Abs, Badge, Button, Icon, mix, Sk } from "../../qs-kit/ui/primitives";
 
 const HEAD = ["Fecha", "Numero de Pedido", "Cliente", "Sucursal", "Total", "Estado", "Acciones"];
 const SORTABLE = [true, true, false, false, false, false, false];
+// Misma alineación para título y contenido de cada columna.
+const ALIGN: ("left" | "center")[] = ["left", "left", "left", "left", "left", "center", "center"];
 const colX = (i: number) => LIST.cols.slice(0, i).reduce((a, b) => a + b, 0);
 
 const NEW_ORDER: OrderRow = {
@@ -73,7 +75,7 @@ const Row: React.FC<{
           5,
           <div style={{ position: "relative" }}>
             <Sk w={96} h={16} r={6} style={{ position: "absolute", left: "50%", top: 2, marginLeft: -48, opacity: 1 - badge }} />
-            <Badge status={row.status} style={{ opacity: badge, transform: `scale(${0.9 + 0.1 * badge})` }} />
+            <Badge tone={STATUS_TONE[row.status]} label={STATUS_LABEL[row.status]} style={{ opacity: badge, transform: `scale(${0.9 + 0.1 * badge})` }} />
           </div>,
           "center",
         )}
@@ -148,7 +150,7 @@ export const OrderList: React.FC<{ s: SceneState; total: number }> = ({ s, total
           <Icon name="filter-fill" size={11} />
         </Button>
       </Abs>
-      <Abs x={CARD.list.x + CARD.list.w - 20 - 130} y={LIST.headerY + 42} style={{ opacity: L.search.o, transform: `translateY(${L.search.y}px)` }}>
+      <Abs x={CARD.list.x + CARD.list.w - 20 - 140 - 12 - 130} y={LIST.headerY + 1} style={{ opacity: L.search.o, transform: `translateY(${L.search.y}px)` }}>
         <Button label="Exportar a excel" variant="secondary" height={28} fontSize={12} style={{ width: 130 }}>
           <Icon name="file-excel" size={11} color={c.muted} />
         </Button>
@@ -161,13 +163,13 @@ export const OrderList: React.FC<{ s: SceneState; total: number }> = ({ s, total
             key={h}
             style={{
               position: "absolute",
-              left: colX(i),
-              width: LIST.cols[i],
+              left: colX(i) + (ALIGN[i] === "left" ? 12 : 0),
+              width: LIST.cols[i] - (ALIGN[i] === "left" ? 12 : 0),
               height: 32,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              gap: 14,
+              justifyContent: ALIGN[i] === "center" ? "center" : "flex-start",
+              gap: 8,
               fontSize: 12.5,
               fontWeight: 600,
               color: c.textStrong,

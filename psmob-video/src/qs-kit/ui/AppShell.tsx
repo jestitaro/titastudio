@@ -2,27 +2,28 @@
 // es el ancla espacial que hace que el flujo se lea como "dentro del producto".
 import React from "react";
 import { Img, staticFile } from "remotion";
-import { SHELL, VIEW } from "../animation/layout";
+import { SHELL, VIEW } from "../motion/viewport";
 import { c, font } from "../design/tokens";
-import { Icon } from "./ui";
+import { Icon } from "./primitives";
 
-const NAV: { label: string; caret?: boolean; active?: boolean }[] = [
-  { label: "Pedidos" },
-  { label: "Documentación" },
-  { label: "Sistema", caret: true },
-  { label: "Importador" },
-  { label: "Clientes", caret: true },
-  { label: "Productos", caret: true },
-  { label: "Pedidos a Autorizar" },
-  { label: "Pedidos", active: true },
-  { label: "Pedidos Pendientes" },
-  { label: "Gestor de Descuentos" },
+// Menú lateral actual de Apollo, por secciones. Cada video marca el ítem activo.
+export type NavItem = { label: string; caret?: boolean };
+export type NavSection = { title: string; items: NavItem[] };
+
+export const APOLLO_NAV: NavSection[] = [
+  { title: "SISTEMA", items: [{ label: "Parametrización", caret: true }, { label: "Seguridad", caret: true }] },
+  { title: "PEDIDOS", items: [{ label: "Pedidos" }, { label: "Pedidos Pendientes" }] },
+  { title: "CLIENTES", items: [{ label: "Clientes" }] },
+  {
+    title: "PRODUCTOS",
+    items: [{ label: "Productos" }, { label: "Gestor de Descuentos" }, { label: "Productos Deshabilitados por Cliente" }, { label: "Importador" }],
+  },
 ];
 
 // Logo oficial QuartzSales full color (public/logo-qs-fullcolor.svg, 1313×248).
 const Logo: React.FC = () => <Img src={staticFile("logo-qs-fullcolor.svg")} style={{ width: 148, height: 148 * (248 / 1313), display: "block" }} />;
 
-export const Sidebar: React.FC = () => (
+export const Sidebar: React.FC<{ nav?: NavSection[]; active: string }> = ({ nav = APOLLO_NAV, active }) => (
   <div
     style={{
       position: "absolute",
@@ -39,24 +40,30 @@ export const Sidebar: React.FC = () => (
     <div style={{ paddingLeft: 4 }}>
       <Logo />
     </div>
-    <div style={{ marginTop: 38, fontSize: 10, fontWeight: 600, color: c.primary, letterSpacing: 0.3 }}>ADMINISTRACIÓN</div>
-    <div style={{ marginTop: 10 }}>
-      {NAV.map((n, i) => (
-        <div
-          key={i}
-          style={{
-            height: 32,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            paddingRight: 30,
-            fontSize: 12.5,
-            color: c.textStrong,
-            fontWeight: n.active ? 600 : 400,
-          }}
-        >
-          <span>{n.label}</span>
-          {n.caret ? <Icon name="angle-down" size={11} color={c.muted} /> : null}
+    <div style={{ marginTop: 26 }}>
+      {nav.map((sec) => (
+        <div key={sec.title} style={{ marginTop: 14 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: c.primary, letterSpacing: 0.3, height: 22, display: "flex", alignItems: "center" }}>{sec.title}</div>
+          {sec.items.map((n) => (
+            <div
+              key={n.label}
+              style={{
+                minHeight: 30,
+                padding: "5px 18px 5px 0",
+                boxSizing: "border-box",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontSize: 12.5,
+                lineHeight: 1.3,
+                color: c.textStrong,
+                fontWeight: n.label === active ? 600 : 400,
+              }}
+            >
+              <span>{n.label}</span>
+              {n.caret ? <Icon name="angle-down" size={11} color={c.muted} /> : null}
+            </div>
+          ))}
         </div>
       ))}
     </div>
@@ -71,7 +78,8 @@ const Flag: React.FC = () => (
   </svg>
 );
 
-export const Topbar: React.FC = () => (
+// breadcrumb: secciones intermedias + página actual (la última va en violeta).
+export const Topbar: React.FC<{ crumbs: string[]; avatar?: string }> = ({ crumbs, avatar = "PP" }) => (
   <div
     style={{
       position: "absolute",
@@ -92,10 +100,14 @@ export const Topbar: React.FC = () => (
     <Icon name="bars" size={15} color={c.muted} />
     <Icon name="home" size={14} color={c.primary} style={{ marginLeft: 8 }} />
     <span style={{ color: c.muted }}>/</span>
-    <Icon name="folder" size={12} color={c.faint} />
-    <span style={{ fontWeight: 500 }}>Administración</span>
-    <span style={{ color: c.muted }}>/</span>
-    <span style={{ color: c.primary, fontWeight: 500 }}>Pedidos</span>
+    {crumbs.slice(0, -1).map((cr) => (
+      <React.Fragment key={cr}>
+        <Icon name="folder" size={12} color={c.faint} />
+        <span style={{ fontWeight: 500 }}>{cr}</span>
+        <span style={{ color: c.muted }}>/</span>
+      </React.Fragment>
+    ))}
+    <span style={{ color: c.primary, fontWeight: 500 }}>{crumbs[crumbs.length - 1]}</span>
     <div style={{ flex: 1 }} />
     <div
       style={{
@@ -131,7 +143,7 @@ export const Topbar: React.FC = () => (
         fontSize: 12,
       }}
     >
-      aa
+      {avatar}
     </div>
   </div>
 );

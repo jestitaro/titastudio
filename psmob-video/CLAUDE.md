@@ -26,6 +26,21 @@ npx remotion render <Comp> out/<archivo>.mp4 --browser-executable=/opt/pw-browse
 
 Las fuentes (Roboto / Roboto Mono) van por `@fontsource`, sin red. Textos en `src/i18n/es.ts`.
 
-## Composición Pedidos-Flow (QuartzSales web · Apollo)
+## Videos de producto QuartzSales (Apollo web)
 
-Es otra pieza, independiente de PSMob. Vive en `src/pedidos/` con sus propios tokens (tema Lara violeta, Poppins, PrimeIcons) y trabaja a 60 fps. Todos los timings están en `src/pedidos/animation/timeline.ts`. La documentación está en `docs/pedidos-flow.md`. Formato de moneda de las capturas de Apollo: `$24,150.00`.
+Independientes de PSMob. Trabajan a 60 fps sobre un viewport lógico de 1600×900 escalado ×1,2.
+
+- `src/qs-kit/`: kit compartido por todos los videos. No importa nada de un video puntual.
+  - `motion/`: easing, viewport, `makeCamera` (cámara virtual) y `makeCursor` (cursor).
+  - `design/tokens.ts`: tema Lara violeta, Poppins, PrimeIcons y tonos de badge.
+  - `ui/`: primitivas (Button, Badge, Field, Sk…), `Sidebar`/`Topbar` con el menú actual de Apollo (`APOLLO_NAV`) y `Cursor`.
+- `src/<video>/`: cada video tiene su carpeta con `animation/` (timeline, layout, camera, cursor, scene-state), `components/` y `data/`. El ejemplo de referencia es `src/pedidos/` (composición `Pedidos-Flow`, documentada en `docs/pedidos-flow.md`).
+- **Flujo de entrega:** primero preview en baja (`--scale=0.5 --crf=30`, por ejemplo `npm run pedidos:preview`). Recién con OK, render en alta (`--crf=16`).
+- **Frames sueltos:** `COMP=<Composición> node scripts/stills.mjs <frames…>`.
+- **Reglas acordadas:**
+  - Títulos de columna con la misma alineación que su contenido.
+  - Título de sección alineado con el buscador o chip de la misma fila.
+  - Total arriba en el panel lateral.
+  - Sin zoom a botones.
+  - Datos siempre ficticios.
+- Moneda `$24,150.00`.

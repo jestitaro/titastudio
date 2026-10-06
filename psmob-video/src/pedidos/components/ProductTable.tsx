@@ -5,10 +5,10 @@ import React from "react";
 import { Img } from "remotion";
 import { FORM, productColX, PRODUCTS_L, qtyStepper } from "../animation/layout";
 import { SceneState } from "../animation/scene-state";
-import { c, font } from "../design/tokens";
+import { c, font } from "../../qs-kit/design/tokens";
 import { FINAL_LINES, money, ORDER, Product, PRODUCTS } from "../data/mock-data";
 import { productImage } from "../data/catalog";
-import { Abs, Button, Caret, Icon, mix, Sk } from "./ui";
+import { Abs, Button, Caret, Icon, mix, Sk } from "../../qs-kit/ui/primitives";
 
 type Align = "left" | "center" | "right";
 const HEAD: { label: string; sort?: boolean; align: Align }[] = [
@@ -273,8 +273,12 @@ export const ProductTable: React.FC<{ s: SceneState }> = ({ s }) => {
                   <Sk w={36} h={40} r={8} style={{ position: "absolute", left: CELL_PAD, top: 6 }} />
                   <Sk w={[150, 130, 170, 120][i % 4]} h={10} style={{ position: "absolute", left: CELL_PAD + 48, top: 14 }} />
                   <Sk w={110} h={8} style={{ position: "absolute", left: CELL_PAD + 48, top: 31 }} />
-                  {[1, 2, 3, 5].map((k) => (
-                    <Sk key={k} w={k >= 3 ? 64 : 22} h={9} style={{ position: "absolute", left: colX(k) + PRODUCTS_L.cols[k] / 2 - (k >= 3 ? 32 : 11), top: 21 }} />
+                  {/* Misma alineación que título y contenido: UxB/Pres. centrados, precios a la derecha */}
+                  {[1, 2].map((k) => (
+                    <Sk key={k} w={22} h={9} style={{ position: "absolute", left: colX(k) + PRODUCTS_L.cols[k] / 2 - 11, top: 21 }} />
+                  ))}
+                  {[3, 5].map((k) => (
+                    <Sk key={k} w={64} h={9} style={{ position: "absolute", left: colX(k) + PRODUCTS_L.cols[k] - CELL_PAD - 64, top: 21 }} />
                   ))}
                   <Sk w={PRODUCTS_L.stepW} h={PRODUCTS_L.stepH} r={8} style={{ position: "absolute", left: st.x - FORM.innerX, top: (RH - PRODUCTS_L.stepH) / 2 }} />
                 </div>

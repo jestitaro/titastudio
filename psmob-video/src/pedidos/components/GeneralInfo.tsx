@@ -2,9 +2,9 @@
 import React from "react";
 import { FORM, panelRect } from "../animation/layout";
 import { SceneState } from "../animation/scene-state";
-import { c, font, shadow } from "../design/tokens";
+import { c, font, shadow } from "../../qs-kit/design/tokens";
 import { BRANCH_INDEX, BRANCH_OPTIONS, CLIENT_INDEX, CLIENT_OPTIONS, ORDER } from "../data/mock-data";
-import { Abs, Button, Caret, Field, Icon, Label, mix, Sk } from "./ui";
+import { Abs, Button, Caret, Field, Icon, Label, mix, Sk } from "../../qs-kit/ui/primitives";
 
 type Rect = { x: number; y: number; w: number; h: number };
 

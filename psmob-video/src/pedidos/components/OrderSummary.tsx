@@ -3,11 +3,11 @@
 import React from "react";
 import { FORM, PRODUCTS_L, qtyStepper, SUMMARY } from "../animation/layout";
 import { SceneState } from "../animation/scene-state";
-import { c, font } from "../design/tokens";
+import { c, font } from "../../qs-kit/design/tokens";
 import { FINAL_LINES, money, ORDER, orderTotal, orderUnits, PRODUCTS } from "../data/mock-data";
 import { StatusDot } from "./CartSummary";
 import { colX, ProductValues, QtyStepper } from "./ProductTable";
-import { Abs, Badge, Button, Icon, mix } from "./ui";
+import { Abs, Badge, Button, Icon, mix } from "../../qs-kit/ui/primitives";
 
 const Sep = () => <span style={{ color: c.textStrong, margin: "0 12px" }}>|</span>;
 
@@ -20,8 +20,8 @@ export const OrderSummary: React.FC<{ s: SceneState }> = ({ s }) => {
   return (
     <div style={{ position: "absolute", inset: 0, fontFamily: font, color: c.textStrong, opacity: S.opacity }}>
       {/* Badge de estado junto al título */}
-      <Abs x={FORM.innerX + 172} y={SUMMARY.titleY - 10} style={{ opacity: S.badge, transform: `scale(${0.85 + 0.15 * S.badge})`, transformOrigin: "left center" }}>
-        <Badge status="borrador" />
+      <Abs x={FORM.innerX + 172} y={SUMMARY.titleY - 12} h={24} style={{ display: "flex", alignItems: "center", opacity: S.badge, transform: `scale(${0.85 + 0.15 * S.badge})`, transformOrigin: "left center" }}>
+        <Badge tone="neutral" label="Borrador" />
       </Abs>
 
       {/* Caja de información del pedido */}

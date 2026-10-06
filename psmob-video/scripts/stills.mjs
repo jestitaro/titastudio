@@ -1,5 +1,5 @@
 // Renderiza frames sueltos de Pedidos-Flow a PNG (verificación visual / renderFrame).
-// Uso: node scripts/pedidos-stills.mjs 0 214 600 1200 ...  [--out out/pedidos-frames]
+// Uso: [COMP=<Composición>] node scripts/stills.mjs 0 214 600 1200 ...  [--out out/frames]
 import { bundle } from "@remotion/bundler";
 import { enableTailwind } from "@remotion/tailwind-v4";
 import { renderStill, selectComposition } from "@remotion/renderer";
@@ -14,7 +14,7 @@ const browserExecutable = process.env.REMOTION_BROWSER ?? "/opt/pw-browsers/chro
 
 fs.mkdirSync(outDir, { recursive: true });
 const serveUrl = await bundle({ entryPoint: path.resolve("src/index.ts"), webpackOverride: enableTailwind, rspack: true });
-const composition = await selectComposition({ serveUrl, id: "Pedidos-Flow", browserExecutable });
+const composition = await selectComposition({ serveUrl, id: process.env.COMP ?? "Pedidos-Flow", browserExecutable });
 for (const frame of frames) {
   const output = path.join(outDir, `frame-${String(frame).padStart(4, "0")}.png`);
   await renderStill({ serveUrl, composition, frame, output, browserExecutable, overwrite: true });

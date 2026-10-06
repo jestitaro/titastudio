@@ -1,6 +1,7 @@
 // Datos ficticios. Se mantienen iguales durante toda la historia.
 // Formatos tomados de las capturas: moneda $1,234.56 y fecha DD/MM/YYYY.
 import { CATALOG, CatalogItem } from "./catalog";
+import type { BadgeTone } from "../../qs-kit/ui/primitives";
 
 export type OrderStatus = "completo" | "parcial" | "rechazado" | "noCreado" | "transmitido" | "borrador";
 
@@ -29,6 +30,15 @@ export const STATUS_LABEL: Record<OrderStatus, string> = {
   noCreado: "No Creado",
   transmitido: "Transmitido",
   borrador: "Borrador",
+};
+
+export const STATUS_TONE: Record<OrderStatus, BadgeTone> = {
+  completo: "success",
+  parcial: "warn",
+  rechazado: "rose",
+  noCreado: "danger",
+  transmitido: "info",
+  borrador: "neutral",
 };
 
 export const ORDERS: OrderRow[] = [

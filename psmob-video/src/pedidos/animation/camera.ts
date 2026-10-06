@@ -1,21 +1,16 @@
 // Cámara virtual: foco (x, y) en coordenadas lógicas + escala.
 // Keyframes consecutivos iguales = respiración (la cámara no se mueve).
-import { easeCamera, lerp, progress } from "./easing";
-import { CARD, CART, center, FORM, LIST, VIEW } from "./layout";
+import { Cam, CamKey, cameraTransform, HOME, makeCamera } from "../../qs-kit/motion/camera";
+import { CARD, CART, center, FORM, LIST } from "./layout";
 import { T } from "./timeline";
 
-type Cam = { x: number; y: number; s: number };
-type Key = { f: number; cam: Cam };
-
-const HOME: Cam = { x: VIEW.w / 2, y: VIEW.h / 2, s: 1 };
 const [nbx, nby] = center(LIST.newBtn);
 
-// Resumen del Pedido (card inferior derecha): zoom fuerte en dos encuadres.
-// 1) métricas + líneas (edición de cantidad) · 2) líneas + total (eliminación y resultado).
-const FOCUS_ITEMS: Cam = { x: CARD.cart.x + CARD.cart.w, y: CART.statsY + 120, s: 2.1 };
-const FOCUS_TOTAL: Cam = { x: CARD.cart.x + CARD.cart.w, y: CARD.cart.y + CARD.cart.h, s: 2.1 };
+// Panel lateral (card inferior derecha): un solo encuadre con total, métricas y líneas,
+// así la edición y la eliminación se ven junto al total que cambia.
+const FOCUS_PANEL: Cam = { x: CARD.cart.x + CARD.cart.w, y: (CART.totalY + CART.itemsY + 3 * CART.itemH) / 2 + 10, s: 2.1 };
 
-const KEYS: Key[] = [
+const KEYS: CamKey[] = [
   { f: 0, cam: HOME },
   { f: T.pushIn[0], cam: HOME },
   // Push-in hacia "+ Nuevo Pedido"
@@ -34,11 +29,8 @@ const KEYS: Key[] = [
   // Selección de productos: pantalla completa, la tabla es la protagonista
   { f: T.focusIn[0], cam: HOME },
   // Enfoque: pan + zoom hacia abajo a la derecha, hasta encuadrar el Resumen del Pedido
-  { f: T.focusIn[1], cam: FOCUS_ITEMS },
-  { f: T.minusA[1] + 8, cam: FOCUS_ITEMS },
-  // Seguimiento: baja dentro del panel para tener el total en cuadro antes de eliminar
-  { f: T.cursorToTrashB[1] - 2, cam: FOCUS_TOTAL },
-  { f: T.focusHold, cam: FOCUS_TOTAL },
+  { f: T.focusIn[1], cam: FOCUS_PANEL },
+  { f: T.focusHold, cam: FOCUS_PANEL },
   // Alejamiento: vuelta a la pantalla completa
   { f: T.focusOut[1], cam: HOME },
   // Resumen y envío: plano general, sin zoom a botones (Continuar / Enviar Pedido)
@@ -48,28 +40,5 @@ const KEYS: Key[] = [
   { f: T.end, cam: { x: 900, y: 300, s: 1.2 } },
 ];
 
-// Evita mostrar fuera del viewport cuando hay zoom.
-const clampFocus = (c: Cam): Cam => {
-  const hw = VIEW.w / (2 * c.s);
-  const hh = VIEW.h / (2 * c.s);
-  return { s: c.s, x: Math.min(VIEW.w - hw, Math.max(hw, c.x)), y: Math.min(VIEW.h - hh, Math.max(hh, c.y)) };
-};
-
-// Interpola el rectángulo visible (1/escala lineal) y no la escala: así el paneo y el zoom
-// avanzan juntos a velocidad pareja en pantalla, sin la aceleración de un zoom lineal.
-export const getCamera = (frame: number): Cam => {
-  if (frame <= KEYS[0].f) return clampFocus(KEYS[0].cam);
-  for (let i = 1; i < KEYS.length; i++) {
-    const a = clampFocus(KEYS[i - 1].cam);
-    const b = clampFocus(KEYS[i].cam);
-    if (frame <= KEYS[i].f) {
-      const t = progress(frame, KEYS[i - 1].f, KEYS[i].f, easeCamera);
-      return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), s: 1 / lerp(1 / a.s, 1 / b.s, t) };
-    }
-  }
-  return clampFocus(KEYS[KEYS.length - 1].cam);
-};
-
-// Transform CSS del contenedor de cámara (coordenadas lógicas).
-export const cameraTransform = (cam: Cam) =>
-  `translate(${VIEW.w / 2}px, ${VIEW.h / 2}px) scale(${cam.s}) translate(${-cam.x}px, ${-cam.y}px)`;
+export const getCamera = makeCamera(KEYS);
+export { cameraTransform };

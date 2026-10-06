@@ -2,8 +2,8 @@
 import React from "react";
 import { STEPPER } from "../animation/layout";
 import { SceneState, StepState } from "../animation/scene-state";
-import { c, font, shadow } from "../design/tokens";
-import { mix } from "./ui";
+import { c, font, shadow } from "../../qs-kit/design/tokens";
+import { mix } from "../../qs-kit/ui/primitives";
 
 const LABELS = ["Información General", "Selección de Productos", "Resumen de Pedido"];
 
