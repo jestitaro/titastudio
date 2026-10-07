@@ -33,7 +33,8 @@ const StepCircle: React.FC<{ n: number; st: StepState }> = ({ n, st }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 11,
+          fontSize: 12,
+          fontWeight: 600,
           color: mix("#aab3c0", "#ffffff", a),
           opacity: 1 - st.done,
         }}
