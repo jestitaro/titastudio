@@ -6,7 +6,7 @@ import { SceneState } from "../animation/scene-state";
 import { c, font } from "../../qs-kit/design/tokens";
 import { FINAL_LINES, money, ORDER, orderTotal, orderUnits, PRODUCTS } from "../data/mock-data";
 import { colX, ProductValues, QtyStepper } from "./ProductTable";
-import { Abs, Badge, Button, Icon, mix, StatusDot } from "../../qs-kit/ui/primitives";
+import { Abs, Badge, Button, Centered, Icon, mix, StatusDot } from "../../qs-kit/ui/primitives";
 
 const Sep = () => <span style={{ color: c.textStrong, margin: "0 12px" }}>|</span>;
 
@@ -113,32 +113,49 @@ export const OrderSummary: React.FC<{ s: SceneState }> = ({ s }) => {
         );
       })}
 
-      {/* Enviar Pedido */}
-      <Abs x={SUMMARY.send.x} y={SUMMARY.send.y} style={{ opacity: S.send.appear }}>
-        <Button
-          label=""
-          hover={S.send.hover}
-          scale={S.send.scale}
-          height={SUMMARY.send.h}
-          style={{ width: SUMMARY.send.w, position: "relative", background: mix(c.primaryHover, c.primary, 0.3 * (1 - S.send.hover)) }}
-        >
-          {/* Idle */}
-          <span style={{ position: "absolute", display: "flex", gap: 7, alignItems: "center", opacity: 1 - S.send.loading - S.send.sent, transform: `translateY(${-S.send.loading * 6}px)` }}>
-            <Icon name="send" size={12} /> Enviar Pedido
-          </span>
-          {/* Loading */}
-          <span style={{ position: "absolute", display: "flex", gap: 8, alignItems: "center", opacity: S.send.loading, transform: `translateY(${(1 - S.send.loading) * 6 - S.send.sent * 6}px)` }}>
-            <svg width="13" height="13" viewBox="0 0 16 16" style={{ transform: `rotate(${S.send.spin}deg)` }}>
-              <circle cx="8" cy="8" r="6" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2" />
-              <path d="M8 2a6 6 0 0 1 6 6" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            Enviando…
-          </span>
-          {/* Enviado */}
-          <span style={{ position: "absolute", display: "flex", gap: 7, alignItems: "center", opacity: S.send.sent, transform: `translateY(${(1 - S.send.sent) * 6}px)` }}>
-            <Icon name="check" size={12} /> Enviado
-          </span>
-        </Button>
+      {/* Enviar Pedido: superficie del botón + capas de estado (idle / enviando / enviado)
+          superpuestas y centradas sobre el mismo rect. */}
+      <Abs x={SUMMARY.send.x} y={SUMMARY.send.y} w={SUMMARY.send.w} h={SUMMARY.send.h} style={{ opacity: S.send.appear, transform: `scale(${S.send.scale})` }}>
+        <Button label="" hover={S.send.hover} height={SUMMARY.send.h} style={{ width: SUMMARY.send.w, background: mix(c.primaryHover, c.primary, 0.3 * (1 - S.send.hover)) }} />
+        {[
+          { o: 1 - S.send.loading - S.send.sent, y: -S.send.loading * 6, content: <><Icon name="send" size={12} color="#fff" /><Centered>Enviar Pedido</Centered></> },
+          {
+            o: S.send.loading,
+            y: (1 - S.send.loading) * 6 - S.send.sent * 6,
+            content: (
+              <>
+                <svg width="13" height="13" viewBox="0 0 16 16" style={{ display: "block", transform: `rotate(${S.send.spin}deg)` }}>
+                  <circle cx="8" cy="8" r="6" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2" />
+                  <path d="M8 2a6 6 0 0 1 6 6" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                <Centered>Enviando…</Centered>
+              </>
+            ),
+          },
+          { o: S.send.sent, y: (1 - S.send.sent) * 6, content: <><Icon name="check" size={12} color="#fff" /><Centered>Enviado</Centered></> },
+        ].map((layer, i) =>
+          layer.o > 0.001 ? (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                color: "#fff",
+                fontFamily: font,
+                fontSize: 13,
+                fontWeight: 500,
+                opacity: layer.o,
+                transform: `translateY(${layer.y}px)`,
+              }}
+            >
+              {layer.content}
+            </div>
+          ) : null,
+        )}
       </Abs>
     </div>
   );
