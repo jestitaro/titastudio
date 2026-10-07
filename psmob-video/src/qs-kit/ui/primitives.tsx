@@ -17,6 +17,10 @@ export const mix = (a: string, b: string, t: number) => {
 // corrido. Para textos que se centran en una caja (botones, chips, círculos) usar <Centered>:
 // line-height 1 + corrección óptica medida (QS-Kit-Specimen: 1,5 % del cuerpo).
 export const OPTICAL_Y = 0.015;
+// En botones (texto en mayúscula y minúscula + ícono) hace falta un poco más:
+// medido sobre "Detalle", el label quedaba 0,9 px arriba del centro y el ícono 0,4 px.
+const BTN_LABEL_Y = 0.08;
+const BTN_ICON_Y = 0.035;
 export const Centered: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
   <span style={{ display: "block", lineHeight: 1, transform: `translateY(${OPTICAL_Y}em)`, whiteSpace: "nowrap", ...style }}>{children}</span>
 );
@@ -90,9 +94,14 @@ export const Button: React.FC<BtnProps> = ({
         ...style,
       }}
     >
-      {children}
-      {icon && !children ? <Icon name={icon} size={fontSize - 1} /> : null}
-      {label ? <Centered>{label}</Centered> : null}
+      {/* Ícono y label centrados sobre el centro real del botón (medido a píxel en el render). */}
+      {children || icon ? (
+        <span style={{ display: "flex", alignItems: "center", transform: `translateY(${BTN_ICON_Y}em)` }}>
+          {children}
+          {icon && !children ? <Icon name={icon} size={fontSize - 1} /> : null}
+        </span>
+      ) : null}
+      {label ? <Centered style={{ transform: `translateY(${BTN_LABEL_Y}em)` }}>{label}</Centered> : null}
     </div>
   );
 };

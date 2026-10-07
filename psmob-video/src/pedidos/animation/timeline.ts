@@ -104,10 +104,12 @@ export const T = {
   newRowHighlightOut: [1896, 1956] as const,
   toastOut: [1846, 1868] as const,
   cursorOut: [1746, 1806] as const,
-  end: 2016,
+  // ── Cierre de marca ────────────────────────────────────────────
+  outro: { uiOut: [1990, 2032] as const, logoIn: [2024, 2066] as const },
+  end: 2130,
 } as const;
 
 // Duración de las animaciones de valor (totales, unidades) tras cada cambio.
 export const VALUE_TWEEN = 26;
 
-export const DURATION = T.end; // 33,6 s @ 60 fps
+export const DURATION = T.end; // 35,5 s @ 60 fps

@@ -21,6 +21,8 @@ import { Stepper } from "./components/Stepper";
 import { Toast } from "./components/Toast";
 import { c, shadow } from "../qs-kit/design/tokens";
 import { orderTotal } from "./data/mock-data";
+import { LogoOutro, outroUiOpacity } from "../qs-kit/ui/LogoOutro";
+import { T } from "./animation/timeline";
 
 const Surface: React.FC<{ rect: { x: number; y: number; w: number; h: number }; opacity: number; style?: React.CSSProperties }> = ({ rect, opacity, style }) =>
   opacity > 0 ? (
@@ -87,10 +89,11 @@ export const PedidosFrame: React.FC<{ frame: number }> = ({ frame }) => {
   return (
     <AbsoluteFill style={{ background: c.ground, overflow: "hidden" }}>
       <div style={{ position: "absolute", left: 0, top: 0, width: VIEW.w, height: VIEW.h, transform: `scale(${VIEW.scale})`, transformOrigin: "0 0" }}>
-        <div style={{ position: "absolute", inset: 0, transform: cameraTransform(s.camera), transformOrigin: "0 0" }}>
+        <div style={{ position: "absolute", inset: 0, transform: cameraTransform(s.camera), transformOrigin: "0 0", opacity: outroUiOpacity(frame, T.outro) }}>
           <Screen s={s} />
         </div>
       </div>
+      <LogoOutro frame={frame} timing={T.outro} />
     </AbsoluteFill>
   );
 };

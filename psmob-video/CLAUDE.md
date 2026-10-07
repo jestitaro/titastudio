@@ -41,6 +41,7 @@ Independientes de PSMob. Trabajan a 60 fps sobre un viewport lógico de 1600×90
   - Tablas: títulos y contenido de todas las columnas alineados a la izquierda (valores, chips y acciones también).
   - Texto centrado en una caja (botones, chips, números de pasos): usar `<Centered>` de `qs-kit/ui/primitives` (line-height 1 + corrección óptica de Poppins). Íconos de estado, en SVG (`StatusDot`).
   - Controles de una misma fila del header (botones, buscador): misma altura (32) y mismo y.
+  - Cierre: la interfaz se desvanece y aparece el logo oficial sobre blanco (`qs-kit/ui/LogoOutro`, tiempos en la timeline del video).
   - Título de sección alineado con el buscador o chip de la misma fila.
   - Total arriba en el panel lateral.
   - Sin zoom a botones.
