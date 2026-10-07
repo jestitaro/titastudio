@@ -333,7 +333,7 @@ export const ProductTable: React.FC<{ s: SceneState }> = ({ s }) => {
           hover={P.continueBtn.hover}
           scale={P.continueBtn.scale}
           height={PRODUCTS_L.continueBtn.h}
-          style={{ width: PRODUCTS_L.continueBtn.w }}
+          style={{ width: PRODUCTS_L.continueBtn.w, boxShadow: P.continueBtn.glow > 0 ? `0 0 0 ${4 * P.continueBtn.glow}px ${c.primaryRing}` : "none" }}
         />
       </Abs>
     </div>

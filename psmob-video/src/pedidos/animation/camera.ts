@@ -10,6 +10,10 @@ const [nbx, nby] = center(LIST.newBtn);
 // así la edición y la eliminación se ven junto al total que cambia.
 const FOCUS_PANEL: Cam = { x: CARD.cart.x + CARD.cart.w, y: (CART.totalY + CART.itemsY + 3 * CART.itemH) / 2 + 10, s: 2.1 };
 
+// Fila nueva del listado: de Cliente a Acciones (se lee qué pedido es y su estado),
+// con la zona de toasts arriba a la derecha en cuadro.
+const FOCUS_ROW: Cam = { x: 1100, y: 300, s: 1.45 };
+
 const KEYS: CamKey[] = [
   { f: 0, cam: HOME },
   { f: T.pushIn[0], cam: HOME },
@@ -35,9 +39,12 @@ const KEYS: CamKey[] = [
   { f: T.focusOut[1], cam: HOME },
   // Resumen y envío: plano general, sin zoom a botones (Continuar / Enviar Pedido)
   { f: T.newRow[0], cam: HOME },
-  // Foco final en la fila nueva
-  { f: T.newRow[1] + 60, cam: { x: 900, y: 300, s: 1.2 } },
-  { f: T.end, cam: { x: 900, y: 300, s: 1.2 } },
+  // Ciclo de vida: zoom a la fila nueva (Estado + Acciones) con los toasts en cuadro
+  { f: T.rowFocus[0], cam: HOME },
+  { f: T.rowFocus[1], cam: FOCUS_ROW },
+  { f: T.rowFocusOut[0], cam: FOCUS_ROW },
+  { f: T.rowFocusOut[1], cam: HOME },
+  { f: T.end, cam: HOME },
 ];
 
 export const getCamera = makeCamera(KEYS);

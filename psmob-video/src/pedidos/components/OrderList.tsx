@@ -49,8 +49,10 @@ const Row: React.FC<{
   badge: number;
   hover?: boolean;
   highlight?: number;
-  isNew?: boolean;
-}> = ({ row, y, reveal, skeleton, badge, hover, highlight = 0, isNew }) => {
+  statusPop?: number;
+  statusIn?: number;
+}> = ({ row, y, reveal, skeleton, badge, hover, highlight = 0, statusPop = 0, statusIn = 1 }) => {
+  const editable = row.status === "borrador"; // solo el borrador se edita; el resto, Detalle
   const bg = highlight > 0 ? mix("#ffffff", c.primary50, highlight) : hover ? c.hover : "transparent";
   return (
     <div style={{ position: "absolute", left: 0, top: y, width: LIST.innerW, height: LIST.rowH, background: bg, borderBottom: `1px solid ${c.rowLine}` }}>
@@ -75,15 +77,15 @@ const Row: React.FC<{
           5,
           <div style={{ position: "relative" }}>
             <Sk w={96} h={20} r={6} style={{ position: "absolute", left: 0, top: 0, opacity: 1 - badge }} />
-            <Badge tone={STATUS_TONE[row.status]} label={STATUS_LABEL[row.status]} style={{ opacity: badge, transform: `scale(${0.9 + 0.1 * badge})` }} />
+            <Badge tone={STATUS_TONE[row.status]} label={STATUS_LABEL[row.status]} style={{ opacity: badge * (0.35 + 0.65 * statusIn), transform: `scale(${(0.9 + 0.1 * badge) * (1 + 0.1 * statusPop)})`, transformOrigin: "left center" }} />
           </div>,
           
         )}
         {cell(
           6,
           <Button
-            label={isNew ? "Editar" : "Detalle"}
-            icon={isNew ? "pencil" : "eye"}
+            label={editable ? "Editar" : "Detalle"}
+            icon={editable ? "pencil" : "eye"}
             variant="outlined"
             height={24}
             fontSize={11.5}
@@ -199,7 +201,7 @@ export const OrderList: React.FC<{ s: SceneState; total: number }> = ({ s, total
         })}
         {nr && nr.o > 0 ? (
           <div style={{ position: "absolute", left: 0, top: 0, width: LIST.innerW, height: LIST.rowH, opacity: nr.o, transform: `translateY(${nr.y}px)` }}>
-            <Row row={{ ...NEW_ORDER, total }} y={0} reveal={1} skeleton={0} badge={nr.badge} highlight={nr.highlight} isNew />
+            <Row row={{ ...NEW_ORDER, total, status: nr.status }} y={0} reveal={1} skeleton={0} badge={nr.badge} highlight={Math.max(nr.highlight, nr.statusPop * 0.6)} statusPop={nr.statusPop} statusIn={nr.statusIn} />
           </div>
         ) : null}
       </Abs>

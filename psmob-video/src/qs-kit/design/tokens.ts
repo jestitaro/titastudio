@@ -48,6 +48,7 @@ export const badge = {
   danger: { bg: "#fde2e2", fg: "#b91c1c" },
   info: { bg: "#ede5fd", fg: "#6d28d9" },
   neutral: { bg: "#eef1f6", fg: "#334155" },
+  pending: { bg: "#dbe8fe", fg: "#1d4ed8" },
 } as const;
 
 export const radius = { card: 12, control: 6, badge: 6 };

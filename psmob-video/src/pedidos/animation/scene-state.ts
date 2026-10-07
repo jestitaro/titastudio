@@ -15,7 +15,7 @@ import { getCamera } from "./camera";
 import { CursorState, getCursor } from "./cursor";
 import { CARD, FORM, LIST, lerpRect, panelRect, PRODUCTS_L, Rect, SUMMARY } from "./layout";
 import { T, VALUE_TWEEN } from "./timeline";
-import { BRANCH_OPTIONS, CLIENT_OPTIONS, FINAL_LINES, LINE_A, LINE_B, LINE_C, ORDER, PRODUCTS } from "../data/mock-data";
+import { BRANCH_OPTIONS, CLIENT_OPTIONS, FINAL_LINES, LINE_A, LINE_B, LINE_C, ORDER, OrderStatus, PRODUCTS } from "../data/mock-data";
 
 const inside = (cur: CursorState, r: Rect, pad = 0) =>
   cur.opacity > 0.5 && cur.x >= r.x - pad && cur.x <= r.x + r.w + pad && cur.y >= r.y - pad && cur.y <= r.y + r.h + pad;
@@ -119,6 +119,16 @@ export const getSceneState = (frame: number) => {
           o: newRowP,
           y: (1 - newRowP) * -8,
           badge: progress(f, T.newRow[1] - 2, T.newRow[1] + 18, easeProduct),
+          // Ciclo de vida: Borrador → Pendiente → Transmitido → Creado Completo
+          status: (f >= T.status.completo ? "completo" : f >= T.status.transmitido ? "transmitido" : f >= T.status.pendiente ? "pendiente" : "borrador") as OrderStatus,
+          // "pop" del chip en cada cambio de estado
+          statusPop: Math.max(
+            ...[T.status.pendiente, T.status.transmitido, T.status.completo].map((c) => pulse(f, c, c + 6, c + 10, c + 26, easeOutCubic)),
+          ),
+          statusIn: Math.min(
+            1,
+            ...[T.status.pendiente, T.status.transmitido, T.status.completo].filter((c) => f >= c).map((c) => progress(f, c, c + 14, easeProduct)),
+          ),
           highlight: progress(f, T.newRow[0] + 8, T.newRow[1]) * (1 - progress(f, T.newRowHighlightOut[0], T.newRowHighlightOut[1], easeInOutCubic)),
         }
       : null,
@@ -260,6 +270,7 @@ export const getSceneState = (frame: number) => {
     invalid,
     continueBtn: {
       enabled: 1 - invalid,
+      glow: pulse(f, T.commitA + 8, T.commitA + 16, T.commitA + 22, T.commitA + 50, easeOutCubic),
       hover: hoverWindow(f, T.cursorToContinue[1] - 8, T.clickContinue + 14),
       scale: pressScale(f, T.clickContinue),
     },
@@ -298,6 +309,8 @@ export const getSceneState = (frame: number) => {
     boxes: units,
     total,
     invalid,
+    // Validación: el pedido supera el monto mínimo → el check del total "late" una vez.
+    validPulse: pulse(f, T.commitA + 6, T.commitA + 14, T.commitA + 20, T.commitA + 44, easeOutCubic),
     count,
     items,
     empty: clamp((0.3 - Math.max(...items.map((it) => it.size))) / 0.3),
@@ -360,9 +373,14 @@ export const getSceneState = (frame: number) => {
     },
   };
 
-  const toastP = progress(f, T.toast[0], T.toast[1], easeProduct);
-  const toastOut = progress(f, T.toastOut[0], T.toastOut[1], easeInOutCubic);
-  const toast = { visible: f >= T.toast[0] && f < T.toastOut[1], o: toastP * (1 - toastOut), x: (1 - toastP) * 24 + toastOut * 12 };
+  // Toasts: uno a la vez; entra deslizando desde la derecha y sale con fade.
+  const toasts = T.toasts
+    .map((t) => {
+      const pin = progress(f, t.in, t.in + 24, easeProduct);
+      const pout = progress(f, t.out, t.out + 20, easeInOutCubic);
+      return { id: t.id, visible: f >= t.in && f < t.out + 20, o: pin * (1 - pout), x: (1 - pin) * 24 + pout * 12 };
+    })
+    .filter((t) => t.visible);
 
   return {
     frame: f,
@@ -383,7 +401,7 @@ export const getSceneState = (frame: number) => {
     stepper,
     shared,
     summary,
-    toast,
+    toasts,
   };
 };
 

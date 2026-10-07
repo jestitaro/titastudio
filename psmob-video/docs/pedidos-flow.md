@@ -81,3 +81,9 @@ Totales coherentes: después de cargar, $33,511.50 (14 u.); después de editar y
 | 7 · Resumen | 1502–1672 |
 | 8 · Envío (Enviando… → toast) | 1672–1738 |
 | 9 · Cierre (fila nueva "Borrador") | 1734–2016 |
+
+## Ciclo de vida después del envío (escena 10)
+
+El video cubre los 5 pasos: **Carga** (formulario, productos, panel) → **Validación** (aviso de monto mínimo, check del total, Continuar habilitado) → **Aprobación** (otra persona: toast con el avatar del aprobador) → **Transmisión al ERP** → **Confirmación y notificación**.
+
+En el listado, el chip de la fila nueva avanza: Borrador → Pendiente → Transmitido → Creado Completo. La acción pasa de "Editar" a "Detalle" y la cámara encuadra la fila (×1,45) con los toasts. Los frames están en `timeline.ts` (`status`, `toasts`, `rowFocus`, `rowFocusOut`) y los textos de los toasts en `mock-data.ts` (`TOASTS`, `APPROVER`).

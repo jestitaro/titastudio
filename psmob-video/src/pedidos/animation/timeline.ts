@@ -94,7 +94,6 @@ export const T = {
 
   // ── Escena 8 · Envío ───────────────────────────────────────────
   sending: [1674, 1714] as const, // ≈ 670 ms
-  toast: [1714, 1738] as const,
 
   // ── Escena 9 · Cierre ──────────────────────────────────────────
   backToList: [1734, 1778] as const, // card de resumen → card de listado
@@ -102,14 +101,28 @@ export const T = {
   listRows: 1792,
   newRow: [1828, 1862] as const,
   newRowHighlightOut: [1896, 1956] as const,
-  toastOut: [1846, 1868] as const,
   cursorOut: [1746, 1806] as const,
   // ── Cierre de marca ────────────────────────────────────────────
-  outro: { uiOut: [1990, 2032] as const, logoIn: [2024, 2066] as const },
-  end: 2130,
+  // ── Escena 10 · Ciclo de vida (aprobación → ERP → confirmación) ─
+  // Estados del pedido nuevo en el listado (frame en que cambia el chip).
+  status: { pendiente: 1938, transmitido: 2092, completo: 2172 } as const,
+  rowFocus: [1880, 1936] as const, // zoom a la fila nueva (Estado + Acciones + toasts)
+  rowFocusOut: [2244, 2300] as const,
+  // Toasts (entrada, salida). Uno a la vez, arriba a la derecha.
+  toasts: [
+    { id: "created", in: 1714, out: 1846 },
+    { id: "pending", in: 1942, out: 2004 },
+    { id: "approved", in: 2012, out: 2084 },
+    { id: "erp", in: 2096, out: 2164 },
+    { id: "confirmed", in: 2176, out: 2266 },
+  ] as const,
+
+  // ── Cierre de marca ────────────────────────────────────────────
+  outro: { uiOut: [2296, 2338] as const, logoIn: [2330, 2372] as const },
+  end: 2436,
 } as const;
 
 // Duración de las animaciones de valor (totales, unidades) tras cada cambio.
 export const VALUE_TWEEN = 26;
 
-export const DURATION = T.end; // 35,5 s @ 60 fps
+export const DURATION = T.end; // 40,6 s @ 60 fps

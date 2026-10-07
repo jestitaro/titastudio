@@ -3,7 +3,7 @@
 import { CATALOG, CatalogItem } from "./catalog";
 import type { BadgeTone } from "../../qs-kit/ui/primitives";
 
-export type OrderStatus = "completo" | "parcial" | "rechazado" | "noCreado" | "transmitido" | "borrador";
+export type OrderStatus = "completo" | "parcial" | "rechazado" | "noCreado" | "transmitido" | "borrador" | "pendiente";
 
 export type OrderRow = {
   date: string;
@@ -30,6 +30,7 @@ export const STATUS_LABEL: Record<OrderStatus, string> = {
   noCreado: "No Creado",
   transmitido: "Transmitido",
   borrador: "Borrador",
+  pendiente: "Pendiente",
 };
 
 export const STATUS_TONE: Record<OrderStatus, BadgeTone> = {
@@ -39,6 +40,7 @@ export const STATUS_TONE: Record<OrderStatus, BadgeTone> = {
   noCreado: "danger",
   transmitido: "info",
   borrador: "neutral",
+  pendiente: "pending",
 };
 
 export const ORDERS: OrderRow[] = [
@@ -95,3 +97,16 @@ export const orderUnits = () => FINAL_LINES.reduce((t, l) => t + l.qty, 0);
 
 export const money = (v: number) =>
   "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// Ciclo de vida del pedido nuevo después de enviarlo (los frames están en la timeline):
+// Carga → Validación → Aprobación (otra persona) → Transmisión al ERP → Confirmación y notificación.
+export const APPROVER = { name: "Laura Méndez", initials: "LM" };
+
+export type ToastContent = { tone: "success" | "info"; icon?: string; avatar?: string; title: string; detail: string };
+export const TOASTS: Record<"created" | "pending" | "approved" | "erp" | "confirmed", ToastContent> = {
+  created: { tone: "success", icon: "check-circle", title: "Pedido creado", detail: `Pedido #${ORDER.number} · ${ORDER.client}` },
+  pending: { tone: "info", icon: "clock", title: "Pendiente de aprobación", detail: `Pedido #${ORDER.number} enviado al aprobador` },
+  approved: { tone: "success", avatar: APPROVER.initials, title: `Aprobado por ${APPROVER.name}`, detail: `Pedido #${ORDER.number} · listo para transmitir` },
+  erp: { tone: "info", icon: "sync", title: "Transmitido al ERP", detail: `Pedido #${ORDER.number} · sincronizado` },
+  confirmed: { tone: "success", icon: "envelope", title: "Pedido confirmado", detail: `Notificación enviada a ${ORDER.client}` },
+};

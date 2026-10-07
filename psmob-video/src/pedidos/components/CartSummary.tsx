@@ -72,7 +72,9 @@ export const CartSummary: React.FC<{ s: SceneState }> = ({ s }) => {
         }}
       >
         <Centered style={{ fontSize: 14.5, fontWeight: 600 }}>Total</Centered>
-        <StatusDot invalid={C.invalid} size={14} />
+        <div style={{ transform: `scale(${1 + 0.3 * C.validPulse})` }}>
+          <StatusDot invalid={C.invalid} size={14} />
+        </div>
         <div style={{ flex: 1 }} />
         <Centered style={{ fontSize: 19, fontWeight: 600, fontVariantNumeric: "tabular-nums", color: mix(c.textStrong, c.primary, flashTotal) }}>{money(C.total)}</Centered>
       </div>
