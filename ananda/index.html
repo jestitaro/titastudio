@@ -274,6 +274,9 @@ dialog.lb::backdrop{background:transparent}
 .host h3{font:400 clamp(28px,4vw,40px)/1.1 var(--display);margin:10px 0 12px}
 .host p{color:var(--ink-soft);max-width:60ch}
 .host .addr{margin-top:12px;font-size:15px;color:var(--ink)}
+.map-btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 20px;border-radius:99px;border:1px solid rgba(43,28,20,.25);color:var(--ink);text-decoration:none;font:600 15px var(--body);transition:background .2s,border-color .2s;justify-self:start}
+.map-btn:hover{background:rgba(217,105,46,.08);border-color:var(--terra)}
+.map-btn svg{width:19px;height:19px;color:var(--terra)}
 
 /* CIERRE */
 .outro{background:var(--wood);color:#F3ECE2;text-align:center}
@@ -482,7 +485,10 @@ dialog.lb::backdrop{background:transparent}
         <p>Un equipo local que conoce Mar Azul y Mar de las Pampas como nadie. Te acompañan desde la reserva hasta la entrega de llaves, y son los primeros a quienes llamar si querés repetir las vacaciones, recomendarnos o necesitás algo durante tu estadía.</p>
         <p class="addr">Calle 33 y Av. Mar del Plata, Mar Azul</p>
       </div>
-      <a class="btn btn-ink" href="https://maps.app.goo.gl/iYoXHcAKPUe14qQA6" target="_blank" rel="noopener">Cómo llegar a Gianini</a>
+      <a class="map-btn" href="https://maps.app.goo.gl/iYoXHcAKPUe14qQA6" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        Cómo llegar a Gianini
+      </a>
     </div>
   </div>
 </section>
