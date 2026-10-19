@@ -280,6 +280,10 @@ dialog.lb::backdrop{background:transparent}
 .outro p.big{font:400 clamp(30px,5vw,50px)/1.15 var(--display);max-width:18ch;margin:0 auto 18px}
 .outro p.big em{color:#F0A673}
 .outro small{opacity:.7;font-size:15px}
+.outro-links{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:32px}
+.outro-links a{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 20px;border-radius:99px;border:1px solid rgba(243,236,226,.3);color:#F3ECE2;text-decoration:none;font:600 15px var(--body);transition:background .2s,border-color .2s}
+.outro-links a:hover{background:rgba(243,236,226,.1);border-color:#F2A47A}
+.outro-links svg{width:19px;height:19px;color:#F2A47A}
 
 /* NAV inferior (mobile) / superior (desktop) */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(251,248,243,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
@@ -487,6 +491,16 @@ dialog.lb::backdrop{background:transparent}
   <div class="wrap">
     <p class="big">Gracias por ser parte de <em>esta historia</em>.</p>
     <small>Bienvenidos a Ananda. Que la Fuerza los acompañe.</small>
+    <div class="outro-links">
+      <a href="https://maps.app.goo.gl/1uMJ1DpLZbWJckJY6" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        Cómo llegar a Ananda
+      </a>
+      <a href="https://www.instagram.com/anandamarazul/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg>
+        @anandamarazul
+      </a>
+    </div>
   </div>
 </section>
 
