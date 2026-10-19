@@ -22,7 +22,7 @@ encuesta-apps-script.gs    backend de la encuesta (Google Sheets)
 ## Configurar
 Todo lo editable está en el bloque `CONFIG` al principio del `<script>` de `index.html`:
 - `wifi.ssid` / `wifi.pass`
-- `gianini`: celulares de Luciano y Noe (formato `549` + característica + número)
+- `gianini.phone`: celular de Gianini Inmobiliaria, Noe y Luciano (formato `549` + característica + número)
 - `survey.endpoint`: URL de la app web de Apps Script (instrucciones en `encuesta-apps-script.gs`)
 - `survey.whatsapp`: alternativa si no hay endpoint (la reseña llega por WhatsApp)
 
