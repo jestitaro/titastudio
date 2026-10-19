@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ananda · Mar Azul</title>
+<meta name="description" content="Ananda, un sueño hecho hogar en el bosque de Mar Azul. Guía para huéspedes: fotos, inventario, WiFi, teléfonos útiles y descuentos locales.">
+<meta name="theme-color" content="#4A2E22">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBF6EE;
+  --cream:#F2E8D9;
+  --ink:#2B1C14;
+  --ink-soft:#6A5446;
+  --wood:#4A2E22;
+  --brown:#6B4130;
+  --terra:#D9692E;
+  --terra-deep:#A9491B;
+  --terra-soft:#F6E0CF;
+  --stone:#DCCFBF;
+  --line:rgba(43,28,20,.12);
+  --radius:18px;
+  --gutter:clamp(16px,4vw,40px);
+  --max:1120px;
+  --nav-h:68px;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Figtree",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
+img{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--terra);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+section{padding:clamp(64px,10vw,120px) 0}
+.eyebrow{font:600 12px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--terra-deep)}
+h2{font:400 clamp(34px,6vw,56px)/1.05 var(--display);letter-spacing:-.01em;margin:14px 0 18px}
+h2 em{font-style:italic;color:var(--terra-deep)}
+.lead{color:var(--ink-soft);max-width:56ch}
+
+/* Placeholder si falta la foto */
+.ph{background:linear-gradient(135deg,var(--stone),var(--brown));position:relative}
+.ph[data-missing]::after{content:attr(data-missing);position:absolute;inset:auto 12px 12px auto;font:600 11px var(--body);color:#fff;background:rgba(0,0,0,.35);padding:4px 8px;border-radius:99px}
+
+/* HERO */
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;color:#fff;padding:0;overflow:hidden;background:var(--wood)}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(20,26,20,.15) 30%,rgba(20,18,14,.82))}
+.hero .wrap{position:relative;z-index:2;width:100%;padding-bottom:clamp(40px,8vw,88px)}
+.hero h1{font:400 clamp(72px,17vw,190px)/.9 var(--display);letter-spacing:.02em}
+.hero .tag{font:italic 400 clamp(22px,3.4vw,32px)/1.2 var(--display);margin:10px 0 22px;opacity:.95}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:15px;opacity:.9}
+.hero .meta span{display:inline-flex;align-items:center;gap:6px}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 22px;border-radius:99px;font:600 15px var(--body);text-decoration:none;border:0;cursor:pointer;transition:transform .15s,background .15s}
+.btn:active{transform:scale(.97)}
+.btn-terra{background:var(--terra);color:#fff}
+.btn-terra:hover{background:var(--terra-deep)}
+.btn-ghost{background:rgba(255,255,255,.14);color:#fff;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.35)}
+.btn-ghost:hover{background:rgba(255,255,255,.24)}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-line{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+
+/* HISTORIA */
+.story{display:grid;gap:clamp(32px,6vw,72px);align-items:center}
+@media(min-width:900px){.story{grid-template-columns:1fr 1.1fr}}
+.story>figure{border-radius:var(--radius);overflow:hidden;aspect-ratio:4/5}
+.story>figure img{width:100%;height:100%;object-fit:cover}
+.letter p{margin-bottom:1em;color:var(--ink-soft)}
+.polaroid{float:right;width:clamp(150px,42%,230px);margin:4px 0 14px 18px;background:#fff;padding:8px 8px 6px;border-radius:3px;box-shadow:0 10px 22px rgba(43,28,20,.18);transform:rotate(3deg)}
+.polaroid img{width:100%;height:auto}
+.polaroid figcaption{font:italic 400 15px/1.3 var(--display);color:var(--terra-deep);text-align:center;padding-top:6px}
+.letter .closing{clear:both}
+.letter p.big{font:400 clamp(22px,2.6vw,27px)/1.4 var(--display);color:var(--ink)}
+.letter .sign{font:italic 400 clamp(22px,2.4vw,26px)/1.4 var(--display);color:var(--terra-deep)}
+.letter .closing{border-left:3px solid var(--terra);padding:4px 0 4px 20px;margin-top:28px}
+.letter .closing p{margin-bottom:.7em}
+.letter .closing .sign:last-child{margin:14px 0 0}
+
+/* FOTOS */
+#fotos{background:var(--cream)}
+.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:32px}
+@media(min-width:760px){.gallery{grid-template-columns:repeat(4,1fr);grid-auto-rows:220px;grid-auto-flow:dense;gap:14px}}
+.gallery button{border:0;padding:0;cursor:zoom-in;border-radius:14px;overflow:hidden;aspect-ratio:1;background:none}
+@media(min-width:760px){
+  .gallery button{aspect-ratio:auto}
+  .gallery .tall{grid-row:span 2}
+  .gallery .wide{grid-column:span 2}
+  .gallery .big{grid-column:span 2;grid-row:span 2}
+}
+.gallery img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.gallery button:hover img{transform:scale(1.04)}
+dialog.lb{border:0;background:rgba(18,14,11,.94);width:100%;height:100%;max-width:none;max-height:none;padding:0;color:#fff}
+dialog.lb::backdrop{background:transparent}
+.lb-inner{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:56px 12px}
+.lb img{max-width:100%;max-height:100%;border-radius:8px;object-fit:contain}
+.lb-btn{position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:22px;cursor:pointer}
+.lb-close{top:12px;right:12px}.lb-prev{left:12px;top:50%;transform:translateY(-50%)}.lb-next{right:12px;top:50%;transform:translateY(-50%)}
+.lb-cap{position:absolute;bottom:16px;left:0;right:0;text-align:center;font-size:14px;opacity:.8}
+
+/* DATOS + INVENTARIO */
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:32px 0 40px}
+@media(min-width:760px){.facts{grid-template-columns:repeat(4,1fr)}}
+.facts div{background:var(--paper);padding:22px 20px}
+.facts b{display:block;font:400 40px/1 var(--display);color:var(--terra-deep)}
+.facts span{font-size:14px;color:var(--ink-soft)}
+.help{background:var(--terra-soft);border-radius:var(--radius);padding:20px 22px;margin-bottom:28px}
+.help p{font-weight:500}
+.inv li.note{color:var(--terra-deep);font-weight:600}
+.inv li.note::before{background:transparent;border:2px solid var(--terra)}
+.kit{position:relative;background:var(--wood);color:#F6EBDD;border-radius:var(--radius);padding:clamp(22px,4vw,36px);margin-bottom:28px;overflow:hidden}
+.kit::before{content:"";position:absolute;background:var(--terra)}
+.kit::before{top:0;bottom:0;right:clamp(40px,8vw,90px);width:14px}
+.kit-head{display:flex;align-items:center;gap:14px;margin-bottom:20px;position:relative}
+.kit-ico{font-size:40px;line-height:1}
+.kit .eyebrow{color:#F2A47A}
+.kit h3{font:400 clamp(28px,4vw,36px)/1.1 var(--display);margin-top:6px}
+.kit-cols{display:grid;gap:22px;position:relative;padding-right:clamp(40px,8vw,100px)}
+@media(min-width:760px){.kit-cols{grid-template-columns:1fr 1.4fr}}
+.kit h4{font:600 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:#F2A47A;margin-bottom:8px}
+.kit ul{list-style:none;display:grid;gap:6px}
+.kit li{font-size:16px}
+.kit li small{display:block;opacity:.7;font-size:13px}
+@media(min-width:760px){.kit-cols>div:last-child ul{grid-template-columns:1fr 1fr;column-gap:20px}}
+.inv{display:grid;gap:12px}
+@media(min-width:760px){.inv{grid-template-columns:1fr 1fr}}
+.inv details{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.inv summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;font:600 17px var(--body)}
+.inv summary::-webkit-details-marker{display:none}
+.inv summary small{font-weight:500;color:var(--ink-soft);font-size:13px}
+.inv summary .chev{transition:transform .2s;color:var(--terra)}
+.inv details[open] .chev{transform:rotate(180deg)}
+.inv ul{list-style:none;padding:0 20px 18px;display:grid;gap:2px}
+.inv li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:16px}
+.inv li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--terra);margin-top:9px}
+
+/* HELADERA */
+/* La sección ES la heladera: pared marrón + puerta esmaltada crema */
+#heladera{background:var(--wood) repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.08) 46px 48px);padding:clamp(40px,6vw,72px) 0}
+.fridge{position:relative;max-width:900px;margin:0 auto;border-radius:34px 34px 26px 26px;background:linear-gradient(90deg,#EFE6D8 0%,#FBF6EE 18%,#FFFDF9 50%,#F7EFE3 85%,#E6DACA 100%);box-shadow:0 40px 70px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.6),inset 0 -8px 0 rgba(0,0,0,.06)}
+.freezer{position:relative;padding:clamp(26px,4vw,40px) clamp(56px,8vw,96px) clamp(26px,4vw,40px) clamp(20px,4vw,48px);border-bottom:4px solid #D9CCBA;box-shadow:0 2px 0 #fff}
+.cooler{position:relative;padding:clamp(34px,5vw,56px) clamp(56px,8vw,96px) clamp(40px,6vw,64px) clamp(20px,4vw,48px)}
+.handle{position:absolute;right:clamp(16px,2.6vw,28px);width:14px;border-radius:10px;background:linear-gradient(90deg,#BFB3A3,#F6F0E6 45%,#CDBFAD);box-shadow:-2px 3px 6px rgba(0,0,0,.18)}
+.freezer .handle{bottom:22px;height:64px}
+.cooler .handle{top:28px;height:clamp(150px,22vw,220px)}
+.plate{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);font:600 11px var(--body);letter-spacing:.32em;color:#B7A894;text-shadow:0 1px 0 #fff}
+.note{display:inline-block;background:#fff;padding:18px 22px 20px;border-radius:4px;box-shadow:0 8px 18px rgba(0,0,0,.12);transform:rotate(-1.5deg);position:relative;max-width:520px}
+.note::before{content:"";position:absolute;top:-10px;left:28px;width:22px;height:22px;border-radius:50%;background:var(--terra);box-shadow:inset -3px -3px 0 rgba(0,0,0,.2),0 3px 5px rgba(0,0,0,.2)}
+.note h2{color:var(--ink);margin:8px 0 6px;font-size:clamp(30px,5vw,46px)}
+.note p{color:var(--ink-soft);font-size:15px}
+.fridge-badge{display:inline-block;background:var(--terra);color:#fff;font:600 13px var(--body);padding:8px 14px;border-radius:99px;transform:rotate(2deg);margin:0 0 26px}
+.magnets{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px}
+.magnet{position:relative;color:var(--ink);border-radius:14px;padding:26px 20px 20px;text-decoration:none;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 18px rgba(0,0,0,.12);transform:rotate(var(--r,0deg));transition:transform .2s,box-shadow .2s}
+.magnet:hover{transform:rotate(0) translateY(-4px);box-shadow:0 14px 26px rgba(0,0,0,.16)}
+.magnet::before{content:"";position:absolute;top:-9px;left:50%;width:22px;height:22px;margin-left:-11px;border-radius:50%;background:var(--pin,#4A2E22);box-shadow:inset -3px -3px 0 rgba(0,0,0,.2),0 3px 5px rgba(0,0,0,.2)}
+.magnet .kind{font:600 11px var(--body);letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+.magnet h3{font:600 26px/1.05 var(--display)}
+.magnet p{font-size:14px;line-height:1.45}
+.magnet .deal{margin-top:8px;font:600 13px var(--body);background:rgba(255,255,255,.65);border:1.5px dashed currentColor;border-radius:10px;padding:8px 10px}
+.magnet .go{font:600 13px var(--body);margin-top:auto;padding-top:8px;text-decoration:underline;text-underline-offset:3px}
+.m-yellow{background:#F3D29A}.m-terra{background:#F2A47A}.m-sky{background:#E9D3B8}.m-mint{background:#D69A70}
+.magnet.slot{background:transparent;border:2px dashed #C9B9A5;box-shadow:none;color:var(--ink-soft);justify-content:center;align-items:center;text-align:center;min-height:180px}
+.magnet.slot::before{background:#C9B9A5}
+
+/* TELEFONOS */
+.wifi{background:var(--ink);color:#fff;border-radius:var(--radius);padding:clamp(22px,4vw,34px);display:grid;gap:18px;margin:32px 0 36px}
+@media(min-width:760px){.wifi{grid-template-columns:auto 1fr 1fr;align-items:center;gap:32px}}
+.wifi-ico{width:56px;height:56px;border-radius:16px;background:var(--terra);display:grid;place-items:center}
+.wifi-field small{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:4px}
+.wifi-field div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.wifi-field code{font:600 22px/1.2 var(--body);word-break:break-all}
+.copy{min-height:36px;padding:0 14px;border-radius:99px;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;font:600 13px var(--body);cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.12)}
+.sos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:36px}
+@media(min-width:760px){.sos{grid-template-columns:repeat(4,1fr)}}
+.sos a{background:#F7E1D3;border-radius:16px;padding:18px;text-decoration:none;display:flex;flex-direction:column;gap:2px;min-height:110px;justify-content:space-between}
+.sos a:hover{background:#F2D1BC}
+.sos b{font:400 44px/1 var(--display);color:var(--terra-deep)}
+.sos span{font-weight:600}
+.sos small{color:var(--ink-soft);font-size:13px}
+.groups{display:grid;gap:32px}
+@media(min-width:900px){.groups{grid-template-columns:repeat(3,1fr)}}
+.group h3{font:600 13px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);padding-bottom:10px;border-bottom:2px solid var(--ink);margin-bottom:4px}
+.contact{padding:14px 0;border-bottom:1px solid var(--line)}
+.contact strong{display:block;font-size:16px}
+.contact p{font-size:14px;color:var(--ink-soft)}
+.calls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.call{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:99px;background:var(--cream);color:var(--wood);text-decoration:none;font:600 14px var(--body)}
+.call:hover{background:var(--stone)}
+.help .call{background:#fff}
+.call.wa{background:#DCF3E3;color:#14663A}
+
+/* ENCUESTA */
+#encuesta{background:var(--terra);color:#fff;position:relative;overflow:hidden}
+#encuesta::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;right:-180px;top:-200px;background:rgba(255,255,255,.07)}
+#encuesta .wrap{position:relative}
+#encuesta .eyebrow{color:#FFE1CC}
+#encuesta h2 em{color:var(--wood)}
+#encuesta .lead{color:#FFEDE0}
+.survey-head{text-align:center;max-width:640px;margin:0 auto}
+.survey-head .lead{margin:0 auto}
+.rep{display:inline-flex;align-items:center;gap:10px;margin-top:20px;background:var(--wood);border-radius:99px;padding:8px 18px 8px 12px;font:600 15px var(--body)}
+.rep[hidden]{display:none}
+.rep b{font:400 26px/1 var(--display);color:#FFB27A}
+.rep svg{width:22px;height:22px;fill:#FFB27A}
+.rep small{opacity:.75;font-weight:500}
+.quiz{background:var(--paper);color:var(--ink);border-radius:28px;max-width:680px;margin:32px auto 0;padding:clamp(22px,5vw,44px);box-shadow:0 30px 60px rgba(74,46,34,.35)}
+.progress{display:flex;align-items:center;gap:8px;margin-bottom:28px}
+.hilt{flex:none;width:30px;height:12px;border-radius:3px;background:linear-gradient(180deg,#d9d6d0,#8d8880);box-shadow:inset 3px 0 0 #5c574f,inset -3px 0 0 #5c574f}
+.saber{flex:1;height:8px;border-radius:0 99px 99px 0;background:var(--cream);overflow:hidden}
+.saber i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#FFD2B0,var(--terra));box-shadow:0 0 10px var(--terra);transition:width .45s cubic-bezier(.3,.7,.2,1)}
+.progress small{flex:none;font:600 13px var(--body);color:var(--ink-soft);min-width:34px;text-align:right}
+.step{display:none}
+.step.on{display:block;animation:stepIn .35s ease}
+@keyframes stepIn{from{opacity:0;transform:translateY(12px)}}
+.step h3{font:400 clamp(28px,4.8vw,40px)/1.1 var(--display);margin-bottom:6px}
+.step .hint{color:var(--ink-soft);margin-bottom:22px}
+.stars{display:flex;justify-content:center;gap:clamp(2px,1.5vw,10px)}
+.star{width:clamp(52px,13vw,66px);height:clamp(52px,13vw,66px);border:0;background:none;cursor:pointer;padding:4px;transition:transform .15s}
+.star svg{width:100%;height:100%;fill:var(--cream);stroke:var(--stone);stroke-width:1;transition:fill .15s}
+.star.lit svg{fill:var(--terra);stroke:var(--terra-deep)}
+.star:hover{transform:scale(1.12) rotate(-6deg)}
+.star.pop{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.35)}}
+.star-label{text-align:center;font:italic 400 clamp(20px,3vw,24px)/1.3 var(--display);color:var(--terra-deep);min-height:1.4em;margin-top:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 16px;border-radius:99px;border:1.5px solid var(--stone);background:#fff;color:var(--ink);font:500 15px var(--body);cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--terra)}
+.chip[aria-pressed="true"]{background:var(--wood);border-color:var(--wood);color:#fff}
+.quiz textarea,.quiz input{width:100%;margin-top:14px;border:1.5px solid var(--stone);border-radius:14px;padding:13px 15px;font:400 16px var(--body);color:var(--ink);background:#fff}
+.quiz textarea{min-height:88px;resize:vertical}
+.quiz textarea:focus,.quiz input:focus{outline:none;border-color:var(--terra);box-shadow:0 0 0 3px var(--terra-soft)}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.choice{border:1.5px solid var(--stone);background:#fff;border-radius:20px;padding:20px 6px 16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font:600 15px var(--body);color:var(--ink);transition:all .15s}
+.choice .emo{font-size:clamp(34px,8vw,44px);line-height:1;transition:transform .2s}
+.choice:hover .emo{transform:scale(1.15) rotate(-8deg)}
+.choice[aria-pressed="true"]{border-color:var(--terra);background:var(--terra-soft);transform:scale(1.04)}
+.q-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:28px}
+.q-back{background:none;border:0;font:600 15px var(--body);color:var(--ink-soft);cursor:pointer;min-height:44px;padding:0 6px}
+.q-back[hidden]{display:block;visibility:hidden}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.done{text-align:center;padding:12px 0}
+.done .big-emo{font-size:64px;line-height:1;margin-bottom:10px}
+.done h3{font:400 clamp(30px,5vw,42px)/1.1 var(--display);margin-bottom:10px}
+.done p{color:var(--ink-soft);max-width:40ch;margin:0 auto 22px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:80}
+#volver{background:var(--cream);padding-top:clamp(48px,7vw,80px)}
+#volver .host{border-top:0;padding-top:0}
+
+/* GIANINI */
+.host{display:grid;gap:28px;align-items:center;border-top:1px solid var(--line);padding-top:clamp(40px,6vw,64px)}
+@media(min-width:860px){.host{grid-template-columns:1fr auto}}
+.host h3{font:400 clamp(28px,4vw,40px)/1.1 var(--display);margin:10px 0 12px}
+.host p{color:var(--ink-soft);max-width:60ch}
+.host .addr{margin-top:12px;font-size:15px;color:var(--ink)}
+
+/* CIERRE */
+.outro{background:var(--wood);color:#F3ECE2;text-align:center}
+.outro p.big{font:400 clamp(30px,5vw,50px)/1.15 var(--display);max-width:18ch;margin:0 auto 18px}
+.outro p.big em{color:#F0A673}
+.outro small{opacity:.7;font-size:15px}
+
+/* NAV inferior (mobile) / superior (desktop) */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(251,248,243,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.nav ul{list-style:none;display:flex;justify-content:space-around;max-width:640px;margin:0 auto;height:var(--nav-h)}
+.nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:100%;padding:0 6px;text-decoration:none;font:600 11px var(--body);color:var(--ink-soft)}
+.nav a svg{width:22px;height:22px}
+.nav a.on{color:var(--terra-deep)}
+.nav a.sos-link{color:var(--terra-deep)}
+@media(min-width:900px){
+  body{padding-bottom:0}
+  .nav{top:16px;bottom:auto;left:50%;right:auto;transform:translateX(-50%);border:1px solid var(--line);border-radius:99px;padding:0 8px;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+  .nav ul{height:52px;gap:2px}
+  .nav a{flex-direction:row;font-size:14px;padding:0 14px;gap:7px;white-space:nowrap}
+  .nav a svg{width:17px;height:17px}
+  html{scroll-padding-top:90px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<!-- ========== HERO ========== -->
+<header class="hero" id="inicio">
+  <picture>
+    <source media="(min-aspect-ratio: 1/1)" srcset="img/exterior-deck.jpg">
+    <img src="img/exterior-noche.jpg" alt="Deck de Ananda con la pérgola naranja, rodeado de pinos" class="ph" fetchpriority="high">
+  </picture>
+  <div class="wrap">
+    <p class="eyebrow" style="color:#F6C6A4">Mar Azul · Buenos Aires</p>
+    <h1>Ananda</h1>
+    <p class="tag">Un sueño hecho hogar.</p>
+    <div class="meta">
+      <span>6 huéspedes</span><span>3 habitaciones</span><span>6 camas</span><span>2 baños (1 en suite)</span>
+    </div>
+    <div class="ctas">
+      <a class="btn btn-terra" href="#telefonos">WiFi y teléfonos útiles</a>
+      <a class="btn btn-ghost" href="#historia">Nuestra historia</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ========== HISTORIA ========== -->
+<section id="historia">
+  <div class="wrap story">
+    <figure><img src="img/escalera.jpg" alt="Escalera con baranda de madera y ventanales hacia los pinos" class="ph" loading="lazy"></figure>
+    <div class="letter">
+      <p class="eyebrow">Bienvenidos</p>
+      <h2>Ananda nació de un <em>sueño</em>.</h2>
+      <figure class="polaroid">
+        <img src="img/aldo-y-monica.jpg" alt="Aldo y Mónica sonriendo, abrazados, en un paseo entre los pinos" loading="lazy" width="640" height="516">
+        <figcaption>Aldo &amp; Mónica</figcaption>
+      </figure>
+      <p class="big">El sueño de Aldo y Mónica. Él, excombatiente de Malvinas; ella, la mejor artesana de Zona Oeste (al menos para nosotros).</p>
+      <p>Con mucho esfuerzo, amor y ganas, lograron hacerlo realidad. Y muchas de las cosas que vas a encontrar en esta casa fueron hechas con sus propias manos.</p>
+      <p>Hoy ya no están físicamente con nosotros, pero como buenos fans de Star Wars, nos gusta creer que se hicieron uno con la Fuerza y que, de alguna manera, siguen acá, en cada rincón de la casa.</p>
+      <div class="closing">
+        <p class="sign">Somos Aldo y Jésica, sus hijos, y ahora nos toca a nosotros seguir cuidando ese sueño.</p>
+        <p class="sign">Por eso, queremos pedirte algo muy simple: cuidá Ananda como si fuera tu propia casa, así muchos otros también pueden disfrutarla.</p>
+        <p class="sign">Aldo &amp; Jésica</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOTOS ========== -->
+<section id="fotos">
+  <div class="wrap">
+    <p class="eyebrow">La casa</p>
+    <h2>Entre pinos, <em>a pasos del mar</em>.</h2>
+    <p class="lead">Tocá cualquier foto para verla en grande.</p>
+    <div class="gallery" id="gallery"></div>
+  </div>
+</section>
+
+<!-- ========== INVENTARIO ========== -->
+<section id="inventario">
+  <div class="wrap">
+    <p class="eyebrow">Qué hay en la casa</p>
+    <h2>Todo lo que <em>vas a encontrar</em>.</h2>
+    <div class="facts">
+      <div><b>6</b><span>huéspedes</span></div>
+      <div><b>3</b><span>habitaciones</span></div>
+      <div><b>6</b><span>camas</span></div>
+      <div><b>2</b><span>baños (1 en suite)</span></div>
+    </div>
+    <div class="help">
+      <p>Si algo falta o no funciona, avisanos así lo resolvemos rápido. Escribile a Gianini Inmobiliaria:</p>
+      <div class="calls" id="help-calls"></div>
+    </div>
+    <div class="kit">
+      <div class="kit-head">
+        <span class="kit-ico" aria-hidden="true">🎁</span>
+        <div><p class="eyebrow">Te espera en la casa</p><h3>Kit de bienvenida</h3></div>
+      </div>
+      <div class="kit-cols">
+        <div>
+          <h4>Un mimo</h4>
+          <ul><li>🍷 Un vino</li><li>🍫 Unos chocolatitos</li><li>🖍️ Libros para colorear de Ananda <small>(si vienen con chicos, pedíselos a Noe o Luciano)</small></li></ul>
+        </div>
+        <div>
+          <h4>Para arrancar</h4>
+          <ul><li>Esponja y detergente</li><li>Papel higiénico en ambos baños</li><li>Rollo de cocina</li><li>Sal</li><li>Repasador y rejilla</li><li>Trapo de piso</li><li>2 bolsas de basura</li><li>Curitas</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="inv" id="inv"></div>
+  </div>
+</section>
+
+<!-- ========== HELADERA ========== -->
+<section id="heladera">
+  <div class="wrap">
+    <div class="fridge">
+      <div class="freezer">
+        <div class="note">
+          <p class="eyebrow">Imanes útiles</p>
+          <h2>La heladera <em>de Ananda</em>.</h2>
+          <p>Nuestros lugares favoritos de Mar Azul. Nombrando a Ananda tenés 5% de descuento.</p>
+        </div>
+        <span class="handle" aria-hidden="true"></span>
+      </div>
+      <div class="cooler">
+        <span class="fridge-badge">Decí “vengo de Ananda” → 5% OFF</span>
+        <div class="magnets" id="magnets"></div>
+        <span class="handle" aria-hidden="true"></span>
+        <span class="plate" aria-hidden="true">ANANDA</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TELÉFONOS ========== -->
+<section id="telefonos">
+  <div class="wrap">
+    <p class="eyebrow">A mano</p>
+    <h2>Teléfonos <em>útiles</em>.</h2>
+    <p class="lead">Tocá cualquier número para llamar directo.</p>
+
+    <div class="wifi" aria-label="Datos de WiFi">
+      <div class="wifi-ico" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="#fff"/></svg>
+      </div>
+      <div class="wifi-field"><small>Red WiFi</small><div><code id="wifi-ssid"></code><button class="copy" data-copy="wifi-ssid">Copiar</button></div></div>
+      <div class="wifi-field"><small>Contraseña</small><div><code id="wifi-pass"></code><button class="copy" data-copy="wifi-pass">Copiar</button></div></div>
+    </div>
+
+    <div class="sos">
+      <a href="tel:107"><b>107</b><span>Emergencias</span><small>Ambulancia</small></a>
+      <a href="tel:100"><b>100</b><span>Bomberos</span><small>Mar Azul: 2255 47-7999</small></a>
+      <a href="tel:101"><b>101</b><span>Policía</span><small>Urgencias</small></a>
+      <a href="tel:+542255478012"><b>478012</b><span>Seguridad Municipal</span><small>(2255) · Interno 212</small></a>
+    </div>
+
+    <div class="groups" id="groups"></div>
+  </div>
+</section>
+
+<!-- ========== ENCUESTA + GIANINI ========== -->
+<section id="encuesta">
+  <div class="wrap">
+    <div class="survey-head">
+      <p class="eyebrow">Tu opinión</p>
+      <h2>¿Nos contás cómo <em>estuvo</em>?</h2>
+      <p class="lead">Lo que más queremos es que te sientas como en casa. Un minuto, siete preguntas y cero aburrimiento.</p>
+      <div class="rep" id="rep" hidden aria-live="polite">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>
+        <b id="rep-avg">–</b><span>Reputación Ananda</span><small id="rep-count"></small>
+      </div>
+    </div>
+
+    <div class="quiz" id="quiz">
+      <div class="progress" aria-hidden="true"><span class="hilt"></span><div class="saber"><i id="saber"></i></div><small id="q-count"></small></div>
+      <form id="quiz-form" novalidate>
+        <div id="quiz-steps"></div>
+        <div class="q-nav">
+          <button type="button" class="q-back" id="q-back">← Volver</button>
+          <button type="submit" class="btn btn-terra" id="q-next">Siguiente</button>
+        </div>
+      </form>
+      <div class="done" id="quiz-done" hidden>
+        <div class="big-emo" aria-hidden="true">🧡</div>
+        <h3 id="done-title">¡Gracias!</h3>
+        <p id="done-text">Ya sos parte de la historia de Ananda. Que la Fuerza te traiga de vuelta.</p>
+        <button class="btn btn-line" id="q-again" type="button">Dejar otra reseña</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="volver">
+  <div class="wrap">
+    <div class="host">
+      <div>
+        <p class="eyebrow">¿Querés volver?</p>
+        <h3>Ananda se alquila con <em style="color:var(--terra-deep)">Gianini Inmobiliaria</em>.</h3>
+        <p>Un equipo local que conoce Mar Azul y Mar de las Pampas como nadie. Te acompañan desde la reserva hasta la entrega de llaves, y son los primeros a quienes llamar si querés repetir las vacaciones, recomendarnos o necesitás algo durante tu estadía.</p>
+        <p class="addr">Calle 33 y Av. Mar del Plata, Mar Azul</p>
+      </div>
+      <a class="btn btn-ink" href="https://maps.app.goo.gl/iYoXHcAKPUe14qQA6" target="_blank" rel="noopener">Cómo llegar a Gianini</a>
+    </div>
+  </div>
+</section>
+
+<section class="outro">
+  <div class="wrap">
+    <p class="big">Gracias por ser parte de <em>esta historia</em>.</p>
+    <small>Bienvenidos a Ananda. Que la Fuerza los acompañe.</small>
+  </div>
+</section>
+
+</main>
+
+<!-- ========== NAV ========== -->
+<nav class="nav" aria-label="Secciones">
+  <ul>
+    <li><a href="#historia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Historia</a></li>
+    <li><a href="#fotos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="11" r="2"/><path d="m21 17-5-5-9 8"/></svg>Fotos</a></li>
+    <li><a href="#inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>Inventario</a></li>
+    <li><a href="#heladera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M5 10h14M8 5v2M8 13v3"/></svg>Heladera</a></li>
+    <li><a href="#telefonos" class="sos-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>WiFi y tel.</a></li>
+    <li><a href="#encuesta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>Opiná</a></li>
+  </ul>
+</nav>
+
+<dialog class="lb" id="lb" aria-label="Foto ampliada">
+  <div class="lb-inner">
+    <img id="lb-img" alt="">
+    <button class="lb-btn lb-close" id="lb-close" aria-label="Cerrar">✕</button>
+    <button class="lb-btn lb-prev" id="lb-prev" aria-label="Foto anterior">‹</button>
+    <button class="lb-btn lb-next" id="lb-next" aria-label="Foto siguiente">›</button>
+    <p class="lb-cap" id="lb-cap"></p>
+  </div>
+</dialog>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+<script>
+/* =========================================================
+   CONFIGURACIÓN — editá solo esta parte
+   ========================================================= */
+const CONFIG = {
+  wifi: { ssid: "NOMBRE_DE_LA_RED", pass: "CONTRASEÑA" },
+  // Encuesta: pegá acá la URL del Apps Script (ver encuesta-apps-script.gs).
+  // Guarda cada respuesta en una planilla y devuelve el promedio de estrellas.
+  // Si queda vacío, la reseña se envía por WhatsApp al número de abajo.
+  survey: {
+    endpoint: "",
+    whatsapp: "",          // ej: 5491122223333
+    minToShowRep: 3,       // reseñas mínimas para mostrar la reputación
+  },
+  // Contactos de Gianini (formato internacional sin espacios, celular con 9: 5492255XXXXXX)
+  gianini: [
+    { name: "Luciano", phone: "549XXXXXXXXXX" },
+    { name: "Noe",     phone: "549XXXXXXXXXX" },
+  ],
+};
+
+const PHOTOS = [
+  { src: "img/exterior-deck.jpg",  alt: "Fondo con deck, pérgola y ducha exterior", cls: "big" },
+  { src: "img/exterior-noche.jpg", alt: "Deck con pérgola naranja al atardecer", cls: "tall" },
+  { src: "img/escalera.jpg",       alt: "Escalera con ventanales al bosque", cls: "tall" },
+  { src: "img/living.jpg",         alt: "Living con estufa a leña y TV", cls: "wide" },
+  { src: "img/frente.jpg",         alt: "Frente de la casa entre los pinos", cls: "wide" },
+  { src: "img/cocina.jpg",         alt: "Cocina y comedor", cls: "wide" },
+  { src: "img/living-sillon.jpg",  alt: "Sillón esquinero y lámpara de pie", cls: "wide" },
+];
+
+const INVENTORY = [
+  { name: "Cocina y comedor", items: ["Heladera con freezer","Cocina a gas con horno","Horno eléctrico","Pava eléctrica","Cafetera italiana","Extractor","Mesa de comedor con sillas","Vajilla y utensilios de cocina","Tacho de residuos"] },
+  { name: "Living", items: ["Estufa a leña con leñero","Sillón esquinero","Televisor","WiFi","Ventilador"] },
+  { name: "Habitaciones", items: ["Jacuzzi en la habitación de arriba","Televisores en las habitaciones de arriba","Vestidor en la habitación con cama de 2 plazas","Cajoneras","Percheros con estantes","Cortinas blackout","Ventiladores","Acolchados y almohadas",{ note: "No incluye sábanas: traé las tuyas" }] },
+  { name: "Baños y lavado", items: ["2 baños (1 en suite)","Toalleros en ambos baños","Tachos de residuos en ambos baños","Secador de pelo","Agua caliente","Lavarropas","Secarropas (en el baño)"] },
+  { name: "Limpieza", items: ["Escoba","Secador","Pala","Balde"] },
+  { name: "Exterior", items: ["Parrilla","Deck con pérgola","Mesa y sillas de exterior","Ducha exterior","Bacha exterior"] },
+];
+
+const MAGNETS = [
+  { kind: "Pizzería", name: "1810", desc: "Pizzas para la noche de playa.", addr: "Av. Mar del Plata y Calle 33", url: "https://maps.app.goo.gl/CiSCQBi857NVpDDw7", color: "m-terra", pin: "#4A2E22", r: "-2deg" },
+  { kind: "Restaurante", name: "El Barril", desc: "Para una cena sin cocinar.", addr: "Av. Mar del Plata y Calle 34", url: "https://maps.app.goo.gl/vNmLcWypXSEZqpwX9", color: "m-yellow", pin: "#A9491B", r: "1.5deg" },
+  { kind: "Churrería", name: "Churros El Topo", desc: "La merienda obligada.", addr: "Av. Mar del Plata 653", url: "https://maps.app.goo.gl/uE3ZwhHixYndwsgaA", color: "m-sky", pin: "#D9692E", r: "-1deg" },
+  { kind: "Lavadero", name: "Laverap", desc: "Lavado, secado y acolchados. Todos los días de 8 a 21.", addr: "Av. Mar del Plata 860", url: "https://maps.google.com/maps?cid=13190191633708466493", color: "m-mint", pin: "#4A2E22", r: "2deg" },
+];
+const SHOW_AD_SLOT = true; // imán vacío "Tu comercio acá"
+
+const CONTACTS = [
+  { group: "Salud", items: [
+    { name: "Hospital Gral. de Agudos Arturo Illia", info: "Calle 123 Nº 900, Villa Gesell", calls: [["2255 46-2618","+542255462618"]] },
+    { name: "Centro de Salud Mar Azul", info: "Calle 45 y Punta del Este", calls: [["2255 45-3463","+542255453463"]] },
+    { name: "Bomberos · Destacamento Mar Azul", info: "Línea directa", calls: [["2255 47-7999","+542255477999"]] },
+  ]},
+  { group: "Luz y gas", items: [
+    { name: "Guardia eléctrica Cevige", info: "Cortes de luz", calls: [["0800-222-9999","08002229999"],["Oficina MdPampas","+542255464734"]] },
+    { name: "Garrafero Guillermo Gas", info: "Recambio de garrafas", calls: [["2255 48-5003","+5492255485003"],["Fijo 2255 45-4597","+542255454597"]] },
+    { name: "YPF Gas", info: "Bv. Gesell y Calle 107, Villa Gesell", calls: [["011 5150-8400","+541151508400"]] },
+  ]},
+  { group: "Arreglos en la casa", items: [
+    { name: "Darío", info: "Electricista, plomero y gasista", calls: [["11 2258-6664","+5491122586664"]], wa: "5491122586664" },
+    ...CONFIG.gianini.map(g => ({ name: `${g.name} · Gianini Inmobiliaria`, info: "Consultas y problemas en la casa", calls: [["Llamar","+" + g.phone]], wa: g.phone })),
+    { name: "Oficina Gianini", info: "Calle 33 y Av. Mar del Plata, Mar Azul", map: "https://maps.app.goo.gl/iYoXHcAKPUe14qQA6" },
+  ]},
+];
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const phFallback = img => { img.addEventListener("error", () => { img.removeAttribute("src"); img.dataset.missing = img.getAttribute("data-file") || "foto pendiente"; img.classList.add("ph"); }, { once: true }); };
+document.querySelectorAll("img.ph").forEach(i => { i.setAttribute("data-file", i.getAttribute("src")); phFallback(i); i.addEventListener("load", () => i.classList.remove("ph")); });
+
+// Galería
+const gal = $("#gallery");
+PHOTOS.forEach((p, i) => {
+  const b = document.createElement("button");
+  b.className = p.cls || "";
+  b.setAttribute("aria-label", "Ampliar: " + p.alt);
+  b.innerHTML = `<img src="${p.src}" alt="${p.alt}" loading="lazy" class="ph" data-file="${p.src}">`;
+  const img = b.firstElementChild; phFallback(img); img.addEventListener("load", () => img.classList.remove("ph"));
+  b.onclick = () => openLb(i);
+  gal.appendChild(b);
+});
+const lb = $("#lb"), lbImg = $("#lb-img"), lbCap = $("#lb-cap");
+let cur = 0, touchX = null;
+function openLb(i){ cur = i; showLb(); lb.showModal(); }
+function showLb(){ const p = PHOTOS[cur]; lbImg.src = p.src; lbImg.alt = p.alt; lbCap.textContent = `${p.alt} · ${cur+1}/${PHOTOS.length}`; }
+const step = d => { cur = (cur + d + PHOTOS.length) % PHOTOS.length; showLb(); };
+$("#lb-close").onclick = () => lb.close();
+$("#lb-prev").onclick = () => step(-1);
+$("#lb-next").onclick = () => step(1);
+lb.addEventListener("keydown", e => { if (e.key === "ArrowLeft") step(-1); if (e.key === "ArrowRight") step(1); });
+lb.addEventListener("touchstart", e => touchX = e.touches[0].clientX, { passive: true });
+lb.addEventListener("touchend", e => { if (touchX === null) return; const dx = e.changedTouches[0].clientX - touchX; if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1); touchX = null; });
+lb.addEventListener("click", e => { if (e.target.classList.contains("lb-inner")) lb.close(); });
+
+// Inventario
+$("#inv").innerHTML = INVENTORY.map((c, i) => `
+  <details ${i === 0 ? "open" : ""}>
+    <summary><span>${c.name} <small>· ${c.items.length}</small></span><span class="chev" aria-hidden="true">▾</span></summary>
+    <ul>${c.items.map(it => typeof it === "string" ? `<li>${it}</li>` : `<li class="note">${it.note}</li>`).join("")}</ul>
+  </details>`).join("");
+
+// Ayuda (inventario) → Gianini
+$("#help-calls").innerHTML = CONFIG.gianini.map(g => `
+  <a class="call wa" href="https://wa.me/${g.phone}" target="_blank" rel="noopener">WhatsApp ${g.name}</a>
+  <a class="call" href="tel:+${g.phone}">📞 ${g.name}</a>`).join("");
+
+// Heladera
+$("#magnets").innerHTML = MAGNETS.map(m => `
+  <a class="magnet ${m.color}" style="--r:${m.r};--pin:${m.pin}" href="${m.url}" target="_blank" rel="noopener">
+    <span class="kind">${m.kind}</span>
+    <h3>${m.name}</h3>
+    <p>${m.desc}</p>
+    <p>${m.addr}</p>
+    <span class="deal">Nombrando a Ananda: 5% de descuento</span>
+    <span class="go">Ver en el mapa →</span>
+  </a>`).join("") + (SHOW_AD_SLOT ? `<div class="magnet slot" style="--r:-1deg"><p><strong>¿Tenés un comercio en Mar Azul?</strong><br>Este imán puede ser tuyo.</p></div>` : "");
+
+// Contactos
+$("#groups").innerHTML = CONTACTS.map(g => `
+  <div class="group"><h3>${g.group}</h3>
+    ${g.items.map(c => `
+      <div class="contact"><strong>${c.name}</strong><p>${c.info}</p>
+        <div class="calls">
+          ${(c.calls || []).map(([label, num]) => `<a class="call" href="tel:${num}">📞 ${label}</a>`).join("")}
+          ${c.wa ? `<a class="call wa" href="https://wa.me/${c.wa}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
+          ${c.map ? `<a class="call" href="${c.map}" target="_blank" rel="noopener">📍 Ver en el mapa</a>` : ""}
+        </div>
+      </div>`).join("")}
+  </div>`).join("");
+
+// WiFi + copiar
+$("#wifi-ssid").textContent = CONFIG.wifi.ssid;
+$("#wifi-pass").textContent = CONFIG.wifi.pass;
+document.querySelectorAll(".copy").forEach(b => b.onclick = async () => {
+  const txt = document.getElementById(b.dataset.copy).textContent;
+  try { await navigator.clipboard.writeText(txt); b.textContent = "¡Copiado!"; }
+  catch { b.textContent = "Mantené apretado para copiar"; }
+  setTimeout(() => b.textContent = "Copiar", 1800);
+});
+
+/* =========================================================
+   ENCUESTA
+   ========================================================= */
+const YES_NO = [["Sí","😍"],["Es probable","🤔"],["No","😬"]];
+const STEPS = [
+  { id: "estrellas", type: "stars", q: "¿Cuántas estrellas le das a Ananda?", hint: "Cada estrella suma a nuestra reputación." },
+  { id: "encanto", type: "chips", q: "¿Qué te encantó?", hint: "Elegí todas las que quieras.",
+    options: ["La estufa a leña","El jacuzzi","El bosque","El deck y la parrilla","La ducha exterior","La cercanía al mar","La decoración","La tranquilidad","La limpieza"],
+    text: "¿Algo más que te haya enamorado?" },
+  { id: "no_tanto", type: "chips", q: "¿Y qué no tanto?", hint: "Sin filtro, nos ayuda un montón.",
+    options: ["¡Nada, todo diez!","La limpieza","El agua caliente","El WiFi","Las camas","La cocina","La calefacción","Los ruidos"],
+    exclusive: "¡Nada, todo diez!", text: "Contanos un poco más" },
+  { id: "falta", type: "chips", q: "¿Qué nos falta?", hint: "Eso que te hubiera gustado encontrar.",
+    options: ["Juegos de mesa","Sombrilla y reposeras","Más utensilios de cocina","Toallas","Bicis","Mejor WiFi","¡Nada, está completa!"],
+    exclusive: "¡Nada, está completa!", text: "¿Otra idea?" },
+  { id: "volveria", type: "choice", q: "¿Volverías a Ananda?", hint: "Que la Fuerza te traiga de vuelta." },
+  { id: "recomendaria", type: "choice", q: "¿Nos recomendarías?", hint: "A tu familia, a tus amigos, al vecino…" },
+  { id: "firma", type: "sign", q: "Firmá tu reseña", hint: "Es opcional, pero nos encanta saber quién nos visitó." },
+];
+const STAR_LABELS = ["Tocá una estrella", "Uy… algo salió mal", "Más o menos", "Estuvo bien", "¡Muy lindo!", "¡Que la Fuerza esté con Ananda!"];
+const STAR_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>`;
+const SENT_KEY = "ananda-review-sent";
+
+const qSteps = $("#quiz-steps"), qNext = $("#q-next"), qBack = $("#q-back");
+let answers = {}, idx = 0;
+
+qSteps.innerHTML = STEPS.map((s, i) => {
+  let body = "";
+  if (s.type === "stars") body = `<div class="stars" role="radiogroup" aria-label="Calificación">${[1,2,3,4,5].map(n =>
+      `<button type="button" class="star" role="radio" aria-checked="false" data-n="${n}" aria-label="${n} estrella${n > 1 ? "s" : ""}">${STAR_SVG}</button>`).join("")}</div>
+      <p class="star-label" id="star-label">${STAR_LABELS[0]}</p>`;
+  if (s.type === "chips") body = `<div class="chips">${s.options.map(o =>
+      `<button type="button" class="chip" aria-pressed="false" data-v="${o}">${o}</button>`).join("")}</div>
+      <textarea data-t="${s.id}_txt" placeholder="${s.text}" rows="3"></textarea>`;
+  if (s.type === "choice") body = `<div class="choices" role="radiogroup">${YES_NO.map(([v, e]) =>
+      `<button type="button" class="choice" aria-pressed="false" data-v="${v}"><span class="emo" aria-hidden="true">${e}</span>${v}</button>`).join("")}</div>`;
+  if (s.type === "sign") body = `<input data-t="nombre" placeholder="Tu nombre" autocomplete="given-name">
+      <input data-t="fecha" placeholder="¿Cuándo viniste? Ej: enero 2027">`;
+  return `<fieldset class="step" data-i="${i}" style="border:0"><legend class="sr" hidden>${s.q}</legend><h3>${s.q}</h3><p class="hint">${s.hint}</p>${body}</fieldset>`;
+}).join("");
+
+const stepEls = [...qSteps.querySelectorAll(".step")];
+function paintStars(n){ qSteps.querySelectorAll(".star").forEach(b => b.classList.toggle("lit", +b.dataset.n <= n)); $("#star-label").textContent = STAR_LABELS[n]; }
+function canAdvance(){ const s = STEPS[idx]; return s.type === "stars" ? !!answers.estrellas : s.type === "choice" ? !!answers[s.id] : true; }
+function updateNav(){
+  const s = STEPS[idx], last = idx === STEPS.length - 1;
+  qBack.hidden = idx === 0;
+  qNext.disabled = !canAdvance();
+  const empty = s.type === "chips" && !(answers[s.id] || []).length && !(answers[s.id + "_txt"] || "").trim();
+  qNext.textContent = last ? "Enviar ✨" : empty ? "Saltear" : "Siguiente";
+  $("#saber").style.width = ((idx + 1) / STEPS.length * 100) + "%";
+  $("#q-count").textContent = `${idx + 1}/${STEPS.length}`;
+}
+function go(i){
+  stepEls[idx].classList.remove("on"); idx = i; stepEls[idx].classList.add("on"); updateNav();
+  const q = $("#quiz"); if (q.getBoundingClientRect().top < 0) q.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// Interacciones
+qSteps.addEventListener("click", e => {
+  const star = e.target.closest(".star"), chip = e.target.closest(".chip"), choice = e.target.closest(".choice");
+  const s = STEPS[idx];
+  if (star) {
+    answers.estrellas = +star.dataset.n; paintStars(answers.estrellas);
+    qSteps.querySelectorAll(".star").forEach(b => b.setAttribute("aria-checked", b === star));
+    star.classList.remove("pop"); void star.offsetWidth; star.classList.add("pop");
+    if (answers.estrellas === 5) burst(40);
+  }
+  if (chip) {
+    const v = chip.dataset.v, list = new Set(answers[s.id] || []), on = chip.getAttribute("aria-pressed") !== "true";
+    if (on) { if (v === s.exclusive) list.clear(); else list.delete(s.exclusive); list.add(v); } else list.delete(v);
+    answers[s.id] = [...list];
+    stepEls[idx].querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", list.has(c.dataset.v)));
+  }
+  if (choice) {
+    answers[s.id] = choice.dataset.v;
+    stepEls[idx].querySelectorAll(".choice").forEach(c => c.setAttribute("aria-pressed", c === choice));
+    updateNav(); setTimeout(() => { if (STEPS[idx].id === s.id) go(idx + 1); }, 420);
+  }
+  updateNav();
+});
+qSteps.addEventListener("mouseover", e => { const st = e.target.closest(".star"); if (st) paintStars(+st.dataset.n); });
+qSteps.addEventListener("mouseleave", () => paintStars(answers.estrellas || 0), true);
+qSteps.addEventListener("input", e => { if (e.target.dataset.t) { answers[e.target.dataset.t] = e.target.value; updateNav(); } });
+qBack.onclick = () => go(idx - 1);
+$("#quiz-form").addEventListener("submit", e => { e.preventDefault(); if (!canAdvance()) return; idx < STEPS.length - 1 ? go(idx + 1) : sendReview(); });
+
+async function sendReview(){
+  qNext.disabled = true; qNext.textContent = "Enviando…";
+  const data = { ...answers, enviado: new Date().toISOString() };
+  const { endpoint, whatsapp } = CONFIG.survey;
+  try {
+    if (endpoint) {
+      await fetch(endpoint, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) });
+    } else if (whatsapp) {
+      const j = a => (a || []).join(", ") || "—";
+      const msg = `⭐ Reseña de Ananda: ${"★".repeat(data.estrellas)} (${data.estrellas}/5)
+🧡 Le encantó: ${j(data.encanto)} ${data.encanto_txt || ""}
+😐 No tanto: ${j(data.no_tanto)} ${data.no_tanto_txt || ""}
+🧩 Falta: ${j(data.falta)} ${data.falta_txt || ""}
+🔁 ¿Volvería?: ${data.volveria}
+📣 ¿Recomendaría?: ${data.recomendaria}
+✍️ ${data.nombre || "Anónimo"} ${data.fecha ? "· " + data.fecha : ""}`;
+      window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+    }
+  } catch (err) { console.warn("No se pudo enviar la reseña", err); }
+  try { localStorage.setItem(SENT_KEY, "1"); } catch {}
+  showDone(true);
+  loadRep();
+}
+function showDone(fresh){
+  $("#quiz-form").hidden = true; $("#quiz-done").hidden = false;
+  $("#saber").style.width = "100%"; $("#q-count").textContent = "✓";
+  if (fresh) {
+    const n = answers.estrellas;
+    $("#done-title").textContent = n >= 4 ? "¡Gracias por tantas estrellas!" : "¡Gracias por contarnos!";
+    $("#done-text").textContent = n >= 4 ? "Ya sos parte de la historia de Ananda. Que la Fuerza te traiga de vuelta." : "Lo vamos a tener muy en cuenta para que la próxima sea un diez. Que la Fuerza te acompañe.";
+    burst(140);
+  } else {
+    $("#done-title").textContent = "¡Ya nos dejaste tu reseña!";
+    $("#done-text").textContent = "Gracias por ser parte de esta historia. Si alguien más del grupo quiere opinar, puede dejar la suya.";
+  }
+}
+$("#q-again").onclick = () => {
+  answers = {}; $("#quiz-form").reset(); paintStars(0);
+  qSteps.querySelectorAll("[aria-pressed],[aria-checked]").forEach(b => b.setAttribute(b.hasAttribute("aria-pressed") ? "aria-pressed" : "aria-checked", "false"));
+  $("#quiz-done").hidden = true; $("#quiz-form").hidden = false; go(0);
+};
+
+// Reputación (promedio desde la planilla)
+async function loadRep(){
+  const { endpoint, minToShowRep } = CONFIG.survey; if (!endpoint) return;
+  try {
+    const r = await (await fetch(endpoint + (endpoint.includes("?") ? "&" : "?") + "stats=1")).json();
+    if (r.count >= minToShowRep) {
+      $("#rep-avg").textContent = r.avg.toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      $("#rep-count").textContent = `· ${r.count} reseñas`;
+      $("#rep").hidden = false;
+    }
+  } catch {}
+}
+
+// Confetti con los colores de la casa
+function burst(n){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = $("#confetti"), ctx = cv.getContext("2d"), W = cv.width = innerWidth, H = cv.height = innerHeight;
+  const cols = ["#D9692E","#F2A47A","#4A2E22","#F3D29A","#FBF6EE"];
+  const ps = Array.from({ length: n }, () => ({ x: W / 2 + (Math.random() - .5) * W * .4, y: H * .55, vx: (Math.random() - .5) * 14, vy: -Math.random() * 16 - 6, s: Math.random() * 7 + 4, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: cols[Math.floor(Math.random() * cols.length)] }));
+  let t = 0;
+  (function tick(){
+    ctx.clearRect(0, 0, W, H); t++;
+    ps.forEach(p => { p.vy += .45; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); });
+    if (t < 140) requestAnimationFrame(tick); else ctx.clearRect(0, 0, W, H);
+  })();
+}
+
+// Init
+let alreadySent = false; try { alreadySent = localStorage.getItem(SENT_KEY) === "1"; } catch {}
+stepEls[0].classList.add("on"); updateNav();
+if (alreadySent) showDone(false);
+loadRep();
+
+// Nav activa
+const links = [...document.querySelectorAll(".nav a")];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) links.forEach(l => l.classList.toggle("on", l.getAttribute("href") === "#" + e.target.id));
+}), { rootMargin: "-45% 0px -50% 0px" });
+["historia","fotos","inventario","heladera","telefonos","encuesta"].forEach(id => io.observe(document.getElementById(id)));
+</script>
+</body>
+</html>
