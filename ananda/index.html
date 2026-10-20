@@ -95,11 +95,14 @@ h2 em{font-style:italic;color:var(--terra-deep)}
 
 /* FOTOS */
 #fotos{background:var(--cream)}
-.gallery{display:flex;gap:10px;align-items:flex-start;margin-top:32px}
+.gallery{display:flex;gap:10px;align-items:stretch;margin-top:32px}
 .gal-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
 @media(min-width:760px){.gallery,.gal-col{gap:14px}}
 .gallery button{display:block;width:100%;border:0;padding:0;cursor:zoom-in;border-radius:14px;overflow:hidden;background:var(--stone)}
 .gallery img{width:100%;height:auto;display:block;transition:transform .5s}
+.gal-fill{flex:1;min-height:70px;border-radius:14px;background:var(--terra-soft);display:grid;place-items:center;color:var(--terra);overflow:hidden}
+.gal-fill.alt{background:var(--wood);color:#F2A47A}
+.gal-fill svg{width:clamp(40px,30%,72px);height:auto;max-height:70%}
 .gallery button:hover img{transform:scale(1.04)}
 dialog.lb{border:0;background:rgba(18,14,11,.94);width:100%;height:100%;max-width:none;max-height:none;padding:0;color:#fff}
 dialog.lb::backdrop{background:transparent}
@@ -137,6 +140,10 @@ dialog.lb::backdrop{background:transparent}
 .kit li::before{content:counter(k,decimal-leading-zero);font:500 12px var(--body);letter-spacing:.06em;color:#F2A47A;opacity:.85}
 .kit li small{grid-column:2;display:block;opacity:.65;font-size:13px;margin-top:2px}
 @media(min-width:760px){.kit-cols>div:last-child ol{grid-template-columns:1fr 1fr;column-gap:28px}.kit-cols>div:last-child li:nth-last-child(2){border-bottom:0}}
+.inv-head{margin:44px 0 16px}
+.inv-head h3{font:400 clamp(26px,3.4vw,34px)/1.1 var(--display)}
+.inv-head p{color:var(--ink-soft);font-size:15px;margin-top:6px}
+.help-end{margin:28px 0 0}
 .inv{display:grid;gap:12px;align-items:start}
 @media(min-width:760px){.inv{grid-template-columns:1fr 1fr}}
 .inv details{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
@@ -367,17 +374,13 @@ dialog.lb::backdrop{background:transparent}
 <!-- ========== INVENTARIO ========== -->
 <section id="inventario">
   <div class="wrap">
-    <p class="eyebrow">Qué hay en la casa</p>
-    <h2>Todo lo que <em>vas a encontrar</em>.</h2>
+    <p class="eyebrow">Inventario</p>
+    <h2>Qué hay <em>en la casa</em>.</h2>
     <div class="facts">
       <div><b>6</b><span>huéspedes</span></div>
       <div><b>3</b><span>habitaciones</span></div>
       <div><b>6</b><span>camas</span></div>
       <div><b>2</b><span>baños (1 en suite)</span></div>
-    </div>
-    <div class="help">
-      <p>Si algo falta o no funciona, avisanos así lo resolvemos rápido. Escribile a Gianini Inmobiliaria (te atienden Noe o Luciano):</p>
-      <div class="calls" id="help-calls"></div>
     </div>
     <div class="kit">
       <span class="kit-bow" aria-hidden="true"><svg viewBox="0 0 58 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M29 20C22 8 8 4 5 11s8 13 24 9"/><path d="M29 20c7-12 21-16 24-9s-8 13-24 9"/><path d="M27 21l-8 15M31 21l8 15"/><circle cx="29" cy="20" r="3.5" fill="var(--wood)"/></svg></span>
@@ -396,7 +399,15 @@ dialog.lb::backdrop{background:transparent}
         </div>
       </div>
     </div>
+    <div class="inv-head">
+      <h3>Inventario por ambiente</h3>
+      <p>Tocá cada ambiente para ver lo que hay.</p>
+    </div>
     <div class="inv" id="inv"></div>
+    <div class="help help-end">
+      <p>Si algo falta o no funciona, avisanos así lo resolvemos rápido. Escribile a Gianini Inmobiliaria (te atienden Noe o Luciano):</p>
+      <div class="calls" id="help-calls"></div>
+    </div>
   </div>
 </section>
 
@@ -609,6 +620,13 @@ const $ = s => document.querySelector(s);
 const phFallback = img => { img.addEventListener("error", () => { img.removeAttribute("src"); img.dataset.missing = img.getAttribute("data-file") || "foto pendiente"; img.classList.add("ph"); }, { once: true }); };
 document.querySelectorAll("img.ph").forEach(i => { i.setAttribute("data-file", i.getAttribute("src")); phFallback(i); i.addEventListener("load", () => i.classList.remove("ph")); });
 
+const FILL_ICONS = [
+  // pinos
+  `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6 12 24h6L8 38h7L5 52h38L33 38h7L30 24h6z"/><path d="M24 52v7"/><path d="M46 20 38 32h4l-7 10h5l-7 10h26l-7-10h5l-7-10h4z"/><path d="M46 52v7"/></svg>`,
+  // piña
+  `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M32 4v6"/><path d="M32 10c-10 0-16 9-16 21s7 23 16 27c9-4 16-15 16-27s-6-21-16-21z"/><path d="M19 22c4 3 9 4 13 4s9-1 13-4M17 33c5 4 10 5 15 5s10-1 15-5M20 45c4 3 8 4 12 4s8-1 12-4"/><path d="M26 12c-2 6-3 13 0 19 2 6 1 14-2 21M38 12c2 6 3 13 0 19-2 6-1 14 2 21M32 26v32"/></svg>`,
+];
+
 // Galería tipo Pinterest: cada foto va a la columna más baja
 const gal = $("#gallery");
 const tiles = PHOTOS.map((p, i) => {
@@ -626,6 +644,17 @@ function layoutGallery(){
   const cols = Array.from({ length: n }, () => { const c = document.createElement("div"); c.className = "gal-col"; gal.appendChild(c); return c; });
   const hgt = new Array(n).fill(0);
   PHOTOS.forEach((p, i) => { const k = hgt.indexOf(Math.min(...hgt)); cols[k].appendChild(tiles[i]); hgt[k] += p.h / p.w; });
+  // Rellenar las columnas más cortas con un bloque ilustrado
+  const max = Math.max(...hgt);
+  let f = 0;
+  cols.forEach((c, k) => {
+    if (max - hgt[k] < 0.12) return;
+    const d = document.createElement("div");
+    d.className = "gal-fill" + (f % 2 ? " alt" : "");
+    d.setAttribute("aria-hidden", "true");
+    d.innerHTML = FILL_ICONS[f % FILL_ICONS.length];
+    c.appendChild(d); f++;
+  });
 }
 layoutGallery();
 galMQ.addEventListener("change", layoutGallery);
