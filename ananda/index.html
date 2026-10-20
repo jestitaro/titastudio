@@ -124,20 +124,24 @@ dialog.lb::backdrop{background:transparent}
 .help p{font-weight:500}
 .inv li.note{color:var(--terra-deep);font-weight:600}
 .inv li.note::before{background:transparent;border:2px solid var(--terra)}
-.kit{position:relative;background:var(--wood);color:#F6EBDD;border-radius:var(--radius);padding:clamp(22px,4vw,36px);margin-bottom:28px;overflow:hidden}
-.kit::before{content:"";position:absolute;background:var(--terra)}
-.kit::before{top:0;bottom:0;right:clamp(40px,8vw,90px);width:14px}
-.kit-head{display:flex;align-items:center;gap:14px;margin-bottom:20px;position:relative}
-.kit-ico{font-size:40px;line-height:1}
+.kit{--rib-x:clamp(52px,9vw,96px);--rib-y:clamp(46px,6vw,58px);position:relative;background:var(--wood);color:#F6EBDD;border-radius:var(--radius);padding:calc(var(--rib-y) + clamp(26px,4vw,38px)) calc(var(--rib-x) + 24px) clamp(26px,4vw,38px) clamp(22px,4vw,40px);margin-bottom:28px;overflow:hidden}
+.kit::before,.kit::after{content:"";position:absolute;background:#E08B5A;opacity:.85}
+.kit::before{top:0;bottom:0;right:var(--rib-x);width:2px}
+.kit::after{left:0;right:0;top:var(--rib-y);height:2px}
+.kit-bow{position:absolute;top:var(--rib-y);right:var(--rib-x);width:72px;height:50px;transform:translate(50%,-50%);color:#E08B5A}
+.kit-bow svg{width:100%;height:100%;display:block}
+.kit-head{margin-bottom:24px}
 .kit .eyebrow{color:#F2A47A}
-.kit h3{font:400 clamp(28px,4vw,36px)/1.1 var(--display);margin-top:6px}
-.kit-cols{display:grid;gap:22px;position:relative;padding-right:clamp(40px,8vw,100px)}
-@media(min-width:760px){.kit-cols{grid-template-columns:1fr 1.4fr}}
-.kit h4{font:600 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:#F2A47A;margin-bottom:8px}
-.kit ul{list-style:none;display:grid;gap:6px}
-.kit li{font-size:16px}
-.kit li small{display:block;opacity:.7;font-size:13px}
-@media(min-width:760px){.kit-cols>div:last-child ul{grid-template-columns:1fr 1fr;column-gap:20px}}
+.kit h3{font:400 clamp(30px,4.2vw,40px)/1.1 var(--display);margin-top:8px}
+.kit-cols{display:grid;gap:26px}
+@media(min-width:760px){.kit-cols{grid-template-columns:1fr 1.4fr;gap:40px}}
+.kit h4{font:600 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:#F2A47A;margin-bottom:6px}
+.kit ol{list-style:none;counter-reset:k;display:grid}
+.kit li{counter-increment:k;display:grid;grid-template-columns:30px 1fr;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(246,235,221,.12);font-size:16px}
+.kit li:last-child{border-bottom:0}
+.kit li::before{content:counter(k,decimal-leading-zero);font:500 12px var(--body);letter-spacing:.06em;color:#F2A47A;opacity:.85}
+.kit li small{grid-column:2;display:block;opacity:.65;font-size:13px;margin-top:2px}
+@media(min-width:760px){.kit-cols>div:last-child ol{grid-template-columns:1fr 1fr;column-gap:28px}.kit-cols>div:last-child li:nth-last-child(2){border-bottom:0}}
 .inv{display:grid;gap:12px;align-items:start}
 @media(min-width:760px){.inv{grid-template-columns:1fr 1fr}}
 .inv details{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
@@ -381,18 +385,19 @@ dialog.lb::backdrop{background:transparent}
       <div class="calls" id="help-calls"></div>
     </div>
     <div class="kit">
+      <span class="kit-bow" aria-hidden="true"><svg viewBox="0 0 58 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M29 20C22 8 8 4 5 11s8 13 24 9"/><path d="M29 20c7-12 21-16 24-9s-8 13-24 9"/><path d="M27 21l-8 15M31 21l8 15"/><circle cx="29" cy="20" r="3.5" fill="var(--wood)"/></svg></span>
       <div class="kit-head">
-        <span class="kit-ico" aria-hidden="true">🎁</span>
-        <div><p class="eyebrow">Te espera en la casa</p><h3>Kit de bienvenida</h3></div>
+        <p class="eyebrow">Te espera en la casa</p>
+        <h3>Kit de bienvenida</h3>
       </div>
       <div class="kit-cols">
         <div>
           <h4>Un mimo</h4>
-          <ul><li>🍷 Un vino</li><li>🍫 Unos chocolatitos</li><li>🖍️ Libros para colorear de Ananda <small>(si vienen con chicos, pedíselos a Noe o Luciano)</small></li></ul>
+          <ol><li>Un vino</li><li>Unos chocolatitos</li><li><span>Libros para colorear de Ananda<small>Si vienen con chicos, pedíselos a Noe o Luciano</small></span></li></ol>
         </div>
         <div>
           <h4>Para arrancar</h4>
-          <ul><li>Esponja y detergente</li><li>Papel higiénico en ambos baños</li><li>Rollo de cocina</li><li>Sal</li><li>Repasador y rejilla</li><li>Trapo de piso</li><li>2 bolsas de basura</li><li>Curitas</li></ul>
+          <ol><li>Esponja y detergente</li><li>Papel higiénico en ambos baños</li><li>Rollo de cocina</li><li>Sal</li><li>Repasador y rejilla</li><li>Trapo de piso</li><li>2 bolsas de basura</li><li>Curitas</li></ol>
         </div>
       </div>
     </div>
