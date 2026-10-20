@@ -574,7 +574,7 @@ const PHOTOS = [
   { src: "img/living.jpg",         alt: "Living con estufa a leña y TV", w: 1800, h: 1013 },
   { src: "img/escalera.jpg",       alt: "Escalera con ventanales al bosque", w: 1012, h: 1800 },
   { src: "img/cocina.jpg",         alt: "Cocina y comedor", w: 1800, h: 1013 },
-  { src: "img/living-sillon.jpg",  alt: "Sillón esquinero y lámpara de pie", w: 1012, h: 1800 },
+  { src: "img/detalle.jpg",        alt: "Aromatizador Ananda, lavanda y cuenco de cerámica hecho a mano", w: 1024, h: 1536 },
   { src: "img/frente.jpg",         alt: "Frente de la casa entre los pinos", w: 1800, h: 1013 },
 ];
 
@@ -653,7 +653,9 @@ function layoutGallery(){
     d.className = "gal-fill" + (f % 2 ? " alt" : "");
     d.setAttribute("aria-hidden", "true");
     d.innerHTML = FILL_ICONS[f % FILL_ICONS.length];
-    c.appendChild(d); f++;
+    // alternar: uno al final de la columna, el siguiente después de la primera foto
+    if (f % 2 && c.children.length > 1) c.insertBefore(d, c.children[1]); else c.appendChild(d);
+    f++;
   });
 }
 layoutGallery();
