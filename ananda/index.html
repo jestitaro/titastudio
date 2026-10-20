@@ -95,16 +95,11 @@ h2 em{font-style:italic;color:var(--terra-deep)}
 
 /* FOTOS */
 #fotos{background:var(--cream)}
-.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:32px}
-@media(min-width:760px){.gallery{grid-template-columns:repeat(4,1fr);grid-auto-rows:220px;grid-auto-flow:dense;gap:14px}}
-.gallery button{border:0;padding:0;cursor:zoom-in;border-radius:14px;overflow:hidden;aspect-ratio:1;background:none}
-@media(min-width:760px){
-  .gallery button{aspect-ratio:auto}
-  .gallery .tall{grid-row:span 2}
-  .gallery .wide{grid-column:span 2}
-  .gallery .big{grid-column:span 2;grid-row:span 2}
-}
-.gallery img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.gallery{display:flex;gap:10px;align-items:flex-start;margin-top:32px}
+.gal-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+@media(min-width:760px){.gallery,.gal-col{gap:14px}}
+.gallery button{display:block;width:100%;border:0;padding:0;cursor:zoom-in;border-radius:14px;overflow:hidden;background:var(--stone)}
+.gallery img{width:100%;height:auto;display:block;transition:transform .5s}
 .gallery button:hover img{transform:scale(1.04)}
 dialog.lb{border:0;background:rgba(18,14,11,.94);width:100%;height:100%;max-width:none;max-height:none;padding:0;color:#fff}
 dialog.lb::backdrop{background:transparent}
@@ -563,13 +558,13 @@ const CONFIG = {
 };
 
 const PHOTOS = [
-  { src: "img/exterior-deck.jpg",  alt: "Fondo con deck, pérgola y ducha exterior", cls: "big" },
-  { src: "img/exterior-noche.jpg", alt: "Deck con pérgola naranja al atardecer", cls: "tall" },
-  { src: "img/escalera.jpg",       alt: "Escalera con ventanales al bosque", cls: "tall" },
-  { src: "img/living.jpg",         alt: "Living con estufa a leña y TV", cls: "wide" },
-  { src: "img/frente.jpg",         alt: "Frente de la casa entre los pinos", cls: "wide" },
-  { src: "img/cocina.jpg",         alt: "Cocina y comedor", cls: "wide" },
-  { src: "img/living-sillon.jpg",  alt: "Sillón esquinero y lámpara de pie", cls: "wide" },
+  { src: "img/exterior-noche.jpg", alt: "Deck con pérgola naranja al atardecer", w: 1013, h: 1800 },
+  { src: "img/exterior-deck.jpg",  alt: "Fondo con deck, pérgola y ducha exterior", w: 1800, h: 1013 },
+  { src: "img/living.jpg",         alt: "Living con estufa a leña y TV", w: 1800, h: 1013 },
+  { src: "img/escalera.jpg",       alt: "Escalera con ventanales al bosque", w: 1012, h: 1800 },
+  { src: "img/cocina.jpg",         alt: "Cocina y comedor", w: 1800, h: 1013 },
+  { src: "img/living-sillon.jpg",  alt: "Sillón esquinero y lámpara de pie", w: 1012, h: 1800 },
+  { src: "img/frente.jpg",         alt: "Frente de la casa entre los pinos", w: 1800, h: 1013 },
 ];
 
 const INVENTORY = [
@@ -614,17 +609,26 @@ const $ = s => document.querySelector(s);
 const phFallback = img => { img.addEventListener("error", () => { img.removeAttribute("src"); img.dataset.missing = img.getAttribute("data-file") || "foto pendiente"; img.classList.add("ph"); }, { once: true }); };
 document.querySelectorAll("img.ph").forEach(i => { i.setAttribute("data-file", i.getAttribute("src")); phFallback(i); i.addEventListener("load", () => i.classList.remove("ph")); });
 
-// Galería
+// Galería tipo Pinterest: cada foto va a la columna más baja
 const gal = $("#gallery");
-PHOTOS.forEach((p, i) => {
+const tiles = PHOTOS.map((p, i) => {
   const b = document.createElement("button");
-  b.className = p.cls || "";
+  b.type = "button";
   b.setAttribute("aria-label", "Ampliar: " + p.alt);
-  b.innerHTML = `<img src="${p.src}" alt="${p.alt}" loading="lazy" class="ph" data-file="${p.src}">`;
-  const img = b.firstElementChild; phFallback(img); img.addEventListener("load", () => img.classList.remove("ph"));
+  b.innerHTML = `<img src="${p.src}" alt="${p.alt}" loading="lazy" width="${p.w}" height="${p.h}">`;
   b.onclick = () => openLb(i);
-  gal.appendChild(b);
+  return b;
 });
+const galMQ = matchMedia("(min-width: 760px)");
+function layoutGallery(){
+  const n = galMQ.matches ? 3 : 2;
+  gal.innerHTML = "";
+  const cols = Array.from({ length: n }, () => { const c = document.createElement("div"); c.className = "gal-col"; gal.appendChild(c); return c; });
+  const hgt = new Array(n).fill(0);
+  PHOTOS.forEach((p, i) => { const k = hgt.indexOf(Math.min(...hgt)); cols[k].appendChild(tiles[i]); hgt[k] += p.h / p.w; });
+}
+layoutGallery();
+galMQ.addEventListener("change", layoutGallery);
 const lb = $("#lb"), lbImg = $("#lb-img"), lbCap = $("#lb-cap");
 let cur = 0, touchX = null;
 function openLb(i){ cur = i; showLb(); lb.showModal(); }
