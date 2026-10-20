@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#4A2E22">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Figtree:wght@400;500;600;700&display=block" rel="stylesheet">
 <style>
 :root{
   --paper:#FBF6EE;
@@ -50,12 +50,15 @@ h2 em{font-style:italic;color:var(--terra-deep)}
 .hero{position:relative;padding:10px 10px 0;background:var(--paper)}
 .hero-card{position:relative;isolation:isolate;min-height:calc(100svh - var(--nav-h) - 10px);border-radius:26px;overflow:hidden;color:#fff;background:var(--wood);display:flex;flex-direction:column;justify-content:space-between}
 @media(min-width:900px){.hero{padding:12px}.hero-card{min-height:calc(100svh - 24px);border-radius:32px}}
-.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;animation:heroIn 2.4s cubic-bezier(.2,.7,.2,1) both}
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
+.hero-word{z-index:1;overflow:hidden}
+.hero-word text{font-family:var(--display);font-weight:400;fill:#FBF6EE;animation:wmFade 1.6s ease .2s both}
+@keyframes wmFade{from{opacity:0}}
+.wm-mid,.wm-narrow{display:none}
+@media (max-aspect-ratio:29/20){.wm-wide{display:none}.wm-mid{display:inline}}
+@media (max-aspect-ratio:17/20){.wm-mid{display:none}.wm-narrow{display:inline}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .hero-front{z-index:2;pointer-events:none}
-@keyframes heroIn{from{transform:scale(1.08);filter:brightness(.7)}}
-.wordmark{position:absolute;z-index:1;left:50%;top:var(--wm-top,62%);margin:0;white-space:nowrap;text-align:center;font:400 clamp(96px,25vw,620px)/.8 var(--display);letter-spacing:-.02em;color:#FBF6EE;text-shadow:0 8px 40px rgba(43,28,20,.25);transform:translate(-50%,-50%);animation:wmIn 1.8s cubic-bezier(.2,.7,.2,1) .2s both;user-select:none}
-@keyframes wmIn{from{opacity:0;transform:translate(-50%,-44%)}}
-@media(min-width:900px){.wordmark{font-size:min(21.5vw,50vh);left:47.5%;--wm-top:62%}}
 @keyframes wordIn{from{opacity:0;transform:translateY(24px)}}
 .hero-shade{position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(180deg,rgba(43,28,20,.28) 0%,rgba(43,28,20,0) 26%,rgba(43,28,20,0) 76%,rgba(30,19,13,.78) 100%)}
 .hero-bottom{position:relative;z-index:4;margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:18px;padding:0 clamp(16px,3.5vw,44px) clamp(18px,3.5vw,44px)}
@@ -310,7 +313,13 @@ dialog.lb::backdrop{background:transparent}
 <header class="hero" id="inicio">
   <div class="hero-card">
     <img src="img/frente.jpg" alt="Frente de Ananda entre los pinos de Mar Azul" class="hero-photo ph" fetchpriority="high">
-    <h1 class="wordmark">Ananda</h1>
+    <h1 class="sr-only">Ananda · Mar Azul</h1>
+    <svg class="hero-photo hero-word" viewBox="0 0 1800 1013" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs><filter id="wmShadow" x="-10%" y="-20%" width="120%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="18" flood-color="#2B1C14" flood-opacity=".28"/></filter></defs>
+      <text class="wm-wide" x="830" y="765" text-anchor="middle" font-size="375" textLength="1125" lengthAdjust="spacingAndGlyphs" filter="url(#wmShadow)">Ananda</text>
+      <text class="wm-mid" x="900" y="765" text-anchor="middle" font-size="255" textLength="765" lengthAdjust="spacingAndGlyphs" filter="url(#wmShadow)">Ananda</text>
+      <text class="wm-narrow" x="900" y="760" text-anchor="middle" font-size="148" textLength="444" lengthAdjust="spacingAndGlyphs" filter="url(#wmShadow)">Ananda</text>
+    </svg>
     <img src="img/frente-arboles.webp" alt="" aria-hidden="true" class="hero-photo hero-front">
     <div class="hero-shade" aria-hidden="true"></div>
     <div class="hero-bottom">
