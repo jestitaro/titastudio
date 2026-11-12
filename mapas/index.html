@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapas para completar · Europa y África</title>
 <style>
   :root{
@@ -137,7 +137,7 @@ function start(){
   bindReset(); paint();
 }
 const resetRow=()=>Object.keys(st()).length?'<div class="row"><button class="btn" id="reset">Empezar de nuevo</button></div>':'';
-function bindReset(){const b=$('#reset');if(b)b.onclick=()=>{if(confirm('¿Borrar el avance de este mapa?')){store[mapKey+':'+mode]={};save();start()}}}
+function bindReset(){const b=$('#reset');if(b)b.onclick=()=>{if(b.dataset.sure){store[mapKey+':'+mode]={};save();start()}else{b.dataset.sure=1;b.textContent='¿Seguro? Tocá de nuevo para borrar';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent='Empezar de nuevo'}},4000)}}}
 
 /* ---------- Repasar ---------- */
 function showInfo(i){sel=i;setPanel(M.countries[i].e,answerHTML(M.countries[i]));paint()}
